@@ -1,0 +1,2 @@
+# Controller data folder for contents that are not published to Kafka
+dataPath: /home/steve/data
