@@ -62,27 +62,27 @@ curl -k -X GET https://localhost:8443/v1/pets \
 # reference.v1 instance 1
 curl -k --location --request POST 'https://localhost:8443/services' \
 --header 'Content-Type: application/json' \
---data-raw '{"id":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.144","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.144:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
+--data-raw '{"serviceId":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.144","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.144:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v1 instance 2
 curl -k --location --request POST 'https://localhost:8443/services' \
 --header 'Content-Type: application/json' \
---data-raw '{"id":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.145","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
+--data-raw '{"serviceId":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.145","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v1 instance 3
 curl -k --location --request POST 'https://localhost:8443/services' \
 --header 'Content-Type: application/json' \
---data-raw '{"id":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.146","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
+--data-raw '{"serviceId":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.146","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v2 instance 1
 curl -k --location --request POST 'https://localhost:8443/services' \
 --header 'Content-Type: application/json' \
---data-raw '{"id":"com.networknt.reference.v2","tag":"uat","address":"192.168.1.144","port":8001,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.144:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
+--data-raw '{"serviceId":"com.networknt.reference.v2","tag":"uat","address":"192.168.1.144","port":8001,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.144:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v2 instance 2
 curl -k --location --request POST 'https://localhost:8443/services' \
 --header 'Content-Type: application/json' \
---data-raw '{"id":"com.networknt.reference.v2","tag":"uat","address":"192.168.1.145","port":8001,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
+--data-raw '{"serviceId":"com.networknt.reference.v2","tag":"uat","address":"192.168.1.145","port":8001,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 ```
 

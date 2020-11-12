@@ -33,22 +33,25 @@ public class ServicesPostHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        String id = (String)body.get("id");
+        String serviceId = (String)body.get("serviceId");
         String tag = (String)body.get("tag");
         String address = (String)body.get("address");
         int port = (Integer)body.get("port");
-        if(logger.isDebugEnabled()) logger.debug("id = " + id + " tag = " + tag + " address = " + address + " port = " + port);
+        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " address = " + address + " port = " + port);
         Map<String, Object> nodeMap = new ConcurrentHashMap<>();
         nodeMap.put("address", address);
         nodeMap.put("port", port);
 
         if(tag != null) {
-            List nodes = (List)ControllerStartupHook.services.get(id + "|" + tag);
-            ControllerStartupHook.services.put(id + "|" + tag, addService(nodes, nodeMap));
+            List nodes = (List)ControllerStartupHook.services.get(serviceId + "|" + tag);
+            ControllerStartupHook.services.put(serviceId + "|" + tag, addService(nodes, nodeMap));
         } else {
-            List nodes = (List)ControllerStartupHook.services.get(id);
-            ControllerStartupHook.services.put(id, addService(nodes, nodeMap));
+            List nodes = (List)ControllerStartupHook.services.get(serviceId);
+            ControllerStartupHook.services.put(serviceId, addService(nodes, nodeMap));
         }
+        // now try to get server info from by accessing the endpoint with a URL constructed with address and port
+        // we assume that the server is running with https and it can verify the bootstrap token from the controller.
+        // TODO add the logic here. But don't fail it if there is an error.
 
         setExchangeStatus(exchange, SUC10200);
     }
