@@ -266,6 +266,11 @@ components:
           example: 8080
         check:
           $ref: '#/components/schemas/Check'
+      required:
+        - serviceId
+        - tag
+        - address
+        - port  
     Check:
       type: object
       properties:
@@ -290,13 +295,12 @@ components:
         tlsSkipVerify: 
           type: boolean
           description: If the certificate for an HTTPS check should not be verified.
-        tcp: 
-          type: string
-          description: A TCP to connect against the value of TCP every Interval.
         ttl: 
           type: string
           description: A TTL check and the TTL endpoint must be used periodically to update the state of the check
-          
+      required:
+        - id
+        - deregisterCriticalServiceAfter
     Status:
       type: object
       properties:
@@ -315,7 +319,6 @@ components:
         - code
         - message
         - description
-        - severity
 
   securitySchemes:
     portal_auth:
