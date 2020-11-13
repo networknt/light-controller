@@ -25,7 +25,9 @@ public class ServicesDeleteHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
-        String tag = exchange.getQueryParameters().get("tag").getFirst();
+        String tag = null;
+        Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
+        if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
         String address = exchange.getQueryParameters().get("address").getFirst();
         int port = Integer.valueOf(exchange.getQueryParameters().get("port").getFirst());
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " address = " + address + " port = " + port);
