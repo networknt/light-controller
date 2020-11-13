@@ -60,27 +60,27 @@ curl -k -X GET https://localhost:8443/v1/pets \
 
 ```
 # reference.v1 instance 1
-curl -k --location --request POST 'https://localhost:8443/services' \
+curl -k --location --request POST 'https://localhost:8438/services' \
 --header 'Content-Type: application/json' \
 --data-raw '{"serviceId":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.144","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.144:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v1 instance 2
-curl -k --location --request POST 'https://localhost:8443/services' \
+curl -k --location --request POST 'https://localhost:8438/services' \
 --header 'Content-Type: application/json' \
 --data-raw '{"serviceId":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.145","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v1 instance 3
-curl -k --location --request POST 'https://localhost:8443/services' \
+curl -k --location --request POST 'https://localhost:8438/services' \
 --header 'Content-Type: application/json' \
 --data-raw '{"serviceId":"com.networknt.reference.v1","tag":"uat","address":"192.168.1.146","port":8000,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v2 instance 1
-curl -k --location --request POST 'https://localhost:8443/services' \
+curl -k --location --request POST 'https://localhost:8438/services' \
 --header 'Content-Type: application/json' \
 --data-raw '{"serviceId":"com.networknt.reference.v2","tag":"uat","address":"192.168.1.144","port":8001,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.144:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
 # reference.v2 instance 2
-curl -k --location --request POST 'https://localhost:8443/services' \
+curl -k --location --request POST 'https://localhost:8438/services' \
 --header 'Content-Type: application/json' \
 --data-raw '{"serviceId":"com.networknt.reference.v2","tag":"uat","address":"192.168.1.145","port":8001,"check":{"deregisterCriticalServiceAfter":"1m","http":"https://192.168.1.145:8080/health/com.networknt.reference.v1","tlsSkipVerify":true,"interval":"10s"}}'
 
@@ -89,7 +89,7 @@ curl -k --location --request POST 'https://localhost:8443/services' \
 ### Query All
 
 ```
-curl -k https://localhost:8443/services
+curl -k https://localhost:8438/services
 ```
 
 The result should be 
@@ -108,12 +108,12 @@ The result should be
 ### Query ServiceId
 
 ```
-curl -k 'https://localhost:8443/services?serviceId=com.networknt.reference.v1&tag=uat'
+curl -k 'https://localhost:8438/services?serviceId=com.networknt.reference.v1&tag=uat'
 ```
 
 ### Deregister
 
 ```
-curl -k --request DELETE 'https://localhost:8443/services?serviceId=com.networknt.reference.v1&tag=uat&address=192.168.1.146&port=8000'
+curl -k --request DELETE 'https://localhost:8438/services?serviceId=com.networknt.reference.v1&tag=uat&address=192.168.1.146&port=8000'
 ```
 
