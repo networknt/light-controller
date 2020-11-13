@@ -55,7 +55,7 @@ paths:
         - name: tag
           in: query
           description: Return only nodes with the tag
-          required: true
+          required: false
           schema:
             type: string
         - name: address
@@ -268,7 +268,6 @@ components:
           $ref: '#/components/schemas/Check'
       required:
         - serviceId
-        - tag
         - address
         - port  
     Check:
