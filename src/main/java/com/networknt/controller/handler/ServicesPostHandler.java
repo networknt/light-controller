@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -52,7 +49,6 @@ public class ServicesPostHandler implements LightHttpHandler {
         // now try to get server info from by accessing the endpoint with a URL constructed with address and port
         // we assume that the server is running with https and it can verify the bootstrap token from the controller.
         // TODO add the logic here. But don't fail it if there is an error.
-
         setExchangeStatus(exchange, SUC10200);
     }
 
@@ -61,6 +57,16 @@ public class ServicesPostHandler implements LightHttpHandler {
             nodes = new ArrayList<>();
             nodes.add(nodeMap);
         } else {
+            // delete the nodeMap if it is already there before adding it.
+            String address = (String)nodeMap.get("address");
+            int port = (Integer)nodeMap.get("port");
+            for(Iterator<Map<String, Object>> iter = nodes.iterator(); iter.hasNext(); ) {
+                Map<String, Object> map = iter.next();
+                String a = (String)map.get("address");
+                int p = (Integer)map.get("port");
+                if (address.equals(a) && port == p)
+                    iter.remove();
+            }
             nodes.add(nodeMap);
         }
         return nodes;
