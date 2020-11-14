@@ -28,16 +28,17 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
         if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
+        String key = tag == null ?  serviceId : serviceId + "|" + tag;
         String address = exchange.getQueryParameters().get("address").getFirst();
         int port = Integer.valueOf(exchange.getQueryParameters().get("port").getFirst());
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " address = " + address + " port = " + port);
 
-        if(tag != null) {
-            List nodes = (List)ControllerStartupHook.services.get(serviceId + "|" + tag);
-            ControllerStartupHook.services.put(serviceId + "|" + tag, delService(nodes, address, port));
+        List nodes = (List)ControllerStartupHook.services.get(key);
+        nodes = delService(nodes, address, port);
+        if(nodes != null && nodes.size() > 0) {
+            ControllerStartupHook.services.put(key, nodes);
         } else {
-            List nodes = (List)ControllerStartupHook.services.get(serviceId);
-            ControllerStartupHook.services.put(serviceId, delService(nodes, address, port));
+            ControllerStartupHook.services.remove(key);
         }
         setExchangeStatus(exchange, SUC10200);
     }
@@ -54,5 +55,4 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         }
         return nodes;
     }
-
 }
