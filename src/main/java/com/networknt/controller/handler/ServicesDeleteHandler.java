@@ -3,6 +3,7 @@ package com.networknt.controller.handler;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.JsonMapper;
 import com.networknt.controller.ControllerStartupHook;
+import com.networknt.controller.model.Check;
 import com.networknt.handler.LightHttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
@@ -40,6 +41,12 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         } else {
             ControllerStartupHook.services.remove(key);
         }
+        // delete from the checks, cancel the timer task before deleting.
+        String checkId = key + ":" + address + ":" + port;
+        Check check = (Check)ControllerStartupHook.checks.remove(checkId);
+        // TODO cancel the timer task.
+        // delete from the infos
+        ControllerStartupHook.infos.remove(address + ":" + port);
         setExchangeStatus(exchange, SUC10200);
     }
 

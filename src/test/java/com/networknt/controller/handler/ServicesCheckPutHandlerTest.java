@@ -30,11 +30,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 @Ignore
-public class ServicesPassCheckIdPutHandlerTest {
+public class ServicesCheckPutHandlerTest {
     @ClassRule
     public static TestServer server = TestServer.getInstance();
 
-    static final Logger logger = LoggerFactory.getLogger(ServicesPassCheckIdPutHandlerTest.class);
+    static final Logger logger = LoggerFactory.getLogger(ServicesCheckPutHandlerTest.class);
     static final boolean enableHttp2 = server.getServerConfig().isEnableHttp2();
     static final boolean enableHttps = server.getServerConfig().isEnableHttps();
     static final int httpPort = server.getServerConfig().getHttpPort();
@@ -43,7 +43,7 @@ public class ServicesPassCheckIdPutHandlerTest {
     static final String JSON_MEDIA_TYPE = "application/json";
 
     @Test
-    public void testServicesPassCheckIdPutHandlerTest() throws ClientException {
+    public void testServicesCheckPutHandlerTest() throws ClientException {
 
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -58,7 +58,7 @@ public class ServicesPassCheckIdPutHandlerTest {
             throw new ClientException(e);
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
-        String requestUri = "/services/pass/eJjHjlZGpJUIAVbX";
+        String requestUri = "/services/check";
         String httpMethod = "put";
         try {
             ClientRequest request = new ClientRequest().setPath(requestUri).setMethod(Methods.PUT);

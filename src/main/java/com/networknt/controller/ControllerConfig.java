@@ -2,16 +2,16 @@ package com.networknt.controller;
 
 public class ControllerConfig {
     public static String CONFIG_NAME = "controller";
-    private String dataPath;
+    private String bootstrapToken;
 
     public ControllerConfig() {
     }
 
-    public String getDataPath() {
-        return dataPath;
+    public String getBootstrapToken() {
+        return bootstrapToken;
     }
 
-    public void setDataPath(String dataPath) {
-        this.dataPath = dataPath;
+    public void setBootstrapToken(String bootstrapToken) {
+        this.bootstrapToken = bootstrapToken;
     }
 }

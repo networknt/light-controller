@@ -141,18 +141,18 @@ paths:
         - portal_auth:
             - 'portal.r'
             - 'portal.w'
-  '/services/pass/{checkId}':
+  '/services/check':
     put:
-      summary: Used with a TTL type check to set the status of the check to passing
-      description: TTL check to from the service for pass
-      operationId: checkPass
-      parameters:
-        - name: checkId
-          in: path
-          description: A unique checkId
-          required: true
-          schema:
-            type: string
+      summary: TTL type check to set the status of the check to pass or fail
+      description: TTL check to from the service for pass or not
+      operationId: checkStatus
+      requestBody:
+        description: TTL check to notify if the service is pass or not
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckStatus'
+        required: true
       responses:
         '200':
           description: Successful operation
@@ -169,35 +169,6 @@ paths:
       security:
         - portal_auth:
             - 'portal.w'
-  '/services/fail/{checkId}':
-    put:
-      summary: Used with a TTL type check to set the status of the check to failing
-      description: TTL check to from the service for fail
-      operationId: checkFail
-      parameters:
-        - name: checkId
-          in: path
-          description: A unique checkId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status'
-        '400':
-          description: Invalid Service Register Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status'
-      security:
-        - portal_auth:
-            - 'portal.w'
-
   '/services/info/{serviceId}':
     get:
       summary: Query service info by serviceId
@@ -300,6 +271,15 @@ components:
       required:
         - id
         - deregisterCriticalServiceAfter
+    CheckStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          description: A unique ID for the check with serviceId, address and port combination
+        pass:
+          type: boolean
+          description: If the check is passed or failed
     Status:
       type: object
       properties:

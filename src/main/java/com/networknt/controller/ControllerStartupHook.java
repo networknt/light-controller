@@ -1,14 +1,11 @@
 package com.networknt.controller;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.networknt.server.StartupHookProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class ControllerStartupHook implements StartupHookProvider {
     private static final Logger logger = LoggerFactory.getLogger(ControllerStartupHook.class);
@@ -18,7 +15,9 @@ public class ControllerStartupHook implements StartupHookProvider {
     // configured period in the check during the server registry.
     public static final Map<String, Object> services = new ConcurrentHashMap<>();
 
-
+    // this is a check map with a check id to the Check object. For every valid check, a background
+    // coroutine will check based on the interval (http check) and ttl (ttl check). After a period
+    // of deregisterAfter if a node is in critical state, the node will be removed from the services
     public static final Map<String, Object> checks = new ConcurrentHashMap<>();
 
     // this map contains all the server info entries per address and port combination as keys.

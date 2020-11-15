@@ -65,8 +65,7 @@ handlers:
   - com.networknt.controller.handler.ServicesPostHandler
   - com.networknt.controller.handler.ServicesDeleteHandler
   - com.networknt.controller.handler.ServicesGetHandler
-  - com.networknt.controller.handler.ServicesPassCheckIdPutHandler
-  - com.networknt.controller.handler.ServicesFailCheckIdPutHandler
+  - com.networknt.controller.handler.ServicesCheckPutHandler
   - com.networknt.controller.handler.ServicesInfoServiceIdGetHandler
 
 
@@ -100,16 +99,11 @@ paths:
     exec:
       - default
       - com.networknt.controller.handler.ServicesGetHandler
-  - path: '/services/pass/{checkId}'
+  - path: '/services/check'
     method: 'PUT'
     exec:
       - default
-      - com.networknt.controller.handler.ServicesPassCheckIdPutHandler
-  - path: '/services/fail/{checkId}'
-    method: 'PUT'
-    exec:
-      - default
-      - com.networknt.controller.handler.ServicesFailCheckIdPutHandler
+      - com.networknt.controller.handler.ServicesCheckPutHandler
   - path: '/services/info/{serviceId}'
     method: 'GET'
     exec:
