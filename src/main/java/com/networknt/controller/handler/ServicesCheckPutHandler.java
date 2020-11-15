@@ -1,6 +1,8 @@
 package com.networknt.controller.handler;
 
 import com.networknt.body.BodyHandler;
+import com.networknt.controller.ControllerStartupHook;
+import com.networknt.controller.model.Check;
 import com.networknt.handler.LightHttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
@@ -27,8 +29,22 @@ public class ServicesCheckPutHandler implements LightHttpHandler {
         String id = (String)body.get("id");
         boolean pass = (Boolean)body.get("pass");
         if(logger.isTraceEnabled()) logger.trace("id = " + id + " pass = " + pass);
-
-
+        if(pass) {
+            // if the lastFailedTimestamp is not 0L, then reset it to 0L as it is passed. If it doesn't exist, it
+            // means the node is removed already due to pass the de-register after period.
+            Check check = (Check) ControllerStartupHook.checks.get(id);
+            if(check != null && check.getLastFailedTimestamp() != 0L) {
+                check.setLastFailedTimestamp(0L);
+            }
+        } else {
+            // update the lastFailedTimestamp in the check object in checks map. If it keeps failing, then don't
+            // update it. If it is passed, then reset to 0L again. This will allow the job to remove the node if
+            // the it fails for a long time greater than the de-register after setting in the check.
+            Check check = (Check) ControllerStartupHook.checks.get(id);
+            if(check != null && check.getLastFailedTimestamp() == 0L) {
+                check.setLastFailedTimestamp(System.currentTimeMillis());
+            }
+        }
         setExchangeStatus(exchange, SUC10200);
     }
 }
