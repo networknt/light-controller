@@ -15,6 +15,7 @@ public class Check  {
     private String id;
     private String deregisterCriticalServiceAfter;
     private String ttl;
+    private long lastFailedTimestamp = 0L;
 
     public Check () {
     }
@@ -136,5 +137,13 @@ public class Check  {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");
+    }
+
+    public long getLastFailedTimestamp() {
+        return lastFailedTimestamp;
+    }
+
+    public void setLastFailedTimestamp(long lastFailedTimestamp) {
+        this.lastFailedTimestamp = lastFailedTimestamp;
     }
 }
