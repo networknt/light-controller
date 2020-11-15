@@ -3,8 +3,10 @@ package com.networknt.controller.handler;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
+import com.networknt.controller.ControllerClient;
 import com.networknt.controller.ControllerConfig;
 import com.networknt.controller.ControllerStartupHook;
+import com.networknt.controller.model.Check;
 import com.networknt.handler.LightHttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
@@ -46,9 +48,15 @@ public class ServicesPostHandler implements LightHttpHandler {
             List nodes = (List)ControllerStartupHook.services.get(serviceId);
             ControllerStartupHook.services.put(serviceId, addService(nodes, nodeMap));
         }
+        // save the check Object in another map for background process to perform check periodically.
+        Check check = JsonMapper.objectMapper.convertValue(body.get("check"), Check.class);
+        ControllerStartupHook.checks.put(check.getId(), check);
         // now try to get server info from by accessing the endpoint with a URL constructed with address and port
         // we assume that the server is running with https and it can verify the bootstrap token from the controller.
-        // TODO add the logic here. But don't fail it if there is an error.
+        String info = ControllerClient.getServerInfo(address, port);
+        if(info !=  null) {
+            ControllerStartupHook.infos.put(address + ":" + port, info);
+        }
         setExchangeStatus(exchange, SUC10200);
     }
 
