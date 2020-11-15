@@ -117,3 +117,10 @@ curl -k 'https://localhost:8438/services?serviceId=com.networknt.reference.v1&ta
 curl -k --request DELETE 'https://localhost:8438/services?serviceId=com.networknt.reference.v1&tag=uat&address=192.168.1.146&port=8000'
 ```
 
+### Server Info
+
+
+```
+curl -k https://localhost:8438/services/info/172.18.0.1:8443
+```
+

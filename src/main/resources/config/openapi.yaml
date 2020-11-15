@@ -169,30 +169,18 @@ paths:
       security:
         - portal_auth:
             - 'portal.w'
-  '/services/info/{serviceId}':
+  '/services/info/{node}':
     get:
-      summary: Query service info by serviceId
+      summary: Query service info by node of address and port
       description: Returns a service info object
       operationId: getServiceInfo
       parameters:
-        - name: serviceId
+        - name: node
           in: path
-          description: ID of the service
+          description: node of the service in address:port format
           required: true
           schema:
             type: string
-        - name: tag
-          in: query
-          description: Return only nodes with the tag
-          required: false
-          schema:
-            type: string
-        - name: passing
-          in: query
-          description: Return only nodes with passing state
-          required: false
-          schema:
-            type: boolean
       responses:
         '200':
           description: successful operation

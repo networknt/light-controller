@@ -1,5 +1,6 @@
 package com.networknt.controller.handler;
 
+import com.networknt.controller.ControllerStartupHook;
 import com.networknt.handler.LightHttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
@@ -16,13 +17,15 @@ import java.util.Map;
  *
  * @author Steve Hu
  */
-public class ServicesInfoServiceIdGetHandler implements LightHttpHandler {
-    private static final Logger logger = LoggerFactory.getLogger(ServicesInfoServiceIdGetHandler.class);
+public class ServicesInfoNodeGetHandler implements LightHttpHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ServicesDeleteHandler.class);
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
+        String node = exchange.getQueryParameters().get("node").getFirst();
+        if(logger.isTraceEnabled()) logger.trace("node = " + node);
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.setStatusCode(200);
-        exchange.getResponseSender().send("{}");
+        exchange.getResponseSender().send((String)ControllerStartupHook.infos.get(node));
     }
 }
