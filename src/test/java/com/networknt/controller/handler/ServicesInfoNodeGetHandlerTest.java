@@ -30,11 +30,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 @Ignore
-public class ServicesInfoServiceIdGetHandlerTest {
+public class ServicesInfoNodeGetHandlerTest {
     @ClassRule
     public static TestServer server = TestServer.getInstance();
 
-    static final Logger logger = LoggerFactory.getLogger(ServicesInfoServiceIdGetHandlerTest.class);
+    static final Logger logger = LoggerFactory.getLogger(ServicesInfoNodeGetHandlerTest.class);
     static final boolean enableHttp2 = server.getServerConfig().isEnableHttp2();
     static final boolean enableHttps = server.getServerConfig().isEnableHttps();
     static final int httpPort = server.getServerConfig().getHttpPort();
@@ -43,7 +43,7 @@ public class ServicesInfoServiceIdGetHandlerTest {
     static final String JSON_MEDIA_TYPE = "application/json";
 
     @Test
-    public void testServicesInfoServiceIdGetHandlerTest() throws ClientException {
+    public void testServicesInfoNodeGetHandlerTest() throws ClientException {
 
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -58,7 +58,7 @@ public class ServicesInfoServiceIdGetHandlerTest {
             throw new ClientException(e);
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
-        String requestUri = "/services/info/wvOdTCWytPiCrhhKcoGbCBulNgI?tag=aHaoTbsn&passing=false";
+        String requestUri = "/services/info/knQVdSeSQiJHJjOXdtAHDveoGZH";
         String httpMethod = "get";
         try {
             ClientRequest request = new ClientRequest().setPath(requestUri).setMethod(Methods.GET);
