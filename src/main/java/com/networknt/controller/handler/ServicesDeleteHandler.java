@@ -3,6 +3,7 @@ package com.networknt.controller.handler;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.JsonMapper;
 import com.networknt.controller.ControllerStartupHook;
+import com.networknt.controller.ControllerUtil;
 import com.networknt.controller.model.Check;
 import com.networknt.handler.LightHttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -35,7 +36,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " address = " + address + " port = " + port);
 
         List nodes = (List)ControllerStartupHook.services.get(key);
-        nodes = delService(nodes, address, port);
+        nodes = ControllerUtil.delService(nodes, address, port);
         if(nodes != null && nodes.size() > 0) {
             ControllerStartupHook.services.put(key, nodes);
         } else {
@@ -48,18 +49,5 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         // delete from the infos
         ControllerStartupHook.infos.remove(address + ":" + port);
         setExchangeStatus(exchange, SUC10200);
-    }
-
-    private List delService(List nodes, String address, int port) {
-        if(nodes != null) {
-            for(Iterator<Map<String, Object>> iter = nodes.iterator(); iter.hasNext(); ) {
-                Map<String, Object> map = iter.next();
-                String a = (String)map.get("address");
-                int p = (Integer)map.get("port");
-                if (address.equals(a) && port == p)
-                    iter.remove();
-            }
-        }
-        return nodes;
     }
 }

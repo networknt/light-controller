@@ -239,14 +239,14 @@ components:
           type: string
           description: A unique ID for this check on the node
         interval:
-          type: string
-          description: The frequency at which to run this check
+          type: integer
+          description: The frequency at which to run this check in millisecond
         notes:
           type: string
           description: Arbitrary information for humans. 
         deregisterCriticalServiceAfter:
-          type: string
-          description: Check associated with a service should deregister after this time
+          type: integer
+          description: Check associated with a service should deregister after this time in millisecond
         http: 
           type: string
           description: An HTTP check to perform a GET request against the value of HTTP every Interval. 
@@ -254,7 +254,7 @@ components:
           type: boolean
           description: If the certificate for an HTTPS check should not be verified.
         ttl: 
-          type: string
+          type: integer
           description: A TTL check and the TTL endpoint must be used periodically to update the state of the check
       required:
         - id

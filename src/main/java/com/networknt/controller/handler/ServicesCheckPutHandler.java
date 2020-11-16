@@ -32,17 +32,24 @@ public class ServicesCheckPutHandler implements LightHttpHandler {
         if(pass) {
             // if the lastFailedTimestamp is not 0L, then reset it to 0L as it is passed. If it doesn't exist, it
             // means the node is removed already due to pass the de-register after period.
-            Check check = (Check) ControllerStartupHook.checks.get(id);
-            if(check != null && check.getLastFailedTimestamp() != 0L) {
-                check.setLastFailedTimestamp(0L);
+            Check check = ControllerStartupHook.checks.get(id);
+            if(check != null) {
+                if(check.getLastFailedTimestamp() != 0L) {
+                    check.setLastFailedTimestamp(0L);
+                }
+                check.setLastExecuteTimestamp(System.currentTimeMillis());
             }
         } else {
             // update the lastFailedTimestamp in the check object in checks map. If it keeps failing, then don't
             // update it. If it is passed, then reset to 0L again. This will allow the job to remove the node if
             // the it fails for a long time greater than the de-register after setting in the check.
-            Check check = (Check) ControllerStartupHook.checks.get(id);
-            if(check != null && check.getLastFailedTimestamp() == 0L) {
-                check.setLastFailedTimestamp(System.currentTimeMillis());
+            Check check = ControllerStartupHook.checks.get(id);
+            if(check != null) {
+                long timestamp = System.currentTimeMillis();
+                if(check.getLastFailedTimestamp() == 0L) {
+                    check.setLastFailedTimestamp(timestamp);
+                }
+                check.setLastExecuteTimestamp(timestamp);
             }
         }
         setExchangeStatus(exchange, SUC10200);

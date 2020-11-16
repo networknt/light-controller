@@ -1,9 +1,9 @@
 package com.networknt.controller.model;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 
 public class Check  {
 
@@ -11,11 +11,16 @@ public class Check  {
     private String notes;
     private String name;
     private String http;
-    private String interval;
+    private Integer interval;
     private String id;
-    private String deregisterCriticalServiceAfter;
+    private Integer deregisterCriticalServiceAfter;
     private String ttl;
+    private long lastExecuteTimestamp = 0L;
     private long lastFailedTimestamp = 0L;
+    private String serviceId;
+    private String tag;
+    private String address;
+    private int port;
 
     public Check () {
     }
@@ -57,11 +62,11 @@ public class Check  {
     }
 
     @JsonProperty("interval")
-    public String getInterval() {
+    public Integer getInterval() {
         return interval;
     }
 
-    public void setInterval(String interval) {
+    public void setInterval(Integer interval) {
         this.interval = interval;
     }
 
@@ -72,14 +77,24 @@ public class Check  {
 
     public void setId(String id) {
         this.id = id;
+        String[] parts = StringUtils.split(id, ":");
+        int index = parts[0].indexOf("|");
+        if(index > 0) {
+            this.serviceId = parts[0].substring(0, index);
+            this.tag = parts[0].substring(index + 1);
+        } else {
+            this.serviceId = parts[0];
+        }
+        this.address = parts[1];
+        this.port = Integer.valueOf(parts[2]);
     }
 
     @JsonProperty("deregisterCriticalServiceAfter")
-    public String getDeregisterCriticalServiceAfter() {
+    public Integer getDeregisterCriticalServiceAfter() {
         return deregisterCriticalServiceAfter;
     }
 
-    public void setDeregisterCriticalServiceAfter(String deregisterCriticalServiceAfter) {
+    public void setDeregisterCriticalServiceAfter(Integer deregisterCriticalServiceAfter) {
         this.deregisterCriticalServiceAfter = deregisterCriticalServiceAfter;
     }
 
@@ -145,5 +160,45 @@ public class Check  {
 
     public void setLastFailedTimestamp(long lastFailedTimestamp) {
         this.lastFailedTimestamp = lastFailedTimestamp;
+    }
+
+    public long getLastExecuteTimestamp() {
+        return lastExecuteTimestamp;
+    }
+
+    public void setLastExecuteTimestamp(long lastExecuteTimestamp) {
+        this.lastExecuteTimestamp = lastExecuteTimestamp;
+    }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }
