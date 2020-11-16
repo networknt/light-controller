@@ -3,6 +3,7 @@ package com.networknt.controller.model;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.networknt.utility.StringUtils;
 
 public class Check  {
 
