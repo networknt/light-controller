@@ -3,7 +3,6 @@ package com.networknt.controller.model;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.StringUtils;
 
 public class Check  {
 
@@ -14,7 +13,6 @@ public class Check  {
     private Integer interval;
     private String id;
     private Integer deregisterCriticalServiceAfter;
-    private String ttl;
     private long lastExecuteTimestamp = 0L;
     private long lastFailedTimestamp = 0L;
     private String serviceId;
@@ -98,15 +96,6 @@ public class Check  {
         this.deregisterCriticalServiceAfter = deregisterCriticalServiceAfter;
     }
 
-    @JsonProperty("ttl")
-    public String getTtl() {
-        return ttl;
-    }
-
-    public void setTtl(String ttl) {
-        this.ttl = ttl;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -125,20 +114,19 @@ public class Check  {
                Objects.equals(http, Check.http) &&
                Objects.equals(interval, Check.interval) &&
                Objects.equals(id, Check.id) &&
-               Objects.equals(deregisterCriticalServiceAfter, Check.deregisterCriticalServiceAfter) &&
-               Objects.equals(ttl, Check.ttl);
+               Objects.equals(deregisterCriticalServiceAfter, Check.deregisterCriticalServiceAfter);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tlsSkipVerify, notes, name, http, interval, id, deregisterCriticalServiceAfter, ttl);
+        return Objects.hash(tlsSkipVerify, notes, name, http, interval, id, deregisterCriticalServiceAfter);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Check {\n");
-        sb.append("    tlsSkipVerify: ").append(toIndentedString(tlsSkipVerify)).append("\n");        sb.append("    notes: ").append(toIndentedString(notes)).append("\n");        sb.append("    name: ").append(toIndentedString(name)).append("\n");        sb.append("    http: ").append(toIndentedString(http)).append("\n");        sb.append("    interval: ").append(toIndentedString(interval)).append("\n");        sb.append("    id: ").append(toIndentedString(id)).append("\n");        sb.append("    deregisterCriticalServiceAfter: ").append(toIndentedString(deregisterCriticalServiceAfter)).append("\n");        sb.append("    ttl: ").append(toIndentedString(ttl)).append("\n");
+        sb.append("    tlsSkipVerify: ").append(toIndentedString(tlsSkipVerify)).append("\n");        sb.append("    notes: ").append(toIndentedString(notes)).append("\n");        sb.append("    name: ").append(toIndentedString(name)).append("\n");        sb.append("    http: ").append(toIndentedString(http)).append("\n");        sb.append("    interval: ").append(toIndentedString(interval)).append("\n");        sb.append("    id: ").append(toIndentedString(id)).append("\n");        sb.append("    deregisterCriticalServiceAfter: ").append(toIndentedString(deregisterCriticalServiceAfter)).append("\n");
         sb.append("}");
         return sb.toString();
     }
