@@ -14,6 +14,7 @@ import org.xnio.OptionMap;
 
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ControllerClient {
@@ -31,11 +32,13 @@ public class ControllerClient {
             URI uri = new URI(url);
             connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
             AtomicReference<ClientResponse> reference = send(connection, "/health/" + serviceId, config.getBootstrapToken());
-            int statusCode = reference.get().getResponseCode();
-            if (statusCode >= UNUSUAL_STATUS_CODE) {
-                logger.error("Health check error: {} : {}", statusCode, reference.get().getAttachment(Http2Client.RESPONSE_BODY));
-            } else {
-                healthy = true;
+            if(reference != null && reference.get() != null) {
+                int statusCode = reference.get().getResponseCode();
+                if (statusCode >= UNUSUAL_STATUS_CODE) {
+                    logger.error("Health check error: {} : {}", statusCode, reference.get().getAttachment(Http2Client.RESPONSE_BODY));
+                } else {
+                    healthy = true;
+                }
             }
         } catch (Exception e) {
             logger.error("Health check request exception", e);
@@ -47,17 +50,19 @@ public class ControllerClient {
 
     public static String getServerInfo(String address, int port) {
         String url = "https://" + address + ":" + port;
-        String res = null;
+        String res = "{}";
         ClientConnection connection = null;
         try {
             URI uri = new URI(url);
             connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
             AtomicReference<ClientResponse> reference = send(connection, "/server/info", config.getBootstrapToken());
-            int statusCode = reference.get().getResponseCode();
-            if (statusCode >= UNUSUAL_STATUS_CODE) {
-                logger.error("Server Info error: {} : {}", statusCode, reference.get().getAttachment(Http2Client.RESPONSE_BODY));
-            } else {
-                res = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            if(reference != null && reference.get() != null) {
+                int statusCode = reference.get().getResponseCode();
+                if (statusCode >= UNUSUAL_STATUS_CODE) {
+                    logger.error("Server Info error: {} : {}", statusCode, reference.get().getAttachment(Http2Client.RESPONSE_BODY));
+                } else {
+                    res = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+                }
             }
         } catch (Exception e) {
             logger.error("Server info request exception", e);
@@ -81,7 +86,7 @@ public class ControllerClient {
         ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(path);
         if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
         connection.sendRequest(request, client.createClientCallback(reference, latch));
-        latch.await();
+        latch.await(100, TimeUnit.MILLISECONDS);
         return reference;
     }
 }
