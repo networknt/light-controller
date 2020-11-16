@@ -169,6 +169,35 @@ paths:
       security:
         - portal_auth:
             - 'portal.w'
+  '/services/check/{id}':
+    get:
+      summary: Retrieve the current check status for a check id
+      description: Get the live check status for the node
+      operationId: getCheckStatus
+      parameters:
+        - name: id
+          in: path
+          description: id of the check object in format serviceId|tag:address:port
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Check'
+        '400':
+          description: Invalid Service Register Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+      security:
+        - portal_auth:
+            - 'portal.r'
+            - 'portal.w'
   '/services/info/{node}':
     get:
       summary: Query service info by node of address and port
