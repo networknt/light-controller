@@ -124,3 +124,14 @@ curl -k --request DELETE 'https://localhost:8438/services?serviceId=com.networkn
 curl -k https://localhost:8438/services/info/172.18.0.1:8443
 ```
 
+### Check Status
+
+```
+curl -k https://localhost:8438/services/check/com.networknt.petstore-3.0.1:172.18.0.1:8443
+```
+
+And result:
+
+```
+{"lastExecuteTimestamp":1605563379912,"lastFailedTimestamp":0,"serviceId":"com.networknt.petstore-3.0.1","address":"172.18.0.1","port":8443,"tlsSkipVerify":true,"http":"https://172.18.0.1:8443/health/com.networknt.petstore-3.0.1","interval":10000,"id":"com.networknt.petstore-3.0.1:172.18.0.1:8443","deregisterCriticalServiceAfter":120000}
+```
