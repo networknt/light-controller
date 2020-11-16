@@ -253,11 +253,9 @@ components:
         tlsSkipVerify: 
           type: boolean
           description: If the certificate for an HTTPS check should not be verified.
-        ttl: 
-          type: integer
-          description: A TTL check and the TTL endpoint must be used periodically to update the state of the check
       required:
         - id
+        - interval
         - deregisterCriticalServiceAfter
     CheckStatus:
       type: object
