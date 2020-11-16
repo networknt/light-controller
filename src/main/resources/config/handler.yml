@@ -60,12 +60,14 @@ handlers:
   - com.networknt.info.ServerInfoGetHandler@info
   - com.networknt.specification.SpecDisplayHandler@spec
   - com.networknt.specification.SpecSwaggerUIHandler@swaggerui
+  - com.networknt.resource.PathResourceHandler@resource@resource
   # - com.networknt.metrics.prometheus.PrometheusGetHandler@getprometheus
   # Business Handlers
   - com.networknt.controller.handler.ServicesPostHandler
   - com.networknt.controller.handler.ServicesDeleteHandler
   - com.networknt.controller.handler.ServicesGetHandler
   - com.networknt.controller.handler.ServicesCheckPutHandler
+  - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - com.networknt.controller.handler.ServicesInfoNodeGetHandler
 
 
@@ -104,6 +106,11 @@ paths:
     exec:
       - default
       - com.networknt.controller.handler.ServicesCheckPutHandler
+  - path: '/services/check/{id}'
+    method: 'GET'
+    exec:
+      - default
+      - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - path: '/services/info/{node}'
     method: 'GET'
     exec:
@@ -129,3 +136,6 @@ paths:
     method: 'get'
     exec:
       - swaggerui
+
+defaultHandlers:
+  - resource
