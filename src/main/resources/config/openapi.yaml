@@ -58,6 +58,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: protocol
+          in: query
+          description: Return only nodes with the prototol
+          required: true
+          schema:
+            type: string
         - name: address
           in: query
           description: IP address of the node
@@ -110,18 +116,6 @@ paths:
           required: false
           schema:
             type: string
-        - name: wait
-          in: query
-          description: Blocking query wait period
-          required: false
-          schema:
-            type: string
-        - name: index
-          in: query
-          description: Last query index returned from last query
-          required: false
-          schema:
-            type: integer
       responses:
         '200':
           description: successful operation
@@ -245,6 +239,9 @@ components:
         tag:
           type: string
           description: a list of tags to assign to the service.
+        protocol:
+          type: string
+          description: http or https for the server.
         address:
           type: string
           description: The address of the service.
@@ -256,6 +253,7 @@ components:
           $ref: '#/components/schemas/Check'
       required:
         - serviceId
+        - protocol
         - address
         - port  
     Check:
