@@ -45,6 +45,7 @@ handlers:
   - com.networknt.metrics.MetricsHandler@metrics
   - com.networknt.traceability.TraceabilityHandler@traceability
   - com.networknt.correlation.CorrelationHandler@correlation
+  - com.networknt.basicauth.BasicAuthHandler@basic
   - com.networknt.openapi.OpenApiHandler@specification
   - com.networknt.openapi.JwtVerifyHandler@security
   - com.networknt.body.BodyHandler@body
@@ -66,6 +67,7 @@ handlers:
   - com.networknt.controller.handler.ServicesPostHandler
   - com.networknt.controller.handler.ServicesDeleteHandler
   - com.networknt.controller.handler.ServicesGetHandler
+  - com.networknt.controller.handler.ServicesLookupGetHandler
   - com.networknt.controller.handler.ServicesCheckPutHandler
   - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - com.networknt.controller.handler.ServicesInfoNodeGetHandler
@@ -81,7 +83,17 @@ chains:
     - security
     - body
     - audit
-#    - dump
+    - sanitizer
+    - validator
+  basic:
+    - exception
+    - metrics
+    - traceability
+    - correlation
+    - basic
+    - specification
+    - body
+    - audit
     - sanitizer
     - validator
 
@@ -99,8 +111,13 @@ paths:
   - path: '/services'
     method: 'GET'
     exec:
-      - default
+      - basic
       - com.networknt.controller.handler.ServicesGetHandler
+  - path: '/services/lookup'
+    method: 'GET'
+    exec:
+      - default
+      - com.networknt.controller.handler.ServicesLookupGetHandler
   - path: '/services/check'
     method: 'PUT'
     exec:
@@ -109,12 +126,12 @@ paths:
   - path: '/services/check/{id}'
     method: 'GET'
     exec:
-      - default
+      - basic
       - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - path: '/services/info/{node}'
     method: 'GET'
     exec:
-      - default
+      - basic
       - com.networknt.controller.handler.ServicesInfoNodeGetHandler
 
   - path: '/health/${server.serviceId:com.networknt.controller-1.0.0}'
