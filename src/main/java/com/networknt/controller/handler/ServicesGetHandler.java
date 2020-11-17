@@ -16,9 +16,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Get all the registered services from the controller. A query parameter passing can filter out
- * only the healthy services. If serviceId and tag is passed in, then only a particular service
- * is returned.
+ * Get all the registered services from the controller for the view to display. This is a separate
+ * endpoint as the view might use basic authentication instead of OAuth 2.0 jwt token for service
+ * lookup from discovery. In normal cases, all endpoints should have the same authentication handler;
+ * however, we need to allow basic authentication as an option for some users with small scale usage.
  *
  * @author Steve Hu
  */
@@ -27,32 +28,8 @@ public class ServicesGetHandler implements LightHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        boolean passing = false;
-        Deque<String> passingDeque = exchange.getQueryParameters().get("passing");
-        if(passingDeque != null && !passingDeque.isEmpty()) {
-            passing = true;
-        }
-        String serviceId = null;
-        Deque<String> serviceIdDeque = exchange.getQueryParameters().get("serviceId");
-        if(serviceIdDeque != null && !serviceIdDeque.isEmpty()) serviceId = serviceIdDeque.getFirst();
-        String tag = null;
-        Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
-        if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
-        if(logger.isDebugEnabled()) logger.debug("passing = " + passing + " serviceId = " + serviceId + " tag = " + tag);
-
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         exchange.setStatusCode(200);
-
-        if(serviceId != null) {
-            if(tag != null) {
-                List nodes = (List)ControllerStartupHook.services.get(serviceId + "|" + tag);
-                exchange.getResponseSender().send(JsonMapper.toJson(nodes));
-            } else {
-                List nodes = (List)ControllerStartupHook.services.get(serviceId);
-                exchange.getResponseSender().send(JsonMapper.toJson(nodes));
-            }
-        } else {
-            exchange.getResponseSender().send(JsonMapper.toJson(ControllerStartupHook.services));
-        }
+        exchange.getResponseSender().send(JsonMapper.toJson(ControllerStartupHook.services));
     }
 }

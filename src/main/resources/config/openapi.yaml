@@ -94,14 +94,38 @@ paths:
         - portal_auth:
             - 'portal.w'
     get:
-      summary: Query all healthy services or one with a serviceId and an optional tag
-      description: Returns a list of services or only one
+      summary: Query all healthy services
+      description: Returns a list of services
       operationId: getHealthService
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '404':
+          description: Service not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+      security:
+        - portal_auth:
+            - 'portal.r'
+            - 'portal.w'
+  '/services/lookup':
+    get:
+      summary: Discover service with serviceId and optional tag
+      description: Returns a list of nodes for the service
+      operationId: getLookupService
       parameters:
         - name: serviceId
           in: query
           description: ID of the service
-          required: false
+          required: true
           schema:
             type: string
         - name: passing
