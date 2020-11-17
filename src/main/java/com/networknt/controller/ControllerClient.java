@@ -24,13 +24,17 @@ public class ControllerClient {
     private static ControllerConfig config = (ControllerConfig)Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
     private static final int UNUSUAL_STATUS_CODE = 300;
 
-    public static boolean checkHealth(String address, int port, String serviceId) {
-        String url = "https://" + address + ":" + port;
+    public static boolean checkHealth(String protocol, String address, int port, String serviceId) {
+        String url = protocol + "://" + address + ":" + port;
         boolean healthy = false;
         ClientConnection connection = null;
         try {
             URI uri = new URI(url);
-            connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
+            if("https".equals(protocol)) {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
+            } else {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
+            }
             AtomicReference<ClientResponse> reference = send(connection, "/health/" + serviceId, config.getBootstrapToken());
             if(reference != null && reference.get() != null) {
                 int statusCode = reference.get().getResponseCode();
@@ -48,13 +52,17 @@ public class ControllerClient {
         return healthy;
     }
 
-    public static String getServerInfo(String address, int port) {
-        String url = "https://" + address + ":" + port;
+    public static String getServerInfo(String protocol, String address, int port) {
+        String url = protocol + "://" + address + ":" + port;
         String res = "{}";
         ClientConnection connection = null;
         try {
             URI uri = new URI(url);
-            connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
+            if("https".equals(protocol)) {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
+            } else {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
+            }
             AtomicReference<ClientResponse> reference = send(connection, "/server/info", config.getBootstrapToken());
             if(reference != null && reference.get() != null) {
                 int statusCode = reference.get().getResponseCode();

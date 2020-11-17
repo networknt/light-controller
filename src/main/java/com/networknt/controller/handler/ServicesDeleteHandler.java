@@ -27,13 +27,14 @@ public class ServicesDeleteHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
+        String protocol = exchange.getQueryParameters().get("protocol").getFirst();
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
         if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
         String key = tag == null ?  serviceId : serviceId + "|" + tag;
         String address = exchange.getQueryParameters().get("address").getFirst();
         int port = Integer.valueOf(exchange.getQueryParameters().get("port").getFirst());
-        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " address = " + address + " port = " + port);
+        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " protocol = " + protocol + " tag = " + tag + " address = " + address + " port = " + port);
 
         List nodes = (List)ControllerStartupHook.services.get(key);
         nodes = ControllerUtil.delService(nodes, address, port);
@@ -43,8 +44,8 @@ public class ServicesDeleteHandler implements LightHttpHandler {
             ControllerStartupHook.services.remove(key);
         }
         // delete from the checks, cancel the timer task before deleting.
-        String checkId = key + ":" + address + ":" + port;
-        Check check = (Check)ControllerStartupHook.checks.remove(checkId);
+        String checkId = key + ":" + protocol + ":" + address + ":" + port;
+        Check check = ControllerStartupHook.checks.remove(checkId);
         // TODO cancel the timer task.
         // delete from the infos
         ControllerStartupHook.infos.remove(address + ":" + port);

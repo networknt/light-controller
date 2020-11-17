@@ -34,10 +34,12 @@ public class ServicesPostHandler implements LightHttpHandler {
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
         String serviceId = (String)body.get("serviceId");
         String tag = (String)body.get("tag");
+        String protocol = (String)body.get("protocol");
         String address = (String)body.get("address");
         int port = (Integer)body.get("port");
-        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " address = " + address + " port = " + port);
+        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " protocol = " + protocol + " address = " + address + " port = " + port);
         Map<String, Object> nodeMap = new ConcurrentHashMap<>();
+        nodeMap.put("protocol", protocol);
         nodeMap.put("address", address);
         nodeMap.put("port", port);
 
@@ -53,7 +55,7 @@ public class ServicesPostHandler implements LightHttpHandler {
         ControllerStartupHook.checks.put(check.getId(), check);
         // now try to get server info from by accessing the endpoint with a URL constructed with address and port
         // we assume that the server is running with https and it can verify the bootstrap token from the controller.
-        String info = ControllerClient.getServerInfo(address, port);
+        String info = ControllerClient.getServerInfo(protocol, address, port);
         if(info !=  null) {
             ControllerStartupHook.infos.put(address + ":" + port, info);
         }

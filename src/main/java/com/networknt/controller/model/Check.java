@@ -18,6 +18,7 @@ public class Check  {
     private long lastFailedTimestamp = 0L;
     private String serviceId;
     private String tag;
+    private String protocol;
     private String address;
     private int port;
 
@@ -84,8 +85,9 @@ public class Check  {
         } else {
             this.serviceId = parts[0];
         }
-        this.address = parts[1];
-        this.port = Integer.valueOf(parts[2]);
+        this.protocol = parts[1];
+        this.address = parts[2];
+        this.port = Integer.valueOf(parts[3]);
     }
 
     @JsonProperty("deregisterCriticalServiceAfter")
@@ -173,6 +175,14 @@ public class Check  {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     public String getAddress() {

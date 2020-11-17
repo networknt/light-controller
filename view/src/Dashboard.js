@@ -118,7 +118,7 @@ function Row(props) {
     const tag = words[1];
 
     const handleCheck = (node) => {
-        const k = id + ':' + node.address + ':' + node.port;
+        const k = id + ':' + node.protocol + ":" + node.address + ':' + node.port;
         console.log(node, k);
         history.push({ pathname: '/check', state: { data: { id: k } } });
     }
@@ -153,6 +153,7 @@ function Row(props) {
                             <Table size="small" aria-label="purchases">
                                 <TableHead>
                                     <TableRow>
+                                        <TableCell>Protocol</TableCell>
                                         <TableCell>Address</TableCell>
                                         <TableCell align="right">Port</TableCell>
                                         <TableCell align="right">Status Check</TableCell>
@@ -163,8 +164,9 @@ function Row(props) {
                                     {nodes.map((node, j) => (
                                         <TableRow key={j}>
                                             <TableCell component="th" scope="row">
-                                                {node.address}
+                                                {node.protocol}
                                             </TableCell>
+                                            <TableCell>{node.address}</TableCell>
                                             <TableCell align="right">{node.port}</TableCell>
                                             <TableCell align="right"><CloudDoneIcon onClick={() => handleCheck(node)} /></TableCell>
                                             <TableCell align="right"><HelpIcon onClick={() => handleInfo(node)} /></TableCell>

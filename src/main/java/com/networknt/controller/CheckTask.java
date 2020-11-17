@@ -35,7 +35,7 @@ public class CheckTask extends TimerTask {
 
     private void execute(Check check) {
         if(check.getHttp() != null) {
-            boolean res = ControllerClient.checkHealth(check.getAddress(), check.getPort(), check.getServiceId());
+            boolean res = ControllerClient.checkHealth(check.getProtocol(), check.getAddress(), check.getPort(), check.getServiceId());
             if(res) {
                 check.setLastExecuteTimestamp(System.currentTimeMillis());
                 // whenever this is success, reset the failure flag.
