@@ -11,7 +11,7 @@ export default function HealthCheck(props) {
     const [loading, setLoading] = useState(true);
 
     const url = '/services/check/' + id;
-    const headers = {};
+    const headers = {'Authorization': 'Basic ' + localStorage.getItem('user')};
     useEffect(() => {
         const abortController = new AbortController();
         const fetchData = async () => {
