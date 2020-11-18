@@ -28,12 +28,13 @@ const useRowStyles = makeStyles({
 
 function Dashboard(props) {
     console.log(props);
+    const {history} = props;
     const [services, setServices] = useState();
     const [error, setError] = useState();
     const [loading, setLoading] = useState(true);
 
     const url = '/services';
-    const headers = {};
+    const headers = {'Authorization': 'Basic ' + localStorage.getItem('user')};
 
     useEffect(() => {
         const abortController = new AbortController();
@@ -44,8 +45,12 @@ function Dashboard(props) {
                 if (!response.ok) {
                     const data = await response.json();
                     console.log(data);
-                    setError(data);
                     setLoading(false);
+                    if(data.code === 'ERR10002' || data.code === 'ERR10046' || data.code === 'ERR10047') {
+                        history.push({ pathname: '/login', state: { from: props.location } });
+                    } else {
+                        setError(data);
+                    }  
                 } else {
                     const data = await response.json();
                     console.log(data);

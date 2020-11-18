@@ -11,7 +11,7 @@ export default function ServerInfo(props) {
     const [loading, setLoading] = useState(true);
       
     const url = '/services/info/' + node;
-    const headers = {};
+    const headers = {'Authorization': 'Basic ' + localStorage.getItem('user')};
     useEffect(() => {
         const abortController = new AbortController();
         const fetchData = async () => {
