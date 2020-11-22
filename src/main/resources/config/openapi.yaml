@@ -128,12 +128,6 @@ paths:
           required: true
           schema:
             type: string
-        - name: passing
-          in: query
-          description: Return only nodes with passing state
-          required: false
-          schema:
-            type: boolean
         - name: tag
           in: query
           description: Return only nodes with the tag

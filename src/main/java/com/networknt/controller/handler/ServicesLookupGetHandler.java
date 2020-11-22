@@ -27,24 +27,15 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
-        boolean passing = false;
-        Deque<String> passingDeque = exchange.getQueryParameters().get("passing");
-        if(passingDeque != null && !passingDeque.isEmpty()) {
-            passing = true;
-        }
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
         if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
-        if(logger.isDebugEnabled()) logger.debug("passing = " + passing + " serviceId = " + serviceId + " tag = " + tag);
+        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag);
 
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         exchange.setStatusCode(200);
-        if(tag != null) {
-            List nodes = (List) ControllerStartupHook.services.get(serviceId + "|" + tag);
-            exchange.getResponseSender().send(JsonMapper.toJson(nodes));
-        } else {
-            List nodes = (List)ControllerStartupHook.services.get(serviceId);
-            exchange.getResponseSender().send(JsonMapper.toJson(nodes));
-        }
+        String key =  tag == null ? serviceId : serviceId + "|" + tag;
+        List nodes = (List) ControllerStartupHook.services.get(key);
+        exchange.getResponseSender().send(JsonMapper.toJson(nodes));
     }
 }

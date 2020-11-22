@@ -34,6 +34,7 @@ public class ServicesPostHandler implements LightHttpHandler {
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
         String serviceId = (String)body.get("serviceId");
         String tag = (String)body.get("tag");
+        String key = tag == null ? serviceId : serviceId + "|" + tag;
         String protocol = (String)body.get("protocol");
         String address = (String)body.get("address");
         int port = (Integer)body.get("port");
@@ -43,13 +44,10 @@ public class ServicesPostHandler implements LightHttpHandler {
         nodeMap.put("address", address);
         nodeMap.put("port", port);
 
-        if(tag != null) {
-            List nodes = (List)ControllerStartupHook.services.get(serviceId + "|" + tag);
-            ControllerStartupHook.services.put(serviceId + "|" + tag, addService(nodes, nodeMap));
-        } else {
-            List nodes = (List)ControllerStartupHook.services.get(serviceId);
-            ControllerStartupHook.services.put(serviceId, addService(nodes, nodeMap));
-        }
+        List nodes = (List)ControllerStartupHook.services.get(key);
+        nodes = addService(nodes, nodeMap);
+        ControllerStartupHook.services.put(key, nodes);
+
         // save the check Object in another map for background process to perform check periodically.
         Check check = JsonMapper.objectMapper.convertValue(body.get("check"), Check.class);
         ControllerStartupHook.checks.put(check.getId(), check);
@@ -59,6 +57,10 @@ public class ServicesPostHandler implements LightHttpHandler {
         if(info !=  null) {
             ControllerStartupHook.infos.put(address + ":" + port, info);
         }
+
+        // update all subscribed clients with the nodes
+        WebSocketHandler.sendUpdatedNodes(key, nodes);
+
         setExchangeStatus(exchange, SUC10200);
     }
 
