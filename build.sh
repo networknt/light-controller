@@ -4,7 +4,7 @@
 set -ex
 
 VERSION=$1
-IMAGE_NAME="networknt/controller-1.0.0"
+IMAGE_NAME="networknt/light-controller"
 
 showHelp() {
     echo " "
