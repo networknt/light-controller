@@ -71,7 +71,7 @@ handlers:
   - com.networknt.controller.handler.ServicesCheckPutHandler
   - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - com.networknt.controller.handler.ServicesInfoNodeGetHandler
-
+  - com.networknt.controller.handler.WebSocketHandler
 
 chains:
   default:
@@ -133,6 +133,10 @@ paths:
     exec:
       - basic
       - com.networknt.controller.handler.ServicesInfoNodeGetHandler
+  - path: '/ws'
+    method: 'get'
+    exec:
+      - com.networknt.controller.handler.WebSocketHandler
 
   - path: '/health/${server.serviceId:com.networknt.controller-1.0.0}'
     method: 'get'

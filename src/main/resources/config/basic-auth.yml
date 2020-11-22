@@ -1,7 +1,7 @@
 # Basic Authentication Security Configuration for light-4j
 ---
 # Enable Basic Authentication Handler, default is false.
-enabled: true
+enabled: false
 # usernames and passwords, the password can be encrypted like user2
 # As we are supporting multiple users, so leave the passwords in this file.
 users:
