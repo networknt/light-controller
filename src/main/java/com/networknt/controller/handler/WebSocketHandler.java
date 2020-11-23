@@ -81,6 +81,7 @@ public class WebSocketHandler implements WebSocketConnectionCallback {
             while(iterator.hasNext()) {
                 ServerWebSocketClient client = iterator.next();
                 boolean sent = client.send(JsonMapper.toJson(nodeMap));
+                if(logger.isDebugEnabled()) logger.debug("nodes changed for key " + key + " values = " + nodes);
                 if(!sent) {
                     // the client is gone and it should be removed from the subscription list.
                     if(logger.isDebugEnabled()) logger.debug("client is closed, remove from the list");
