@@ -2,17 +2,22 @@ package com.networknt.controller;
 
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
+import com.networknt.config.JsonMapper;
+import com.networknt.controller.model.LoggerInfo;
+import com.networknt.utility.StringUtils;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.OptionMap;
 
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,7 +40,7 @@ public class ControllerClient {
             } else {
                 connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
             }
-            AtomicReference<ClientResponse> reference = send(connection, "/health/" + serviceId, config.getBootstrapToken());
+            AtomicReference<ClientResponse> reference = send(connection, Methods.GET, "/health/" + serviceId, config.getBootstrapToken(), null);
             if(reference != null && reference.get() != null) {
                 int statusCode = reference.get().getResponseCode();
                 if (statusCode >= UNUSUAL_STATUS_CODE) {
@@ -63,7 +68,7 @@ public class ControllerClient {
             } else {
                 connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
             }
-            AtomicReference<ClientResponse> reference = send(connection, "/server/info", config.getBootstrapToken());
+            AtomicReference<ClientResponse> reference = send(connection, Methods.GET, "/server/info", config.getBootstrapToken(), null);
             if(reference != null && reference.get() != null) {
                 int statusCode = reference.get().getResponseCode();
                 if (statusCode >= UNUSUAL_STATUS_CODE) {
@@ -80,6 +85,62 @@ public class ControllerClient {
         return res;
     }
 
+    public static String getLoggerConfig(String protocol, String address, String port) {
+        String url = protocol + "://" + address + ":" + port;
+        String res = "{}";
+        ClientConnection connection = null;
+        try {
+            URI uri = new URI(url);
+            if("https".equals(protocol)) {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
+            } else {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
+            }
+            AtomicReference<ClientResponse> reference = send(connection, Methods.GET, "/logger", config.getBootstrapToken(), null);
+            if(reference != null && reference.get() != null) {
+                int statusCode = reference.get().getResponseCode();
+                if (statusCode >= UNUSUAL_STATUS_CODE) {
+                    logger.error("Logger config error: {} : {}", statusCode, reference.get().getAttachment(Http2Client.RESPONSE_BODY));
+                } else {
+                    res = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Logger config request exception", e);
+        } finally {
+            client.returnConnection(connection);
+        }
+        return res;
+    }
+
+    public static String updateLoggerConfig(String protocol, String address, int port, List loggers) {
+        String url = protocol + "://" + address + ":" + port;
+        String res = "{}";
+        ClientConnection connection = null;
+        try {
+            URI uri = new URI(url);
+            if("https".equals(protocol)) {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
+            } else {
+                connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
+            }
+            AtomicReference<ClientResponse> reference = send(connection, Methods.POST, "/logger", config.getBootstrapToken(), JsonMapper.toJson(loggers));
+            if(reference != null && reference.get() != null) {
+                int statusCode = reference.get().getResponseCode();
+                if (statusCode >= UNUSUAL_STATUS_CODE) {
+                    logger.error("Logger config error: {} : {}", statusCode, reference.get().getAttachment(Http2Client.RESPONSE_BODY));
+                } else {
+                    res = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Logger config request exception", e);
+        } finally {
+            client.returnConnection(connection);
+        }
+        return res;
+    }
+
     /**
      * send to service from controller with the health check and server info
      *
@@ -88,12 +149,18 @@ public class ControllerClient {
      * @param token      token to put in header
      * @return AtomicReference<ClientResponse> response
      */
-    private static AtomicReference<ClientResponse> send(ClientConnection connection, String path, String token) throws InterruptedException {
+    private static AtomicReference<ClientResponse> send(ClientConnection connection, HttpString method, String path, String token, String json) throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
-        ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(path);
+        ClientRequest request = new ClientRequest().setMethod(method).setPath(path);
         if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
-        connection.sendRequest(request, client.createClientCallback(reference, latch));
+        if(StringUtils.isBlank(json)) {
+            connection.sendRequest(request, client.createClientCallback(reference, latch));
+        } else {
+            request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+            connection.sendRequest(request, client.createClientCallback(reference, latch, json));
+        }
         latch.await(100, TimeUnit.MILLISECONDS);
         return reference;
     }

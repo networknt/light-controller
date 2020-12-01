@@ -1,0 +1,86 @@
+{
+    "loggerConfig": {
+        "formId": "loggerConfig",
+        "actions": [
+            {
+                "path": "/services/logger",
+                "rest": true,
+                "title": "Logger Config",
+                "success": "/success",
+                "failure": "/failure"
+            }
+        ],
+        "schema": {
+            "type": "object",
+            "title": "Logger Config",
+            "required": [
+                "protocol",
+                "address",
+                "port",
+                "loggers"
+            ],
+            "properties": {
+                "protocol": {
+                    "type": "string",
+                    "title": "Protocol",
+                    "readonly": true
+                },
+                "address": {
+                    "type": "string",
+                    "title": "Address",
+                    "readonly": true
+                },
+                "port": {
+                    "type": "integer",
+                    "title": "Port",
+                    "readonly": true
+                },
+                "loggers": {
+                    "type": "array",
+                    "title": "Loggers",
+                    "maxItems": 20,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "Name",
+                                "type": "string"
+                            },
+                            "level": {
+                                "title": "Level",
+                                "type": "string",
+                                "enum": [
+                                    "ERROR",
+                                    "WARN",
+                                    "INFO",
+                                    "DEBUG",
+                                    "TRACE"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "level"
+                        ]
+                    }
+                }
+            }
+        },
+        "form": [
+            "protocol",
+            "address",
+            "port",    
+            {
+                "key": "loggers",
+                "add": "New",
+                "style": {
+                    "add": "btn-success"
+                },
+                "items": [
+                    "loggers[].name",
+                    "loggers[].level"
+                ]
+            }
+        ]
+    }
+}
