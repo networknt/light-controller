@@ -241,6 +241,83 @@ paths:
         - portal_auth:
             - 'portal.r'
             - 'portal.w'
+
+  '/services/logger':
+    get:
+      summary: Query logger for a particular instance
+      description: Returns a list of loggers with logging levels
+      operationId: getServiceLogger
+      parameters:
+        - name: protocol
+          in: query
+          description: target server protocol, http or https.
+          required: true
+          schema:
+            type: string
+            enum: [
+              "http",
+              "https"
+            ]
+        - name: address
+          in: query
+          description: target server address.
+          required: true
+          schema:
+            type: string
+        - name: port
+          in: query
+          description: target server port number.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '404':
+          description: Service not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+      security:
+        - portal_auth:
+            - 'portal.r'
+            - 'portal.w'
+    post:
+      summary: Update the logging level for a particular instance
+      description: Returns a list of loggers with logging levels after updated.
+      operationId: postServiceLogger
+      requestBody:
+        description: Service that is updating loggers.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoggerConfig'
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '404':
+          description: Service not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+      security:
+        - portal_auth:
+            - 'portal.w'
 components:
   schemas:
     Service:
@@ -311,6 +388,48 @@ components:
         pass:
           type: boolean
           description: If the check is passed or failed
+    LoggerConfig:
+      type: object
+      properties:
+        protocol:
+          type: string
+          description: Target server protocol
+        address:
+          type: string
+          description: Target server IP address
+        port:
+          type: integer
+          description: Target server port number
+        loggers:
+          type: array
+          description: A list of LoggerInfo entries
+          items:
+            $ref: '#/components/schemas/LoggerInfo'
+      required:
+        - protocol
+        - address
+        - port
+        - loggers
+
+    LoggerInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the logger
+        level:
+          type: string
+          enum: [
+            "ERROR",
+            "WARN",
+            "INFO",
+            "DEBUG",
+            "TRACE"
+          ]
+          description: Logging level
+      required:
+        - name
+        - level
     Status:
       type: object
       properties:

@@ -16,6 +16,7 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CloudDoneIcon from '@material-ui/icons/CloudDone';
 import HelpIcon from '@material-ui/icons/Help';
+import PermDataSettingIcon from '@material-ui/icons/PermDataSetting';
 import './Dashboard.css';
 
 const useRowStyles = makeStyles({
@@ -128,6 +129,11 @@ function Row(props) {
         history.push({ pathname: '/check', state: { data: { id: k } } });
     }
 
+    const handleLogger = (node) => {
+        console.log(node);
+        history.push({ pathname: '/logger', state: { data: { node } } });
+    }
+
     const handleInfo = (node) => {
         const k = node.address + ':' + node.port;
         console.log(node, k);
@@ -163,6 +169,7 @@ function Row(props) {
                                         <TableCell align="right">Port</TableCell>
                                         <TableCell align="right">Status Check</TableCell>
                                         <TableCell align="right">Server Info</TableCell>
+                                        <TableCell align="right">Logger Config</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -175,6 +182,7 @@ function Row(props) {
                                             <TableCell align="right">{node.port}</TableCell>
                                             <TableCell align="right"><CloudDoneIcon onClick={() => handleCheck(node)} /></TableCell>
                                             <TableCell align="right"><HelpIcon onClick={() => handleInfo(node)} /></TableCell>
+                                            <TableCell align="right"><PermDataSettingIcon onClick={() => handleLogger(node)} /></TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

@@ -72,6 +72,8 @@ handlers:
   - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - com.networknt.controller.handler.ServicesInfoNodeGetHandler
   - com.networknt.controller.handler.WebSocketHandler
+  - com.networknt.controller.handler.ServicesLoggerGetHandler
+  - com.networknt.controller.handler.ServicesLoggerPostHandler
 
 chains:
   default:
@@ -137,6 +139,16 @@ paths:
     method: 'get'
     exec:
       - com.networknt.controller.handler.WebSocketHandler
+  - path: '/services/logger'
+    method: 'GET'
+    exec:
+      - basic
+      - com.networknt.controller.handler.ServicesLoggerGetHandler
+  - path: '/services/logger'
+    method: 'POST'
+    exec:
+      - basic
+      - com.networknt.controller.handler.ServicesLoggerPostHandler
 
   - path: '/health/${server.serviceId:com.networknt.controller-1.0.0}'
     method: 'get'
