@@ -4,6 +4,39 @@ object-assign
 @license MIT
 */
 
+/*!
+      Copyright (c) 2017 Jed Watson.
+      Licensed under the MIT License (MIT), see
+      http://jedwatson.github.io/classnames
+    */
+
+/*!
+  Copyright (c) 2017 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+
+/*!
+  Copyright (c) 2018 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+
+/*!
+ * The MIT License
+   Copyright (c) 2018 Dmitriy Kubyshkin
+   Copied from https://github.com/grassator/insert-text-at-cursor
+ */
+
+/*!
+ * cookie
+ * Copyright(c) 2012-2014 Roman Shtylman
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+/*! showdown v 1.9.1 - 02-11-2019 */
+
 /**
  * A better abstraction over CSS.
  *
