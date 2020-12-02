@@ -153,6 +153,8 @@ public class ControllerClient {
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         ClientRequest request = new ClientRequest().setMethod(method).setPath(path);
+        // add host header for HTTP/1.1 server when HTTP is used.
+        request.getRequestHeaders().put(Headers.HOST, "localhost");
         if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
         if(StringUtils.isBlank(json)) {
             connection.sendRequest(request, client.createClientCallback(reference, latch));
