@@ -163,7 +163,7 @@ public class ControllerClient {
             request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
             connection.sendRequest(request, client.createClientCallback(reference, latch, json));
         }
-        latch.await(100, TimeUnit.MILLISECONDS);
+        latch.await(1000, TimeUnit.MILLISECONDS);
         return reference;
     }
 }
