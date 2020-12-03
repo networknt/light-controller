@@ -5,7 +5,6 @@ import Button from '@material-ui/core/Button';
 import {SchemaForm, utils} from 'react-schema-form';
 import RcSelect from "react-schema-form-rc-select";
 import forms from '../data/forms';
-import Cookies from 'universal-cookie'
 
 const styles = theme => ({
     root: {
@@ -79,8 +78,7 @@ function Form(props) {
     const submitForm = async (url, headers, action) => {
       setFetching(true);
       try {
-        const cookies = new Cookies();
-        Object.assign(headers, {'X-CSRF-TOKEN': cookies.get('csrf')})
+        Object.assign(headers, { 'Authorization': 'Basic ' + localStorage.getItem('user') })
         const response = await fetch(url, { method: action.method ? action.method : 'POST', body: action.rest ? JSON.stringify(action.data) : JSON.stringify(action), headers, credentials: 'include'});
         // we have tried out best to response json from our APIs; however, some services return text instead like light-oauth2.
         const s = await response.text();
