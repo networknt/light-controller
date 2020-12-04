@@ -13,6 +13,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import { useHistory } from "react-router-dom";
 import { userService } from '../services/user';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -26,6 +27,10 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('sm')]: {
             display: 'block',
         },
+    },
+    link: {
+        textDecoration: 'none',
+        color: 'white'
     },
     search: {
         position: 'relative',
@@ -170,9 +175,11 @@ export default function Header(props) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography className={classes.title} variant="h6" noWrap>
-                        Control Panel
-          </Typography>
+                    <Link to="/" className={classes.link}>
+                        <Typography className={classes.title} variant="h6" noWrap>
+                            Control Panel
+                        </Typography>
+                    </Link>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
                             <SearchIcon />
