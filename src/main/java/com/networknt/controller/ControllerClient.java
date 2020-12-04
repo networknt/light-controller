@@ -3,7 +3,6 @@ package com.networknt.controller;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.controller.model.LoggerInfo;
 import com.networknt.utility.StringUtils;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
@@ -163,7 +162,7 @@ public class ControllerClient {
             request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
             connection.sendRequest(request, client.createClientCallback(reference, latch, json));
         }
-        latch.await(1000, TimeUnit.MILLISECONDS);
+        latch.await(config.getClientTimeout(), TimeUnit.MILLISECONDS);
         return reference;
     }
 }
