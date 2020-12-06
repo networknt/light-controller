@@ -11,9 +11,9 @@ import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MoreIcon from '@material-ui/icons/MoreVert';
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import { userService } from '../services/user';
-import { Link } from 'react-router-dom';
+import { useAppDispatch } from "../contexts/AppContext";
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -92,6 +92,12 @@ export default function Header(props) {
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    const appDispatch = useAppDispatch();
+    const changeFilter = (e) => {
+      appDispatch({ type: "UPDATE_FILTER", filter: e.target.value }); 
+    }
+  
     const logout = () => {
         handleMenuClose();
         userService.logout();
@@ -186,6 +192,7 @@ export default function Header(props) {
                         </div>
                         <InputBase
                             placeholder="Search…"
+                            onChange={changeFilter}
                             classes={{
                                 root: classes.inputRoot,
                                 input: classes.inputInput,
