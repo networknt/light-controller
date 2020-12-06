@@ -18,6 +18,7 @@ import CloudDoneIcon from '@material-ui/icons/CloudDone';
 import HelpIcon from '@material-ui/icons/Help';
 import PermDataSettingIcon from '@material-ui/icons/PermDataSetting';
 import './Dashboard.css';
+import { useAppState } from "../contexts/AppContext";
 
 const useRowStyles = makeStyles({
     root: {
@@ -31,9 +32,11 @@ function Dashboard(props) {
     console.log(props);
     const {history} = props;
     const [services, setServices] = useState();
+    const serviceIds = services ? Object.keys(services) : [];
     const [error, setError] = useState();
     const [loading, setLoading] = useState(true);
-
+    const { filter } = useAppState();
+    const filteredServiceIds = serviceIds.filter(serviceId => serviceId.toLowerCase().includes(filter) || !filter)
     const url = '/services';
     const headers = {'Authorization': 'Basic ' + localStorage.getItem('user')};
 
@@ -100,7 +103,7 @@ function Dashboard(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Object.keys(services).map((id, i) => (
+                        {filteredServiceIds.map((id, i) => (
                             <Row key={i} history={props.history} id={id} nodes={services[id]} />
                         ))}
                     </TableBody>
