@@ -61,7 +61,7 @@ handlers:
   - com.networknt.info.ServerInfoGetHandler@info
   - com.networknt.specification.SpecDisplayHandler@spec
   - com.networknt.specification.SpecSwaggerUIHandler@swaggerui
-  - com.networknt.resource.PathResourceHandler@resource@resource
+  - com.networknt.resource.PathResourceHandler@resource
   # - com.networknt.metrics.prometheus.PrometheusGetHandler@getprometheus
   # Business Handlers
   - com.networknt.controller.handler.ServicesPostHandler
