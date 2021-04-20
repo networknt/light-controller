@@ -65,6 +65,10 @@ oauth:
       # - petstore.w
     # the following section defines uri and parameters for client credentials grant type
     client_credentials:
+      # use the proxyHost and proxyPort if the OAuth 2.0 provider is on the cloud and the
+      # server resides in side an organization with a proxy to the cloud service.
+      # proxyHost: ${client.tokenCcProxyHost:proxy.example.com}
+      # proxyPort: ${client.tokenCcProxyPort:8443}
       # token endpoint for client credentials grant
       uri: ${client.tokenCcUri:/oauth2/token}
       # client_id for client credentials grant flow. client_secret is in secret.yml
@@ -90,6 +94,11 @@ oauth:
       # - petstore.w
     # light-oauth2 key distribution endpoint configuration for token verification
     key:
+      # use the proxyHost and proxyPort if the OAuth 2.0 provider is on the cloud and the
+      # server resides in side an organization with a proxy to the cloud service.
+      # proxyHost: ${client.tokenCcProxyHost:proxy.example.com}
+      # proxyPort: ${client.tokenCcProxyPort:8443}
+      # token endpoint for client credentials grant
       # key distribution server url for token verification. It will be used if it is configured.
       # If it is not set, a service lookup will be taken with serviceId to find an instance.
       # server_url: ${client.tokenKeyServerUrl:https://localhost:6886}
