@@ -3,6 +3,7 @@ package com.networknt.controller;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
+import com.networknt.monad.Result;
 import com.networknt.utility.StringUtils;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
@@ -154,7 +155,14 @@ public class ControllerClient {
         ClientRequest request = new ClientRequest().setMethod(method).setPath(path);
         // add host header for HTTP/1.1 server when HTTP is used.
         request.getRequestHeaders().put(Headers.HOST, "localhost");
-        if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
+        if(config.isDynamicToken()) {
+            Result result = client.addCcToken(request);
+            if(result.isFailure()) {
+                logger.error(result.getError().toString());
+            }
+        } else {
+            if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
+        }
         if(StringUtils.isBlank(json)) {
             connection.sendRequest(request, client.createClientCallback(reference, latch));
         } else {
