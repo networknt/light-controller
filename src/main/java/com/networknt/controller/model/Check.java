@@ -10,7 +10,6 @@ public class Check  {
     private Boolean tlsSkipVerify;
     private String notes;
     private String name;
-    private String http;
     private Integer interval;
     private String id;
     private Integer deregisterCriticalServiceAfter;
@@ -20,6 +19,7 @@ public class Check  {
     private String tag;
     private String protocol;
     private String address;
+    private String healthPath;
     private int port;
 
     public Check () {
@@ -52,14 +52,10 @@ public class Check  {
         this.name = name;
     }
 
-    @JsonProperty("http")
-    public String getHttp() {
-        return http;
-    }
+    @JsonProperty("healthPath")
+    public String getHealthPath() { return healthPath; }
 
-    public void setHttp(String http) {
-        this.http = http;
-    }
+    public void setHealthPath(String healthPath) { this.healthPath = healthPath; }
 
     @JsonProperty("interval")
     public Integer getInterval() {
@@ -114,7 +110,7 @@ public class Check  {
         return Objects.equals(tlsSkipVerify, Check.tlsSkipVerify) &&
                Objects.equals(notes, Check.notes) &&
                Objects.equals(name, Check.name) &&
-               Objects.equals(http, Check.http) &&
+               Objects.equals(healthPath, Check.healthPath) &&
                Objects.equals(interval, Check.interval) &&
                Objects.equals(id, Check.id) &&
                Objects.equals(deregisterCriticalServiceAfter, Check.deregisterCriticalServiceAfter);
@@ -122,14 +118,14 @@ public class Check  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(tlsSkipVerify, notes, name, http, interval, id, deregisterCriticalServiceAfter);
+        return Objects.hash(tlsSkipVerify, notes, name, healthPath, interval, id, deregisterCriticalServiceAfter);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Check {\n");
-        sb.append("    tlsSkipVerify: ").append(toIndentedString(tlsSkipVerify)).append("\n");        sb.append("    notes: ").append(toIndentedString(notes)).append("\n");        sb.append("    name: ").append(toIndentedString(name)).append("\n");        sb.append("    http: ").append(toIndentedString(http)).append("\n");        sb.append("    interval: ").append(toIndentedString(interval)).append("\n");        sb.append("    id: ").append(toIndentedString(id)).append("\n");        sb.append("    deregisterCriticalServiceAfter: ").append(toIndentedString(deregisterCriticalServiceAfter)).append("\n");
+        sb.append("    tlsSkipVerify: ").append(toIndentedString(tlsSkipVerify)).append("\n");        sb.append("    notes: ").append(toIndentedString(notes)).append("\n");        sb.append("    name: ").append(toIndentedString(name)).append("\n");        sb.append("    healthPath: ").append(toIndentedString(healthPath)).append("\n");       sb.append("    interval: ").append(toIndentedString(interval)).append("\n");        sb.append("    id: ").append(toIndentedString(id)).append("\n");        sb.append("    deregisterCriticalServiceAfter: ").append(toIndentedString(deregisterCriticalServiceAfter)).append("\n");
         sb.append("}");
         return sb.toString();
     }

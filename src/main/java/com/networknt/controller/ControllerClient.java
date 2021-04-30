@@ -29,7 +29,7 @@ public class ControllerClient {
     private static ControllerConfig config = (ControllerConfig)Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
     private static final int UNUSUAL_STATUS_CODE = 300;
 
-    public static boolean checkHealth(String protocol, String address, int port, String serviceId) {
+    public static boolean checkHealth(String protocol, String address, int port, String healthPath, String serviceId) {
         String url = protocol + "://" + address + ":" + port;
         boolean healthy = false;
         ClientConnection connection = null;
@@ -40,7 +40,7 @@ public class ControllerClient {
             } else {
                 connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
             }
-            AtomicReference<ClientResponse> reference = send(connection, Methods.GET, "/health/" + serviceId, config.getBootstrapToken(), null);
+            AtomicReference<ClientResponse> reference = send(connection, Methods.GET, healthPath + serviceId, config.getBootstrapToken(), null);
             if(reference != null && reference.get() != null) {
                 int statusCode = reference.get().getResponseCode();
                 if (statusCode >= UNUSUAL_STATUS_CODE) {
