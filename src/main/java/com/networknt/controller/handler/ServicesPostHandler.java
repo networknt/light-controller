@@ -38,7 +38,7 @@ public class ServicesPostHandler implements LightHttpHandler {
         String protocol = (String)body.get("protocol");
         String address = (String)body.get("address");
         int port = (Integer)body.get("port");
-        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " protocol = " + protocol + " address = " + address + " port = " + port);
+        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " protocol = " + protocol + " address = " + address + " port = " + port + " check = " + body.get("check"));
         Map<String, Object> nodeMap = new ConcurrentHashMap<>();
         nodeMap.put("protocol", protocol);
         nodeMap.put("address", address);
