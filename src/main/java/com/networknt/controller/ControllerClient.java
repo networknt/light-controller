@@ -159,6 +159,8 @@ public class ControllerClient {
             Result result = client.addCcToken(request);
             if(result.isFailure()) {
                 logger.error(result.getError().toString());
+            } else {
+                 if(logger.isTraceEnabled()) logger.trace("Dynamic token jwt = " + result.getResult().toString());
             }
         } else {
             if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
