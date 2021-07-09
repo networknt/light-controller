@@ -1,6 +1,7 @@
 package com.networknt.controller;
 
 import com.networknt.client.Http2Client;
+import com.networknt.client.oauth.Jwt;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.monad.Result;
@@ -160,9 +161,10 @@ public class ControllerClient {
             if(result.isFailure()) {
                 logger.error(result.getError().toString());
             } else {
-                 if(logger.isTraceEnabled()) logger.trace("Dynamic token jwt = " + result.getResult().toString());
+                if (logger.isTraceEnabled()) logger.trace("Dynamic token  = " + ((Jwt)result.getResult()).getJwt());
             }
         } else {
+            if(logger.isTraceEnabled()) logger.trace("Static token = " + token);
             if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
         }
         if(StringUtils.isBlank(json)) {
