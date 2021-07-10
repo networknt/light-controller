@@ -98,3 +98,5 @@ server.buildNumber: latest
 
 # Service Singletons
 service.singletons:
+
+server.serviceId: com.networknt.controller-1.0.0

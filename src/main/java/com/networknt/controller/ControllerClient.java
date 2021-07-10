@@ -32,6 +32,7 @@ public class ControllerClient {
 
     public static boolean checkHealth(String protocol, String address, int port, String healthPath, String serviceId) {
         String url = protocol + "://" + address + ":" + port;
+        if(logger.isTraceEnabled()) logger.trace("url = " + url + " healthPath = " + healthPath + " serviceId = " + serviceId);
         boolean healthy = false;
         ClientConnection connection = null;
         try {
@@ -41,6 +42,7 @@ public class ControllerClient {
             } else {
                 connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
             }
+            if(logger.isTraceEnabled()) logger.trace("borrowed connection = " + connection);
             AtomicReference<ClientResponse> reference = send(connection, Methods.GET, healthPath + serviceId, config.getBootstrapToken(), null);
             if(reference != null && reference.get() != null) {
                 int statusCode = reference.get().getResponseCode();

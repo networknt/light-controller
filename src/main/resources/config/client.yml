@@ -74,10 +74,6 @@ oauth:
       # - petstore.w
     # the following section defines uri and parameters for client credentials grant type
     client_credentials:
-      # use the proxyHost and proxyPort if the OAuth 2.0 provider is on the cloud and the
-      # server resides in side an organization with a proxy to the cloud service.
-      # proxyHost: ${client.tokenCcProxyHost:proxy.example.com}
-      # proxyPort: ${client.tokenCcProxyPort:8443}
       # token endpoint for client credentials grant
       uri: ${client.tokenCcUri:/oauth2/token}
       # client_id for client credentials grant flow. client_secret is in secret.yml
@@ -86,8 +82,8 @@ oauth:
       client_secret: ${client.tokenCcClientSecret:f6h1FTI8Q3-7UScPZDzfXA}
       # optional scope, default scope in the client registration will be used if not defined.
       # If there are scopes specified here, they will be verified against the registered scopes.
-      # scope:
-      # - petstore.r
+      scope:
+      - admin
       # - petstore.w
     refresh_token:
       # token endpoint for refresh token grant
