@@ -59,6 +59,14 @@ handlers:
   # Framework endpoint handlers
   - com.networknt.health.HealthGetHandler@health
   - com.networknt.info.ServerInfoGetHandler@info
+  - com.networknt.chaos.KillappAssaultHandler@killapp
+  - com.networknt.chaos.LatencyAssaultHandler@latency
+  - com.networknt.chaos.MemoryAssaultHandler@memory
+  - com.networknt.chaos.ExceptionAssaultHandler@exchaos
+  - com.networknt.chaos.ChaosMonkeyGetHandler@chaosget
+  - com.networknt.chaos.ChaosMonkeyPostHandler@chaospost
+  - com.networknt.logging.handler.LoggerGetHandler@getLogger
+  - com.networknt.logging.handler.LoggerPostHandler@postLogger
   - com.networknt.specification.SpecDisplayHandler@spec
   - com.networknt.specification.SpecSwaggerUIHandler@swaggerui
   - com.networknt.resource.PathResourceHandler@resource
@@ -81,6 +89,10 @@ chains:
     - metrics
     - traceability
     - correlation
+    - killapp
+    - latency
+    - memory
+    - exchaos
     - specification
     - security
     - body
@@ -150,7 +162,12 @@ paths:
       - basic
       - com.networknt.controller.handler.ServicesLoggerPostHandler
 
-  - path: '/health/${server.serviceId:com.networknt.controller-1.0.0}'
+  - path: '/health/readiness/${server.serviceId:com.networknt.controller-1.0.0}'
+    method: 'get'
+    exec:
+      - health
+
+  - path: '/health/liveness/${server.serviceId:com.networknt.controller-1.0.0}'
     method: 'get'
     exec:
       - health
@@ -160,6 +177,30 @@ paths:
     exec:
       - info
 
+  - path: '/logger'
+    method: 'get'
+    exec:
+      - security
+      - getLogger
+
+  - path: '/logger'
+    method: 'post'
+    exec:
+      - security
+      - body
+      - postLogger
+
+  - path: '/chaosmonkey/{assault}'
+    method: 'post'
+    exec:
+      - security
+      - chaospost
+
+  - path: '/chaosmonkey'
+    method: 'get'
+    exec:
+      - security
+      - chaosget
 
   - path: '/spec.yaml'
     method: 'get'

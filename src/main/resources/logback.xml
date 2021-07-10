@@ -39,6 +39,45 @@
             <Pattern>%d{HH:mm:ss.SSS} [%thread] %X{sId} %X{cId} %-5level %class{36}:%L %M - %msg%n</Pattern>
         </layout>
     </appender>
+    
+    <!--stdout-file log-->
+    <appender name="stdout-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/stdout.log.json</file>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                    <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
+                </timestamp>
+                <pattern>
+                    <pattern>
+                        {
+                            "thread": "%thread",
+                            "level": "%-5level",
+                            "logger": "%logger{64}",
+                            "correlationId": "%X{cId}",
+                            "serviceId": "%X{sId}",
+                            "class": "%F",
+                            "lineNumber": "%class{64}:%L",
+                            "method": "%M",
+                            "logMessage": "#tryJson{%message}"
+                        }
+                    </pattern>
+                </pattern>
+                <rootStackTraceElement/>
+                <stackTrace/>
+            </providers>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>log/stdout.log.json.%i.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>5</maxIndex> <!-- max number of archived logs that are kept -->
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>200MB
+            </maxFileSize> <!-- The size of the logfile that triggers a switch to a new logfile, and the current one archived -->
+        </triggeringPolicy>
+    </appender>
 
     <!--audit log-->
     <appender name="audit" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -78,8 +117,9 @@
         </triggeringPolicy>
     </appender>
 
-    <root level="error">
+    <root level="info">
         <appender-ref ref="stdout"/>
+        <appender-ref ref="stdout-file"/>
     </root>
 
     <logger name="com.networknt" level="error" additivity="false">
