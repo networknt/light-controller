@@ -1,5 +1,5 @@
 import React from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { alpha, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -35,9 +35,9 @@ const useStyles = makeStyles((theme) => ({
     search: {
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
+        backgroundColor: alpha(theme.palette.common.white, 0.15),
         '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
+            backgroundColor: alpha(theme.palette.common.white, 0.25),
         },
         marginRight: theme.spacing(2),
         marginLeft: 0,
@@ -103,6 +103,12 @@ export default function Header(props) {
         userService.logout();
         history.push("/login");
     }
+
+    const login = () => {
+        handleMenuClose();
+        history.push("/login");
+    }
+
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -138,7 +144,7 @@ export default function Header(props) {
             }
             {
                 !localStorage.getItem('user') ? (
-                    <MenuItem onClick={handleMenuClose}>Login</MenuItem>
+                    <MenuItem onClick={login}>Login</MenuItem>
                 ) : null
             }
         </Menu>
