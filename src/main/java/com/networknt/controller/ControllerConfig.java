@@ -2,10 +2,29 @@ package com.networknt.controller;
 
 public class ControllerConfig {
     public static String CONFIG_NAME = "controller";
+    private boolean clusterMode;
+    private String topic;
     private boolean dynamicToken;
     private String bootstrapToken;
     private int clientTimeout;
+
     public ControllerConfig() {
+    }
+
+    public boolean isClusterMode() {
+        return clusterMode;
+    }
+
+    public void setClusterMode(boolean clusterMode) {
+        this.clusterMode = clusterMode;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
     public boolean isDynamicToken() {

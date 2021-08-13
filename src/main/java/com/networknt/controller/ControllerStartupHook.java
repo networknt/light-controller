@@ -1,7 +1,11 @@
 package com.networknt.controller;
 
+import com.networknt.config.Config;
 import com.networknt.controller.model.Check;
+import com.networknt.kafka.producer.QueuedLightProducer;
+import com.networknt.kafka.producer.TransactionalProducer;
 import com.networknt.server.StartupHookProvider;
+import com.networknt.service.SingletonServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +32,10 @@ public class ControllerStartupHook implements StartupHookProvider {
     // the first time a service is registered, it will call the /server/info endpoint to get
     // the info with a bootstrap token.
     public static final Map<String, Object> infos = new ConcurrentHashMap<>();
-
+    // scheduled executor service for multiple threading.
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    // controller configuration.
+    public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     @Override
     public void onStartup() {
@@ -38,5 +44,11 @@ public class ControllerStartupHook implements StartupHookProvider {
         long period = 1000L;
         CheckTask checkTask = new CheckTask();
         executor.scheduleAtFixedRate(checkTask, delay, period, TimeUnit.MILLISECONDS);
+        if(config.isClusterMode()) {
+            // create Kafka transactional producer for publishing events to portal-event topic
+            TransactionalProducer producer = (TransactionalProducer) SingletonServiceFactory.getBean(QueuedLightProducer.class);
+            producer.open();
+            new Thread(producer).start();
+        }
     }
 }

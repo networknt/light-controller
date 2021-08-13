@@ -1,14 +1,24 @@
 package com.networknt.controller;
 
+import com.networknt.config.Config;
 import com.networknt.controller.model.Check;
+import com.networknt.kafka.common.AvroSerializer;
+import com.networknt.kafka.common.EventId;
+import com.networknt.kafka.producer.QueuedLightProducer;
+import com.networknt.service.SingletonServiceFactory;
+import net.lightapi.portal.controller.ControllerDeregisteredEvent;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
 
 public class CheckTask extends TimerTask {
     private static final Logger logger = LoggerFactory.getLogger(CheckTask.class);
+    public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     @Override
     public void run() {
@@ -62,12 +72,42 @@ public class CheckTask extends TimerTask {
         if(System.currentTimeMillis() - check.getDeregisterCriticalServiceAfter() > check.getLastFailedTimestamp()) {
             // remove the node as it passed the de-register after.
             String key = check.getTag() == null ?  check.getServiceId() : check.getServiceId() + "|" + check.getTag();
-            List nodes = (List)ControllerStartupHook.services.get(key);
-            nodes = ControllerUtil.delService(nodes, check.getAddress(), check.getPort());
-            if(nodes != null && nodes.size() > 0) {
-                ControllerStartupHook.services.put(key, nodes);
+            if(config.isClusterMode()) {
+                EventId eventId = EventId.newBuilder()
+                        .setId(ControllerConstants.USER_ID)
+                        .setNonce(ControllerConstants.NONCE)
+                        .build();
+                ControllerDeregisteredEvent event = ControllerDeregisteredEvent.newBuilder()
+                        .setEventId(eventId)
+                        .setHost(ControllerConstants.HOST)
+                        .setKey(key)
+                        .setServiceId(check.getServiceId())
+                        .setProtocol(check.getProtocol())
+                        .setTag(check.getTag())
+                        .setAddress(check.getAddress())
+                        .setPort(check.getPort())
+                        .setTimestamp(System.currentTimeMillis())
+                        .build();
+
+                AvroSerializer serializer = new AvroSerializer();
+                byte[] bytes = serializer.serialize(event);
+
+                ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
+                QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
+                BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
+                try {
+                    txQueue.put(record);
+                } catch (InterruptedException e) {
+                    logger.error("Exception:", e);
+                }
             } else {
-                ControllerStartupHook.services.remove(key);
+                List nodes = (List) ControllerStartupHook.services.get(key);
+                nodes = ControllerUtil.delService(nodes, check.getAddress(), check.getPort());
+                if (nodes != null && nodes.size() > 0) {
+                    ControllerStartupHook.services.put(key, nodes);
+                } else {
+                    ControllerStartupHook.services.remove(key);
+                }
             }
         }
     }
