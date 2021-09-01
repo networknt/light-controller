@@ -4,8 +4,10 @@ import com.networknt.config.Config;
 import com.networknt.controller.model.Check;
 import com.networknt.kafka.producer.QueuedLightProducer;
 import com.networknt.kafka.producer.TransactionalProducer;
+import com.networknt.server.Server;
 import com.networknt.server.StartupHookProvider;
 import com.networknt.service.SingletonServiceFactory;
+import com.networknt.utility.NetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,8 @@ public class ControllerStartupHook implements StartupHookProvider {
     // controller configuration.
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
+    public static ServiceRegistrationStreams streams = null;
+
     @Override
     public void onStartup() {
         logger.info("ControllerStartupHook onStartup is called.");
@@ -49,6 +53,13 @@ public class ControllerStartupHook implements StartupHookProvider {
             TransactionalProducer producer = (TransactionalProducer) SingletonServiceFactory.getBean(QueuedLightProducer.class);
             producer.open();
             new Thread(producer).start();
+            // start the service registration streams
+            int port = Server.getServerConfig().getHttpsPort();
+            String ip = NetUtils.getLocalAddressByDatagram();
+            logger.info("ip = " + ip + " port = " + port);
+            streams = new ServiceRegistrationStreams();
+            // start the kafka stream process
+            streams.start(ip, port);
         }
     }
 }

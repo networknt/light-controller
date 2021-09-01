@@ -17,9 +17,11 @@ public class ControllerShutdownHook implements ShutdownHookProvider {
         logger.info("ControllerShutdownHook onStartup is called.");
         ControllerStartupHook.executor.shutdown();
         if(config.isClusterMode()) {
-        // close the Kafka transactional producer before the server is shutdown
+            // close the Kafka transactional producer before the server is shutdown
             QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
             try { if(producer != null) producer.close(); } catch(Exception e) {e.printStackTrace();}
+            // close the streams
+            if(ControllerStartupHook.streams != null) ControllerStartupHook.streams.close();
         }
     }
 }

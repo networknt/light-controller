@@ -71,6 +71,7 @@ public class ServicesPostHandler implements LightHttpHandler {
             QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
             BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
             try {
+                if(logger.isDebugEnabled()) logger.debug("Pushing one record to kafka through the txQueue");
                 txQueue.put(record);
             } catch (InterruptedException e) {
                 logger.error("Exception:", e);
