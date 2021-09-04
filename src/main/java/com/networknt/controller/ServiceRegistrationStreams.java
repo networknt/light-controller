@@ -3,13 +3,10 @@ package com.networknt.controller;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.kafka.common.AvroDeserializer;
-import com.networknt.kafka.common.EventNotification;
 import com.networknt.kafka.common.KafkaStreamsConfig;
 import com.networknt.kafka.streams.LightStreams;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import net.lightapi.portal.controller.ControllerRegisteredEvent;
-import net.lightapi.portal.user.UserCreatedEvent;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KeyQueryMetadata;
@@ -26,14 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceRegistrationStreams implements LightStreams {
     static private final Logger logger = LoggerFactory.getLogger(ServiceRegistrationStreams.class);
-    static private final String APP = "service";
-    static private Properties streamsProps;
+    static private final String APP = "controller";
     static final KafkaStreamsConfig config = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
-    static {
-        streamsProps = new Properties();
-        streamsProps.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
-        streamsProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-    }
 
     static private final String service = "service-store";  // local service store between key and service entity
 
@@ -70,8 +61,9 @@ public class ServiceRegistrationStreams implements LightStreams {
         topology.addStateStore(keyValueServiceStoreBuilder, "ServiceEventProcessor");
         // topology.addSink("NonceProcessor", "portal-nonce", "ServiceEventProcessor");
         // topology.addSink("NotificationProcessor", "portal-notification", "ServiceEventProcessor");
-
-        streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "service-query");
+        Properties streamsProps = new Properties();
+        streamsProps.putAll(config.getProperties());
+        streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, APP);
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
         serviceStreams = new KafkaStreams(topology, streamsProps);
         if(config.isCleanUp()) {

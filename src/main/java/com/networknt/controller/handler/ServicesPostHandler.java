@@ -11,8 +11,6 @@ import com.networknt.controller.model.Check;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;
-import com.networknt.kafka.producer.QueuedLightProducer;
-import com.networknt.service.SingletonServiceFactory;
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -21,8 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Register a service to the controller to indicate it is alive. It is normally called
@@ -68,16 +66,17 @@ public class ServicesPostHandler implements LightHttpHandler {
             byte[] bytes = serializer.serialize(event);
 
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
-            QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
-            BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
-            try {
-                if(logger.isDebugEnabled()) logger.debug("Pushing one record to kafka through the txQueue");
-                txQueue.put(record);
-            } catch (InterruptedException e) {
-                logger.error("Exception:", e);
-                setExchangeStatus(exchange, SEND_MESSAGE_EXCEPTION, e.getMessage(), ControllerConstants.USER_ID);
-                return;
-            }
+            final CountDownLatch latch = new CountDownLatch(1);
+            ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
+                if (Objects.nonNull(e)) {
+                    logger.error("Exception occurred while pushing the event", e);
+                } else {
+                    logger.info("Event record pushed successfully. Received Record Metadata is {}",
+                            recordMetadata);
+                }
+                latch.countDown();
+            });
+            latch.await();
         } else {
             Map<String, Object> nodeMap = new ConcurrentHashMap<>();
             nodeMap.put("protocol", protocol);

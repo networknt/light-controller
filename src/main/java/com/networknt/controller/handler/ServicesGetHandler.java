@@ -76,6 +76,7 @@ public class ServicesGetHandler implements LightHttpHandler {
                         }
                     }
                 }
+                exchange.getResponseSender().send(JsonMapper.toJson(services));
             }
         } else {
             exchange.getResponseSender().send(JsonMapper.toJson(ControllerStartupHook.services));

@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Remove a service from the registry with this put request. If the service doesn't exist, then no action
@@ -71,14 +72,17 @@ public class ServicesDeleteHandler implements LightHttpHandler {
 
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
             QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
-            BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
-            try {
-                txQueue.put(record);
-            } catch (InterruptedException e) {
-                logger.error("Exception:", e);
-                setExchangeStatus(exchange, SEND_MESSAGE_EXCEPTION, e.getMessage(), ControllerConstants.USER_ID);
-                return;
-            }
+            final CountDownLatch latch = new CountDownLatch(1);
+            ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
+                if (Objects.nonNull(e)) {
+                    logger.error("Exception occurred while pushing the event", e);
+                } else {
+                    logger.info("Event record pushed successfully. Received Record Metadata is {}",
+                            recordMetadata);
+                }
+                latch.countDown();
+            });
+            latch.await();
         } else {
             List nodes = (List) ControllerStartupHook.services.get(key);
             nodes = ControllerUtil.delService(nodes, address, port);

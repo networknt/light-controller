@@ -2,12 +2,14 @@ package com.networknt.controller;
 
 import com.networknt.config.Config;
 import com.networknt.controller.model.Check;
+import com.networknt.kafka.producer.NativeLightProducer;
 import com.networknt.kafka.producer.QueuedLightProducer;
 import com.networknt.kafka.producer.TransactionalProducer;
 import com.networknt.server.Server;
 import com.networknt.server.StartupHookProvider;
 import com.networknt.service.SingletonServiceFactory;
 import com.networknt.utility.NetUtils;
+import org.apache.kafka.clients.producer.Producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,19 +42,21 @@ public class ControllerStartupHook implements StartupHookProvider {
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     public static ServiceRegistrationStreams streams = null;
+    public static Producer producer = null;
 
     @Override
     public void onStartup() {
-        logger.info("ControllerStartupHook onStartup is called.");
+        logger.info("ControllerStartupHook onStartup begins.");
         long delay  = 1000L;
         long period = 1000L;
         CheckTask checkTask = new CheckTask();
         executor.scheduleAtFixedRate(checkTask, delay, period, TimeUnit.MILLISECONDS);
         if(config.isClusterMode()) {
             // create Kafka transactional producer for publishing events to portal-event topic
-            TransactionalProducer producer = (TransactionalProducer) SingletonServiceFactory.getBean(QueuedLightProducer.class);
-            producer.open();
-            new Thread(producer).start();
+            NativeLightProducer lightProducer = SingletonServiceFactory.getBean(NativeLightProducer.class);
+            lightProducer.open();
+            producer = lightProducer.getProducer();
+
             // start the service registration streams
             int port = Server.getServerConfig().getHttpsPort();
             String ip = NetUtils.getLocalAddressByDatagram();
@@ -61,5 +65,6 @@ public class ControllerStartupHook implements StartupHookProvider {
             // start the kafka stream process
             streams.start(ip, port);
         }
+        logger.info("ControllerStartupHook onStartup ends.");
     }
 }

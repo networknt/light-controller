@@ -1,4 +1,3 @@
-
 # Singleton service factory configuration/IoC injection
 singletons:
 # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
@@ -9,5 +8,5 @@ singletons:
 - com.networknt.server.ShutdownHookProvider:
   - com.networknt.controller.ControllerShutdownHook
 
-- com.networknt.kafka.producer.QueuedLightProducer:
-  - com.networknt.kafka.producer.TransactionalProducer
+- com.networknt.kafka.producer.NativeLightProducer:
+  - com.networknt.kafka.producer.SidecarProducer
