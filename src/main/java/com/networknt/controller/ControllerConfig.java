@@ -7,6 +7,7 @@ public class ControllerConfig {
     private boolean dynamicToken;
     private String bootstrapToken;
     private int clientTimeout;
+    private String schedulerTopic;
 
     public ControllerConfig() {
     }
@@ -49,5 +50,13 @@ public class ControllerConfig {
 
     public void setClientTimeout(int clientTimeout) {
         this.clientTimeout = clientTimeout;
+    }
+
+    public String getSchedulerTopic() {
+        return schedulerTopic;
+    }
+
+    public void setSchedulerTopic(String schedulerTopic) {
+        this.schedulerTopic = schedulerTopic;
     }
 }

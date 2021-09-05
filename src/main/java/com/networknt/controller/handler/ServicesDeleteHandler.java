@@ -12,6 +12,7 @@ import com.networknt.handler.LightHttpHandler;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;
 import com.networknt.kafka.producer.QueuedLightProducer;
+import com.networknt.scheduler.*;
 import com.networknt.service.SingletonServiceFactory;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
@@ -36,17 +37,18 @@ import java.util.concurrent.CountDownLatch;
 public class ServicesDeleteHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesDeleteHandler.class);
     private static final String SUC10200 = "SUC10200";
-    private static final String SEND_MESSAGE_EXCEPTION = "ERR11605";
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
         String protocol = exchange.getQueryParameters().get("protocol").getFirst();
+        String checkInterval = exchange.getQueryParameters().get("checkInterval").getFirst();
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
         if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
         String key = tag == null ?  serviceId : serviceId + "|" + tag;
+
         String address = exchange.getQueryParameters().get("address").getFirst();
         int port = Integer.valueOf(exchange.getQueryParameters().get("port").getFirst());
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " protocol = " + protocol + " tag = " + tag + " address = " + address + " port = " + port);
@@ -83,6 +85,42 @@ public class ServicesDeleteHandler implements LightHttpHandler {
                 latch.countDown();
             });
             latch.await();
+
+            // send task definition with delete action to stop the task scheduling. Send to the light-scheduler topic directly.
+            String checkId = key + ":" + protocol + ":" + address + ":" + port;
+            TaskDefinitionKey taskDefinitionKey = TaskDefinitionKey.newBuilder()
+                    .setName(checkId)
+                    .setHost(ControllerConstants.HOST)
+                    .build();
+            // Task frequency definition triggers the task every 10 sec once
+            TaskFrequency taskFrequency = TaskFrequency.newBuilder()
+                    .setTimeUnit(TimeUnit.SECONDS)
+                    .setTime(checkInterval == null ? ControllerConstants.CHECK_FREQUENCY : Integer.valueOf(checkInterval) / 1000)
+                    .build();
+
+            TaskDefinition taskDefinition = TaskDefinition.newBuilder()
+                    .setName(checkId)
+                    .setHost(ControllerConstants.HOST)
+                    .setAction(DefinitionAction.DELETE)
+                    .setTopic(ControllerConstants.CHECK_TOPIC)
+                    .setFrequency(taskFrequency)
+                    .build();
+
+            byte[] keyBytes = serializer.serialize(taskDefinitionKey);
+            byte[] valueBytes = serializer.serialize(taskDefinition);
+            ProducerRecord<byte[], byte[]> tdRecord = new ProducerRecord<>(config.getSchedulerTopic(), keyBytes, valueBytes);
+            final CountDownLatch schedulerLatch = new CountDownLatch(1);
+            ControllerStartupHook.producer.send(tdRecord, (recordMetadata, e) -> {
+                if (Objects.nonNull(e)) {
+                    logger.error("Exception occurred while pushing the task definition", e);
+                } else {
+                    logger.info("Task definition record pushed successfully. Received Record Metadata is {}",
+                            recordMetadata);
+                }
+                schedulerLatch.countDown();
+            });
+            schedulerLatch.await();
+
         } else {
             List nodes = (List) ControllerStartupHook.services.get(key);
             nodes = ControllerUtil.delService(nodes, address, port);

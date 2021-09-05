@@ -11,6 +11,7 @@ import com.networknt.controller.model.Check;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;
+import com.networknt.scheduler.*;
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -31,7 +32,6 @@ import java.util.concurrent.CountDownLatch;
 public class ServicesPostHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesPostHandler.class);
     private static final String SUC10200 = "SUC10200";
-    private static final String SEND_MESSAGE_EXCEPTION = "ERR11605";
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     @Override
@@ -77,6 +77,53 @@ public class ServicesPostHandler implements LightHttpHandler {
                 latch.countDown();
             });
             latch.await();
+            // schedule health check task with light-scheduler service. There are two ways to do that:
+            // 1. call the light-scheduler REST API to create a task definition.
+            // 2. produce a task definition to the light-scheduler topic directly.
+            // We are using the option 2 here as we light-controller is a producer already.
+            Check check = JsonMapper.objectMapper.convertValue(body.get("check"), Check.class);
+            TaskDefinitionKey taskDefinitionKey = TaskDefinitionKey.newBuilder()
+                    .setName(check.getId())
+                    .setHost(ControllerConstants.HOST)
+                    .build();
+            // Task frequency definition triggers the task every 10 sec once
+            TaskFrequency taskFrequency = TaskFrequency.newBuilder()
+                    .setTimeUnit(TimeUnit.SECONDS)
+                    .setTime(check.getInterval() == null ? ControllerConstants.CHECK_FREQUENCY : check.getInterval() / 1000) // use the interval and fall back to default 20 seconds.
+                    .build();
+
+            Map<CharSequence, CharSequence> dataMap = new HashMap<>();
+            dataMap.put("id", check.getId());
+            dataMap.put("deregisterCriticalServiceAfter", check.getDeregisterCriticalServiceAfter().toString());
+            dataMap.put("healthPath", check.getHealthPath());
+            dataMap.put("tlsSkipVerify", check.getTlsSkipVerify().toString());
+            dataMap.put("interval", check.getInterval().toString());
+
+            TaskDefinition taskDefinition = TaskDefinition.newBuilder()
+                    .setName(check.getId())
+                    .setHost(ControllerConstants.HOST)
+                    .setAction(DefinitionAction.INSERT)
+                    .setTopic(ControllerConstants.CHECK_TOPIC)
+                    .setFrequency(taskFrequency)
+                    .setData(dataMap)
+                    .build();
+
+            byte[] keyBytes = serializer.serialize(taskDefinitionKey);
+            byte[] valueBytes = serializer.serialize(taskDefinition);
+            ProducerRecord<byte[], byte[]> tdRecord = new ProducerRecord<>(config.getSchedulerTopic(), keyBytes, valueBytes);
+            final CountDownLatch schedulerLatch = new CountDownLatch(1);
+            ControllerStartupHook.producer.send(tdRecord, (recordMetadata, e) -> {
+                if (Objects.nonNull(e)) {
+                    logger.error("Exception occurred while pushing the task definition", e);
+                } else {
+                    logger.info("Task definition record pushed successfully. Received Record Metadata is {}",
+                            recordMetadata);
+                }
+                schedulerLatch.countDown();
+            });
+            schedulerLatch.await();
+
+
         } else {
             Map<String, Object> nodeMap = new ConcurrentHashMap<>();
             nodeMap.put("protocol", protocol);
