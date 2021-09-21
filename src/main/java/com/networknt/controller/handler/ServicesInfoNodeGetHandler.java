@@ -1,14 +1,11 @@
 package com.networknt.controller.handler;
 
-import com.networknt.controller.ControllerStartupHook;
+import com.networknt.controller.ControllerClient;
 import com.networknt.handler.LightHttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Query server info based on the serviceId and tag. There might be multiple instances that separated
@@ -24,8 +21,15 @@ public class ServicesInfoNodeGetHandler implements LightHttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String node = exchange.getQueryParameters().get("node").getFirst();
         if(logger.isTraceEnabled()) logger.trace("node = " + node);
+
+        /* get server info */
+        String protocol = exchange.getQueryParameters().get("protocol").getFirst();
+        String address = exchange.getQueryParameters().get("address").getFirst();
+        int port = Integer.parseInt(exchange.getQueryParameters().get("port").getFirst());
+        String info = ControllerClient.getServerInfo(protocol, address, port);
+
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.setStatusCode(200);
-        exchange.getResponseSender().send((String)ControllerStartupHook.infos.get(node));
+        exchange.getResponseSender().send(info);
     }
 }
