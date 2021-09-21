@@ -46,8 +46,6 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         // delete from the checks, cancel the timer task before deleting.
         String checkId = key + ":" + protocol + ":" + address + ":" + port;
         Check check = ControllerStartupHook.checks.remove(checkId);
-        // delete from the infos
-        ControllerStartupHook.infos.remove(address + ":" + port);
 
         // update all subscribed clients with the nodes
         WebSocketHandler.sendUpdatedNodes(key, nodes);
