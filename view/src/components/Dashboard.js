@@ -128,19 +128,25 @@ function Row(props) {
 
     const handleCheck = (node) => {
         const k = id + ':' + node.protocol + ":" + node.address + ':' + node.port;
-        console.log(node, k);
         history.push({ pathname: '/check', state: { data: { id: k } } });
     }
 
     const handleLogger = (node) => {
-        console.log(node);
         history.push({ pathname: '/logger', state: { data: { node } } });
     }
 
     const handleInfo = (node) => {
-        const k = node.address + ':' + node.port;
-        console.log(node, k);
-        history.push({ pathname: '/info', state: { data: { node: k } } });
+        const originUrl = (typeof window !== 'undefined') ? window.location.protocol + '//' + window.location.host : 'null';
+        const fullNode = node.address + ':' + node.port;
+        history.push({ pathname: '/info', state: {
+            data: {
+                node: fullNode,
+                protocol: node.protocol,
+                address: node.address,
+                port: node.port,
+                baseUrl: originUrl
+            }
+        }});
     }
 
     return (
