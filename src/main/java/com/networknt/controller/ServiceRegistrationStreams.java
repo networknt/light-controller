@@ -24,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceRegistrationStreams implements LightStreams {
     static private final Logger logger = LoggerFactory.getLogger(ServiceRegistrationStreams.class);
     static private final String APP = "controller";
-    static final KafkaStreamsConfig config = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
-
+    static final KafkaStreamsConfig streamsConfig = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
+    static final ControllerConfig controllerConfig = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
     static private final String service = "service-store";  // local service store between key and service entity
 
     KafkaStreams serviceStreams;
@@ -56,17 +56,17 @@ public class ServiceRegistrationStreams implements LightStreams {
 
 
         final Topology topology = new Topology();
-        topology.addSource("SourceTopicProcessor", "portal-event");
+        topology.addSource("SourceTopicProcessor", controllerConfig.getTopic());
         topology.addProcessor("ServiceEventProcessor", ServiceEventProcessor::new, "SourceTopicProcessor");
         topology.addStateStore(keyValueServiceStoreBuilder, "ServiceEventProcessor");
         // topology.addSink("NonceProcessor", "portal-nonce", "ServiceEventProcessor");
         // topology.addSink("NotificationProcessor", "portal-notification", "ServiceEventProcessor");
         Properties streamsProps = new Properties();
-        streamsProps.putAll(config.getProperties());
+        streamsProps.putAll(streamsConfig.getProperties());
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, APP);
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
         serviceStreams = new KafkaStreams(topology, streamsProps);
-        if(config.isCleanUp()) {
+        if(streamsConfig.isCleanUp()) {
             serviceStreams.cleanUp();
         }
         serviceStreams.start();
