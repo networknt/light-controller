@@ -137,12 +137,6 @@ public class ServicesPostHandler implements LightHttpHandler {
             // save the check Object in another map for background process to perform check periodically.
             Check check = JsonMapper.objectMapper.convertValue(body.get("check"), Check.class);
             ControllerStartupHook.checks.put(check.getId(), check);
-            // now try to get server info from by accessing the endpoint with a URL constructed with address and port
-            // we assume that the server is running with https and it can verify the bootstrap token from the controller.
-            String info = ControllerClient.getServerInfo(protocol, address, port);
-            if (info != null) {
-                ControllerStartupHook.infos.put(address + ":" + port, info);
-            }
 
             // update all subscribed clients with the nodes
             WebSocketHandler.sendUpdatedNodes(key, nodes);

@@ -35,7 +35,7 @@ public class ControllerStartupHook implements StartupHookProvider {
     // this map contains all the server info entries per address and port combination as keys.
     // the first time a service is registered, it will call the /server/info endpoint to get
     // the info with a bootstrap token.
-    public static final Map<String, Object> infos = new ConcurrentHashMap<>();
+    // public static final Map<String, Object> infos = new ConcurrentHashMap<>();
     // scheduled executor service for multiple threading.
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     // controller configuration.
