@@ -1,8 +1,6 @@
 package com.networknt.controller.handler;
 
-import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
-import com.networknt.config.JsonMapper;
 import com.networknt.controller.ControllerConfig;
 import com.networknt.controller.ControllerConstants;
 import com.networknt.controller.ControllerStartupHook;
@@ -15,17 +13,13 @@ import com.networknt.kafka.producer.QueuedLightProducer;
 import com.networknt.scheduler.*;
 import com.networknt.service.SingletonServiceFactory;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HttpString;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
-import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 /**

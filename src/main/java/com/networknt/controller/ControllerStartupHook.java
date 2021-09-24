@@ -3,8 +3,6 @@ package com.networknt.controller;
 import com.networknt.config.Config;
 import com.networknt.controller.model.Check;
 import com.networknt.kafka.producer.NativeLightProducer;
-import com.networknt.kafka.producer.QueuedLightProducer;
-import com.networknt.kafka.producer.TransactionalProducer;
 import com.networknt.server.Server;
 import com.networknt.server.StartupHookProvider;
 import com.networknt.service.SingletonServiceFactory;
@@ -32,10 +30,6 @@ public class ControllerStartupHook implements StartupHookProvider {
     // of deregisterAfter if a node is in critical state, the node will be removed from the services
     public static final Map<String, Check> checks = new ConcurrentHashMap<>();
 
-    // this map contains all the server info entries per address and port combination as keys.
-    // the first time a service is registered, it will call the /server/info endpoint to get
-    // the info with a bootstrap token.
-    // public static final Map<String, Object> infos = new ConcurrentHashMap<>();
     // scheduled executor service for multiple threading.
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     // controller configuration.

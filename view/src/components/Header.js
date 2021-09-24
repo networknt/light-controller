@@ -103,12 +103,6 @@ export default function Header(props) {
         userService.logout();
         history.push("/login");
     }
-
-    const login = () => {
-        handleMenuClose();
-        history.push("/login");
-    }
-
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -144,7 +138,7 @@ export default function Header(props) {
             }
             {
                 !localStorage.getItem('user') ? (
-                    <MenuItem onClick={login}>Login</MenuItem>
+                    <MenuItem onClick={handleMenuClose}>Login</MenuItem>
                 ) : null
             }
         </Menu>
