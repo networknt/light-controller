@@ -117,7 +117,7 @@ public class ServicesGetHandler implements LightHttpHandler {
         try {
             ClientConnection conn = connCache.get(url);
             if(conn == null || !conn.isOpen()) {
-                conn = client.connect(new URI(url), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+                conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
                 connCache.put(url, conn);
             }
             // Create one CountDownLatch that will be reset in the callback function
