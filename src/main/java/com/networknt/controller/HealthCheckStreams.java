@@ -9,10 +9,7 @@ import com.networknt.scheduler.TaskDefinition;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.KeyQueryMetadata;
-import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.processor.AbstractProcessor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.state.*;
@@ -24,7 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HealthCheckStreams implements LightStreams {
     static private final Logger logger = LoggerFactory.getLogger(HealthCheckStreams.class);
-    static private final String APP = "health";
     static final KafkaStreamsConfig streamsConfig = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
     static final ControllerConfig controllerConfig = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
     static private final String health = "health-store";  // local health store between key and health check status
@@ -37,7 +33,9 @@ public class HealthCheckStreams implements LightStreams {
     }
 
     public ReadOnlyKeyValueStore<String, String> getHealthStore() {
-        return healthStreams.store(health, QueryableStoreTypes.keyValueStore());
+        QueryableStoreType<ReadOnlyKeyValueStore<String, String>> queryableStoreType = QueryableStoreTypes.keyValueStore();
+        StoreQueryParameters<ReadOnlyKeyValueStore<String, String>> sqp = StoreQueryParameters.fromNameAndType(health, queryableStoreType);
+        return healthStreams.store(sqp);
     }
 
     public KeyQueryMetadata getHealthStreamsMetadata(String key) {
@@ -62,7 +60,7 @@ public class HealthCheckStreams implements LightStreams {
         topology.addStateStore(keyValueHealthStoreBuilder, "HealthCheckProcessor");
         Properties streamsProps = new Properties();
         streamsProps.putAll(streamsConfig.getProperties());
-        streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, APP);
+        streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, controllerConfig.getHealthApplicationId());
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
         healthStreams = new KafkaStreams(topology, streamsProps);
         if(streamsConfig.isCleanUp()) {
