@@ -8,6 +8,8 @@ public class ControllerConfig {
     private String bootstrapToken;
     private int clientTimeout;
     private String schedulerTopic;
+    private String registryApplicationId;
+    private String healthApplicationId;
 
     public ControllerConfig() {
     }
@@ -58,5 +60,21 @@ public class ControllerConfig {
 
     public void setSchedulerTopic(String schedulerTopic) {
         this.schedulerTopic = schedulerTopic;
+    }
+
+    public String getRegistryApplicationId() {
+        return registryApplicationId;
+    }
+
+    public void setRegistryApplicationId(String registryApplicationId) {
+        this.registryApplicationId = registryApplicationId;
+    }
+
+    public String getHealthApplicationId() {
+        return healthApplicationId;
+    }
+
+    public void setHealthApplicationId(String healthApplicationId) {
+        this.healthApplicationId = healthApplicationId;
     }
 }

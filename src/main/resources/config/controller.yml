@@ -13,3 +13,7 @@ bootstrapToken: ${controller.bootstrapToken:eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9
 clientTimeout: ${controller.clientTimeout:2000}
 # Light-scheduler task definition topic for health check task scheduling.
 schedulerTopic: ${controller.schedulerTopic:light-scheduler}
+# The service registration streams application.id
+registryApplicationId: ${controller.registryApplicationId:registry}
+# The health check streams application.id
+healthApplicationId: ${controller.healthApplicationId:health}
