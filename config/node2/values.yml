@@ -1,0 +1,3 @@
+server.serviceId: com.networknt.controller-1.0.0
+server.httpsPort: 8432
+kafka-producer.transactional.id: T1002
