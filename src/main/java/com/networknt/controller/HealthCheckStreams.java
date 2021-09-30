@@ -1,13 +1,10 @@
 package com.networknt.controller;
 
 import com.networknt.config.Config;
-import com.networknt.config.JsonMapper;
 import com.networknt.kafka.common.AvroDeserializer;
 import com.networknt.kafka.common.KafkaStreamsConfig;
 import com.networknt.kafka.streams.LightStreams;
 import com.networknt.scheduler.TaskDefinition;
-import net.lightapi.portal.controller.ControllerDeregisteredEvent;
-import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.processor.AbstractProcessor;
@@ -17,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class HealthCheckStreams implements LightStreams {
     static private final Logger logger = LoggerFactory.getLogger(HealthCheckStreams.class);

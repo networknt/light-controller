@@ -5,8 +5,6 @@ import com.networknt.config.JsonMapper;
 import com.networknt.kafka.common.AvroDeserializer;
 import com.networknt.kafka.common.KafkaStreamsConfig;
 import com.networknt.kafka.streams.LightStreams;
-import com.networknt.scheduler.TaskDefinition;
-import com.networknt.scheduler.TaskDefinitionKey;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.common.serialization.Serdes;
