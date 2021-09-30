@@ -7,6 +7,47 @@
     <name>controller</name>
     <version>2.0.32-SNAPSHOT</version>
 
+    <description>Light Controller</description>
+    <url>https://github.com/networknt/light-controller</url>
+
+    <developers>
+        <developer>
+            <id>stevehu</id>
+            <name>Steve Hu</name>
+            <email>stevehu@gmail.com</email>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/networknt/light-controller/issues</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://repository.jboss.org/licenses/apache-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git://github.com:networknt/light-controller.git</connection>
+        <developerConnection>scm:git://github.com:networknt/light-controller.git</developerConnection>
+        <url>https://github.com:networknt/light-controller.git</url>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -406,6 +447,20 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <repository>
+            <id>snapshots-s01</id>
+            <url>
+                https://s01.oss.sonatype.org/content/repositories/snapshots
+            </url>
+            <snapshots>
+                <enabled>true</enabled>
+                <!-- never, daily, interval:X (where X is in minutes) or always -->
+                <!--<updatePolicy>daily</updatePolicy> -->
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
     </repositories>
 
