@@ -4,6 +4,7 @@ import Dashboard from "./components/Dashboard";
 import HealthCheck from "./components/HealthCheck";
 import ServerInfo from "./components/ServerInfo";
 import LoggerConfig from "./components/LoggerConfig";
+import ChaosMonkey from "./components/ChaosMonkey"
 import Login from "./components/Login";
 import Header from './components/Header';
 import Form from "./components/Form";
@@ -19,6 +20,7 @@ const App = () => {
         <Route exact path="/form/:formId" component={Form} />
         <Route path="/check" component={HealthCheck} />
         <Route path="/info" component={ServerInfo} />
+        <Route path="/chaos" component={ChaosMonkey} />
         <Route path="/login" component={Login} />
         <Route path="/logger" component={LoggerConfig} />
         <Route path="/failure" component={Failure} />
