@@ -11,6 +11,8 @@ public class Check  {
     private String notes;
     private String name;
     private Integer interval;
+    //In case health check failed already, the interval will increase
+    private Integer executeInterval=0;
     private String id;
     private Integer deregisterCriticalServiceAfter;
     private long lastExecuteTimestamp = 0L;
@@ -64,6 +66,14 @@ public class Check  {
 
     public void setInterval(Integer interval) {
         this.interval = interval;
+    }
+
+    public Integer getExecuteInterval() {
+        return executeInterval;
+    }
+
+    public void setExecuteInterval(Integer executeInterval) {
+        this.executeInterval = executeInterval;
     }
 
     @JsonProperty("id")

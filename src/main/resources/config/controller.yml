@@ -1,5 +1,5 @@
 # Cluster mode that uses Kafka as backend for high availability
-clusterMode: ${controller.clusterMode:true}
+clusterMode: ${controller.clusterMode:false}
 # The portal event topic for Kafka cluster used for the cluster mode
 topic: ${controller.topic:portal-event}
 # If the OAuth 2.0 implementation does not support long-lived token, we need to set up the controller to get a jwt token
