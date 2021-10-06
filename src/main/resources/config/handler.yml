@@ -82,6 +82,9 @@ handlers:
   - com.networknt.controller.handler.WebSocketHandler
   - com.networknt.controller.handler.ServicesLoggerGetHandler
   - com.networknt.controller.handler.ServicesLoggerPostHandler
+  - com.networknt.controller.handler.ServicesChaosMonkeyGetHandler
+  - com.networknt.controller.handler.ServicesChaosMonkeyPostHandler
+  - com.networknt.controller.handler.ServicesChaosMonkeyAssaultPostHandler
 
 chains:
   default:
@@ -142,11 +145,26 @@ paths:
     exec:
       - basic
       - com.networknt.controller.handler.ServicesCheckIdGetHandler
-  - path: '/services/info/{node}'
+  - path: '/services/info'
     method: 'GET'
     exec:
       - basic
       - com.networknt.controller.handler.ServicesInfoNodeGetHandler
+  - path: '/services/chaosmonkey'
+    method: 'GET'
+    exec:
+      - basic
+      - com.networknt.controller.handler.ServicesChaosMonkeyGetHandler
+  - path: '/services/chaosmonkey'
+    method: 'POST'
+    exec:
+      - basic
+      - com.networknt.controller.handler.ServicesChaosMonkeyPostHandler
+  - path: '/services/chaosmonkey/assault'
+    method: 'POST'
+    exec:
+      - basic
+      - com.networknt.controller.handler.ServicesChaosMonkeyAssaultPostHandler
   - path: '/ws'
     method: 'get'
     exec:

@@ -17,6 +17,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import CloudDoneIcon from '@material-ui/icons/CloudDone';
 import HelpIcon from '@material-ui/icons/Help';
 import PermDataSettingIcon from '@material-ui/icons/PermDataSetting';
+import AssessmentIcon from '@material-ui/icons/Assessment';
+import ChaosMonkey from './ChaosMonkey'
 import './Dashboard.css';
 import { useAppState } from "../contexts/AppContext";
 
@@ -29,13 +31,12 @@ const useRowStyles = makeStyles({
 });
 
 function Dashboard(props) {
-    console.log(props);
     const {history} = props;
-    const [services, setServices] = useState();
+    const [services, setServices] = useState(false);
     const serviceIds = services ? Object.keys(services) : [];
-    const [error, setError] = useState();
+    const [error, setError] = useState(false);
     const [loading, setLoading] = useState(true);
-    const { filter } = useAppState();
+    const { filter } = useAppState(false);
     const filteredServiceIds = serviceIds.filter(serviceId => serviceId.toLowerCase().includes(filter) || !filter)
     const url = '/services';
     const headers = {'Authorization': 'Basic ' + localStorage.getItem('user')};
@@ -48,22 +49,19 @@ function Dashboard(props) {
                 const response = await fetch(url, { headers, signal: abortController.signal });
                 if (!response.ok) {
                     const data = await response.json();
-                    console.log(data);
                     setLoading(false);
                     if(data.code === 'ERR10002' || data.code === 'ERR10046' || data.code === 'ERR10047') {
                         history.push({ pathname: '/login', state: { from: props.location } });
                     } else {
                         setError(data);
-                    }  
+                    }
                 } else {
                     const data = await response.json();
-                    console.log(data);
                     setServices(data);
                     setLoading(false);
                 }
             } catch (e) {
                 if (!abortController.signal.aborted) {
-                    console.log(e);
                     setLoading(false);
                 }
             }
@@ -77,20 +75,15 @@ function Dashboard(props) {
     }, []);
 
     let wait;
-    console.log(loading, error, services);
-
     if (loading) {
-        console.log('display circular progress');
         wait = (<div><CircularProgress /></div>);
     } else if (error) {
-        console.log('display error');
         wait = (
             <div>
                 <pre>{JSON.stringify(error, null, 2)}</pre>
             </div>
         )
     } else if (services) {
-        console.log('display services = ', services);
         wait = (
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
@@ -149,6 +142,19 @@ function Row(props) {
         }});
     }
 
+    const handleChaosMonkey = (node) => {
+      const originUrl = (typeof window !== 'undefined') ? window.location.protocol + '//' + window.location.host : 'null';
+      history.push({
+        pathname: '/chaos', state: {
+          data: {
+            protocol: node.protocol,
+            address: node.address,
+            port: node.port,
+            baseUrl: originUrl,
+          }
+        }});
+    }
+
     return (
         <React.Fragment>
             <TableRow className={classes.root}>
@@ -179,6 +185,7 @@ function Row(props) {
                                         <TableCell align="right">Status Check</TableCell>
                                         <TableCell align="right">Server Info</TableCell>
                                         <TableCell align="right">Logger Config</TableCell>
+                                        <TableCell align="right">Chaos Monkey</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -189,9 +196,26 @@ function Row(props) {
                                             </TableCell>
                                             <TableCell>{node.address}</TableCell>
                                             <TableCell align="right">{node.port}</TableCell>
-                                            <TableCell align="right"><CloudDoneIcon onClick={() => handleCheck(node)} /></TableCell>
-                                            <TableCell align="right"><HelpIcon onClick={() => handleInfo(node)} /></TableCell>
-                                            <TableCell align="right"><PermDataSettingIcon onClick={() => handleLogger(node)} /></TableCell>
+                                            <TableCell align="right">
+                                              <IconButton onClick={() => handleCheck(node)}>
+                                                <CloudDoneIcon />
+                                              </IconButton>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                              <IconButton onClick={() => handleInfo(node)}>
+                                                <HelpIcon  />
+                                              </IconButton>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                              <IconButton onClick={() => handleLogger(node)}>
+                                                <PermDataSettingIcon  />
+                                              </IconButton>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                              <IconButton onClick={() => handleChaosMonkey(node)} >
+                                                <AssessmentIcon />
+                                              </IconButton>
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

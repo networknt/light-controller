@@ -19,9 +19,6 @@ public class ServicesInfoNodeGetHandler implements LightHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        String node = exchange.getQueryParameters().get("node").getFirst();
-        if(logger.isTraceEnabled()) logger.trace("node = " + node);
-
         /* get server info */
         String protocol = exchange.getQueryParameters().get("protocol").getFirst();
         String address = exchange.getQueryParameters().get("address").getFirst();
