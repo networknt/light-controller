@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ControllerStartupHook implements StartupHookProvider {
+
     private static final Logger logger = LoggerFactory.getLogger(ControllerStartupHook.class);
     // this is the service map. The key is serviceId or serviceId + | + tag and the value is a
     // list of map with address and port as keys. The list can only be updated with service post
