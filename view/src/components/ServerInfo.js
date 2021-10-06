@@ -15,7 +15,7 @@ export default function ServerInfo(props) {
     const [loading, setLoading] = useState(true);
 
     /* build query params */
-    var url = new URL(baseUrl + '/services/info/' + node),
+    var url = new URL(baseUrl + '/services/info'),
         params = {'protocol': protocol, 'port': port, 'address': address};
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
 
