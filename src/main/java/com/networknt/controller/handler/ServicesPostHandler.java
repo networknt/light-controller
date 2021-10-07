@@ -105,6 +105,7 @@ public class ServicesPostHandler implements LightHttpHandler {
                     .setAction(DefinitionAction.INSERT)
                     .setTopic(ControllerConstants.CHECK_TOPIC)
                     .setFrequency(taskFrequency)
+                    .setStart(System.currentTimeMillis())
                     .setData(dataMap)
                     .build();
 

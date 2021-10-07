@@ -60,7 +60,7 @@ public class ServicesGetHandler implements LightHttpHandler {
             if(local) {
                 exchange.getResponseSender().send(JsonMapper.toJson(getLocalServices()));
             } else {
-                Collection<StreamsMetadata> metadataList = ControllerStartupHook.streams.getAllServiceStreamsMetadata();
+                Collection<StreamsMetadata> metadataList = ControllerStartupHook.srStreams.getAllServiceStreamsMetadata();
                 Map<String, Object> services = new HashMap<>();
 
                 for (StreamsMetadata metadata : metadataList) {
@@ -86,7 +86,7 @@ public class ServicesGetHandler implements LightHttpHandler {
     private Map<String, Object> getLocalServices() {
         Map<String, Object> services = new HashMap<>();
         // local store access.
-        ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.streams.getServiceStore();
+        ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
         KeyValueIterator<String, String> iterator = serviceStore.all();
         while(iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();

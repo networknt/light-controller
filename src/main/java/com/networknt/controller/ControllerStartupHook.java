@@ -35,7 +35,8 @@ public class ControllerStartupHook implements StartupHookProvider {
     // controller configuration.
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
-    public static ServiceRegistrationStreams streams = null;
+    public static ServiceRegistrationStreams srStreams = null;
+    public static HealthCheckStreams hcStreams = null;
     public static Producer producer = null;
 
     @Override
@@ -51,13 +52,15 @@ public class ControllerStartupHook implements StartupHookProvider {
             lightProducer.open();
             producer = lightProducer.getProducer();
 
-            // start the service registration streams
             int port = Server.getServerConfig().getHttpsPort();
             String ip = NetUtils.getLocalAddressByDatagram();
             logger.info("ip = " + ip + " port = " + port);
-            streams = new ServiceRegistrationStreams();
-            // start the kafka stream process
-            streams.start(ip, port);
+            // start the service registration streams
+            srStreams = new ServiceRegistrationStreams();
+            srStreams.start(ip, port);
+            // start the health check streams
+            hcStreams = new HealthCheckStreams();
+            hcStreams.start(ip, port);
         }
         logger.info("ControllerStartupHook onStartup ends.");
     }

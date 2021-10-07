@@ -51,7 +51,7 @@ public class HealthCheckStreams implements LightStreams {
 
 
         final Topology topology = new Topology();
-        topology.addSource("SourceTopicProcessor", controllerConfig.getSchedulerTopic());
+        topology.addSource("SourceTopicProcessor", controllerConfig.getHealthCheckTopic());
         topology.addProcessor("HealthCheckProcessor", HealthCheckStreams.HealthCheckProcessor::new, "SourceTopicProcessor");
         topology.addStateStore(keyValueHealthStoreBuilder, "HealthCheckProcessor");
         Properties streamsProps = new Properties();

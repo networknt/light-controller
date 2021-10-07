@@ -98,6 +98,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
                     .setAction(DefinitionAction.DELETE)
                     .setTopic(ControllerConstants.CHECK_TOPIC)
                     .setFrequency(taskFrequency)
+                    .setStart(System.currentTimeMillis())
                     .build();
 
             byte[] keyBytes = serializer.serialize(taskDefinitionKey);
