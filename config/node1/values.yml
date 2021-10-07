@@ -1,4 +1,3 @@
-controller.clusterMode: false
+controller.clusterMode: true
 server.serviceId: com.networknt.controller-1.0.0
 server.httpsPort: 8431
-kafka-producer.transactional.id: T1001
