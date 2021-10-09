@@ -125,7 +125,8 @@
     </root>
 
     <logger name="com.networknt" level="error" additivity="false">
-        <appender-ref ref="log"/>
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="stdout-file"/>
     </logger>
 
     <logger name="Audit" level="error" additivity="false">

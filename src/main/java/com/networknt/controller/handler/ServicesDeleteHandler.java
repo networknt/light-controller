@@ -31,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
 public class ServicesDeleteHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesDeleteHandler.class);
     private static final String SUC10200 = "SUC10200";
-    public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -46,7 +45,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         String address = exchange.getQueryParameters().get("address").getFirst();
         int port = Integer.valueOf(exchange.getQueryParameters().get("port").getFirst());
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " protocol = " + protocol + " tag = " + tag + " address = " + address + " port = " + port);
-        if(config.isClusterMode()) {
+        if(ControllerStartupHook.config.isClusterMode()) {
             EventId eventId = EventId.newBuilder()
                     .setId(ControllerConstants.USER_ID)
                     .setNonce(ControllerConstants.NONCE)
@@ -66,7 +65,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
             AvroSerializer serializer = new AvroSerializer();
             byte[] bytes = serializer.serialize(event);
 
-            ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
+            ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
             QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
             final CountDownLatch latch = new CountDownLatch(1);
             ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
@@ -98,11 +97,12 @@ public class ServicesDeleteHandler implements LightHttpHandler {
                     .setAction(DefinitionAction.DELETE)
                     .setTopic(ControllerConstants.CHECK_TOPIC)
                     .setFrequency(taskFrequency)
+                    .setStart(System.currentTimeMillis())
                     .build();
 
             byte[] keyBytes = serializer.serialize(taskDefinitionKey);
             byte[] valueBytes = serializer.serialize(taskDefinition);
-            ProducerRecord<byte[], byte[]> tdRecord = new ProducerRecord<>(config.getSchedulerTopic(), keyBytes, valueBytes);
+            ProducerRecord<byte[], byte[]> tdRecord = new ProducerRecord<>(ControllerStartupHook.config.getSchedulerTopic(), keyBytes, valueBytes);
             final CountDownLatch schedulerLatch = new CountDownLatch(1);
             ControllerStartupHook.producer.send(tdRecord, (recordMetadata, e) -> {
                 if (Objects.nonNull(e)) {

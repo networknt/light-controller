@@ -21,8 +21,10 @@ public class ControllerShutdownHook implements ShutdownHookProvider {
             // close the Kafka Sidecar producer before the server is shutdown
             NativeLightProducer producer = SingletonServiceFactory.getBean(NativeLightProducer.class);
             try { if(producer != null) producer.close(); } catch(Exception e) {e.printStackTrace();}
-            // close the streams
-            if(ControllerStartupHook.streams != null) ControllerStartupHook.streams.close();
+            // close the service registration streams
+            if(ControllerStartupHook.srStreams != null) ControllerStartupHook.srStreams.close();
+            // close the health check streams
+            if(ControllerStartupHook.hcStreams != null) ControllerStartupHook.hcStreams.close();
         }
         logger.info("ControllerShutdownHook onStartup ends.");
     }

@@ -116,6 +116,8 @@ public class ServiceRegistrationStreams implements LightStreams {
                     } else {
                         nodes = JsonMapper.string2List(nodesString);
                     }
+                    // before we add a new entry to the list, we need to make sure that the same entry doesn't exist.
+                    nodes.removeIf(e -> (e.get("protocol").equals(controllerRegisteredEvent.getProtocol()) && e.get("address").equals(controllerRegisteredEvent.getAddress()) && controllerRegisteredEvent.getPort() == (Integer)e.get("port")));
                     nodes.add(nodeMap);
                     nodesString = JsonMapper.toJson(nodes);
                     serviceStore.put(controllerRegisteredEvent.getKey(), nodesString);
