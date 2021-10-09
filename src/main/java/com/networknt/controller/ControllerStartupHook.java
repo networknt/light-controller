@@ -7,6 +7,7 @@ import com.networknt.server.Server;
 import com.networknt.server.StartupHookProvider;
 import com.networknt.service.SingletonServiceFactory;
 import com.networknt.utility.NetUtils;
+import io.undertow.client.ClientConnection;
 import org.apache.kafka.clients.producer.Producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,9 @@ public class ControllerStartupHook implements StartupHookProvider {
     // controller configuration.
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
+    // client connection cache shared by all the interactive query APIs that access other nodes.
+    public static final Map<String, ClientConnection> connCache = new ConcurrentHashMap<>();
+
     public static ServiceRegistrationStreams srStreams = null;
     public static HealthCheckStreams hcStreams = null;
     public static Producer producer = null;
@@ -42,10 +46,6 @@ public class ControllerStartupHook implements StartupHookProvider {
     @Override
     public void onStartup() {
         logger.info("ControllerStartupHook onStartup begins.");
-        long delay  = 1000L;
-        long period = 1000L;
-        CheckTask checkTask = new CheckTask();
-        executor.scheduleAtFixedRate(checkTask, delay, period, TimeUnit.MILLISECONDS);
         if(config.isClusterMode()) {
             // create Kafka transactional producer for publishing events to portal-event topic
             NativeLightProducer lightProducer = SingletonServiceFactory.getBean(NativeLightProducer.class);
@@ -61,6 +61,11 @@ public class ControllerStartupHook implements StartupHookProvider {
             // start the health check streams
             hcStreams = new HealthCheckStreams();
             hcStreams.start(ip, port);
+        } else {
+            long delay  = 1000L;
+            long period = 1000L;
+            CheckTask checkTask = new CheckTask();
+            executor.scheduleAtFixedRate(checkTask, delay, period, TimeUnit.MILLISECONDS);
         }
         logger.info("ControllerStartupHook onStartup ends.");
     }

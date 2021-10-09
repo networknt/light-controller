@@ -3,7 +3,6 @@ package com.networknt.controller.handler;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.controller.ControllerClient;
 import com.networknt.controller.ControllerConfig;
 import com.networknt.controller.ControllerConstants;
 import com.networknt.controller.ControllerStartupHook;
@@ -32,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
 public class ServicesPostHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesPostHandler.class);
     private static final String SUC10200 = "SUC10200";
-    public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -43,8 +41,9 @@ public class ServicesPostHandler implements LightHttpHandler {
         String protocol = (String)body.get("protocol");
         String address = (String)body.get("address");
         int port = (Integer)body.get("port");
+        Check check = JsonMapper.objectMapper.convertValue(body.get(ControllerConstants.CHECK), Check.class);
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " protocol = " + protocol + " address = " + address + " port = " + port + " check = " + body.get(ControllerConstants.CHECK));
-        if(config.isClusterMode()) {
+        if(ControllerStartupHook.config.isClusterMode()) {
             EventId eventId = EventId.newBuilder()
                     .setId(ControllerConstants.USER_ID)
                     .setNonce(ControllerConstants.NONCE)
@@ -65,7 +64,7 @@ public class ServicesPostHandler implements LightHttpHandler {
             AvroSerializer serializer = new AvroSerializer();
             byte[] bytes = serializer.serialize(event);
 
-            ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
+            ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
             final CountDownLatch latch = new CountDownLatch(1);
             ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
                 if (Objects.nonNull(e)) {
@@ -81,7 +80,6 @@ public class ServicesPostHandler implements LightHttpHandler {
             // 1. call the light-scheduler REST API to create a task definition.
             // 2. produce a task definition to the light-scheduler topic directly.
             // We are using the option 2 here as we light-controller is a producer already.
-            Check check = JsonMapper.objectMapper.convertValue(body.get("check"), Check.class);
             TaskDefinitionKey taskDefinitionKey = TaskDefinitionKey.newBuilder()
                     .setName(check.getId())
                     .setHost(ControllerConstants.HOST)
@@ -92,12 +90,20 @@ public class ServicesPostHandler implements LightHttpHandler {
                     .setTime(check.getInterval() == null ? ControllerConstants.CHECK_FREQUENCY : check.getInterval() / 1000) // use the interval and fall back to default 20 seconds.
                     .build();
 
-            Map<CharSequence, CharSequence> dataMap = new HashMap<>();
+            Map<String, String> dataMap = new HashMap<>();
             dataMap.put("id", check.getId());
             dataMap.put("deregisterCriticalServiceAfter", check.getDeregisterCriticalServiceAfter().toString());
             dataMap.put("healthPath", check.getHealthPath());
             dataMap.put("tlsSkipVerify", check.getTlsSkipVerify().toString());
             dataMap.put("interval", check.getInterval().toString());
+            dataMap.put("executeInterval", String.valueOf(check.getExecuteInterval()));
+            dataMap.put("lastExecuteTimestamp", String.valueOf(check.getLastExecuteTimestamp()));
+            dataMap.put("lastFailedTimestamp", String.valueOf(check.getLastFailedTimestamp()));
+            dataMap.put("serviceId", check.getServiceId());
+            dataMap.put("tag", check.getTag());
+            dataMap.put("protocol", check.getProtocol());
+            dataMap.put("address", check.getAddress());
+            dataMap.put("port", String.valueOf(check.getPort()));
 
             TaskDefinition taskDefinition = TaskDefinition.newBuilder()
                     .setName(check.getId())
@@ -111,7 +117,7 @@ public class ServicesPostHandler implements LightHttpHandler {
 
             byte[] keyBytes = serializer.serialize(taskDefinitionKey);
             byte[] valueBytes = serializer.serialize(taskDefinition);
-            ProducerRecord<byte[], byte[]> tdRecord = new ProducerRecord<>(config.getSchedulerTopic(), keyBytes, valueBytes);
+            ProducerRecord<byte[], byte[]> tdRecord = new ProducerRecord<>(ControllerStartupHook.config.getSchedulerTopic(), keyBytes, valueBytes);
             final CountDownLatch schedulerLatch = new CountDownLatch(1);
             ControllerStartupHook.producer.send(tdRecord, (recordMetadata, e) -> {
                 if (Objects.nonNull(e)) {
@@ -135,8 +141,6 @@ public class ServicesPostHandler implements LightHttpHandler {
             nodes = addService(nodes, nodeMap);
             ControllerStartupHook.services.put(key, nodes);
 
-            // save the check Object in another map for background process to perform check periodically.
-            Check check = JsonMapper.objectMapper.convertValue(body.get("check"), Check.class);
             ControllerStartupHook.checks.put(check.getId(), check);
 
             // update all subscribed clients with the nodes

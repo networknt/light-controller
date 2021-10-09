@@ -29,7 +29,6 @@ import org.xnio.OptionMap;
 
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -43,16 +42,14 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ServicesGetHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesGetHandler.class);
-    private static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
     static Http2Client client = Http2Client.getInstance();
-    static Map<String, ClientConnection> connCache = new ConcurrentHashMap<>();
     static final String GENERIC_EXCEPTION = "ERR10014";
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         exchange.setStatusCode(200);
-        if(config.isClusterMode()) {
+        if(ControllerStartupHook.config.isClusterMode()) {
             // get query parameter for the local indicator.
             boolean local = false;
             Deque<String> localDeque = exchange.getQueryParameters().get("local");
@@ -115,10 +112,10 @@ public class ServicesGetHandler implements LightHttpHandler {
     public static Result<String> callQueryExchangeUrl(HttpServerExchange exchange, String url) {
         Result<String> result = null;
         try {
-            ClientConnection conn = connCache.get(url);
+            ClientConnection conn = ControllerStartupHook.connCache.get(url);
             if(conn == null || !conn.isOpen()) {
                 conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
-                connCache.put(url, conn);
+                ControllerStartupHook.connCache.put(url, conn);
             }
             // Create one CountDownLatch that will be reset in the callback function
             final CountDownLatch latch = new CountDownLatch(1);
