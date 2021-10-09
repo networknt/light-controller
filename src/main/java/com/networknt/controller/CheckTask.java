@@ -54,11 +54,14 @@ public class CheckTask extends TimerTask {
             boolean res = ControllerClient.checkHealth(check.getProtocol(), check.getAddress(), check.getPort(), check.getHealthPath(), check.getServiceId());
             check.setLastExecuteTimestamp(System.currentTimeMillis());
             if(res) {
+                // once the health check is successful, reset the last failedTimestamp to 0 so that it is not continue counting.
+                // also set the executeInterval to normal interval from the task definition interval.
                 check.setLastFailedTimestamp(0L);
                 check.setExecuteInterval(check.getInterval());
             } else {
                 // only set the failure flag if it is not set yet.
                 if(check.getLastFailedTimestamp() == 0L) check.setLastFailedTimestamp(System.currentTimeMillis());
+                // double the health check executeInterval to avoid hitting the failed server too fast.
                 check.setExecuteInterval(check.getExecuteInterval()*2);
             }
             if(check.getLastFailedTimestamp() != 0L) {
