@@ -116,10 +116,10 @@ public class HealthCheckStreams implements LightStreams {
                     TaskDefinition taskDefinition = (TaskDefinition) object;
                     // this is the task definition from the controller-health-check topic for the scheduled health check task.
                     if (logger.isTraceEnabled()) logger.trace("Task Definition = " + taskDefinition);
-                    // need to make sure the message is not too old based on the time unit. Get the frequency * 2 in milliseconds.
+                    // need to make sure the message not DELETE action and  is not too old based on the time unit. Get the frequency * 2 in milliseconds.
                     long gracePeriod = TimeUtil.oneTimeUnitMillisecond(TimeUnit.valueOf(taskDefinition.getFrequency().getTimeUnit().name())) * taskDefinition.getFrequency().getTime() * 2;
                     if(logger.isTraceEnabled()) logger.trace("current = " + System.currentTimeMillis() + " task start = " + taskDefinition.getStart() + " gracePeriod = " + gracePeriod);
-                    if(System.currentTimeMillis() - taskDefinition.getStart() < gracePeriod) {
+                    if(DefinitionAction.DELETE != taskDefinition.getAction() && System.currentTimeMillis() - taskDefinition.getStart() < gracePeriod) {
                         // not too old and do the health check here.
                         // first get the health check object from the store.
                         Map<String, String> data = taskDefinition.getData();
