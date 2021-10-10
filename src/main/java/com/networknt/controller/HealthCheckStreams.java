@@ -116,56 +116,91 @@ public class HealthCheckStreams implements LightStreams {
                     TaskDefinition taskDefinition = (TaskDefinition) object;
                     // this is the task definition from the controller-health-check topic for the scheduled health check task.
                     if (logger.isTraceEnabled()) logger.trace("Task Definition = " + taskDefinition);
-                    // need to make sure the message not DELETE action and  is not too old based on the time unit. Get the frequency * 2 in milliseconds.
-                    long gracePeriod = TimeUtil.oneTimeUnitMillisecond(TimeUnit.valueOf(taskDefinition.getFrequency().getTimeUnit().name())) * taskDefinition.getFrequency().getTime() * 2;
-                    if(logger.isTraceEnabled()) logger.trace("current = " + System.currentTimeMillis() + " task start = " + taskDefinition.getStart() + " gracePeriod = " + gracePeriod);
-                    if(DefinitionAction.DELETE != taskDefinition.getAction() && System.currentTimeMillis() - taskDefinition.getStart() < gracePeriod) {
-                        // not too old and do the health check here.
-                        // first get the health check object from the store.
-                        Map<String, String> data = taskDefinition.getData();
-                        String healthString = healthStore.get(data.get("id"));
-                        Map<String, String> healthMap = null;
-                        if(healthString != null) {
-                            // not the first time, let's convert this into a map and update it.
-                            Map<String, Object> objects = JsonMapper.string2Map(healthString);
-                            healthMap = objects.entrySet().stream()
-                                    .collect(Collectors.toMap(Map.Entry::getKey, e -> (String)e.getValue()));
-                        } else {
-                            // first time to run the health check for this id. Create a map and populate it with the data.
-                            healthMap = new HashMap<>(data);
-                        }
-                        String healthPath = data.get("healthPath");
-                        if(healthPath != null) {
-                            // HTTP health check is used.
-                            boolean res = ControllerClient.checkHealth(data.get("protocol"), data.get("address"), Integer.valueOf(data.get("port")), healthPath, data.get("serviceId"));
-                            healthMap.put("lastExecuteTimestamp", String.valueOf(System.currentTimeMillis()));
-                            if(res) {
-                                // once the health check is successful, reset the last failedTimestamp to 0 so that it is not continue counting.
-                                // also set the executeInterval to normal interval from the task definition interval.
-                                healthMap.put("lastFailedTimestamp", "0");
-                                healthMap.put("executeInterval", data.get("interval"));
-                            } else {
-                                // only set the failure flag if it is not set yet.
-                                if("0".equals(healthMap.get("lastFailedTimestamp"))) healthMap.put("lastFailedTimestamp", String.valueOf(System.currentTimeMillis()));
-                                // double the health check executeInterval to avoid hitting the failed server too fast.
-                                healthMap.put("executeInterval", String.valueOf(Integer.valueOf(healthMap.get("executeInterval"))*2));
+                    Map<String, String> data = taskDefinition.getData();
+                    switch(taskDefinition.getAction()) {
+                        case INSERT:
+                            // need to make sure the message is not too old based on the time unit. Get the frequency * 2 in milliseconds.
+                            long gracePeriod = TimeUtil.oneTimeUnitMillisecond(TimeUnit.valueOf(taskDefinition.getFrequency().getTimeUnit().name())) * taskDefinition.getFrequency().getTime() * 2;
+                            if(logger.isTraceEnabled()) logger.trace("current = " + System.currentTimeMillis() + " task start = " + taskDefinition.getStart() + " gracePeriod = " + gracePeriod);
+                            if(System.currentTimeMillis() - taskDefinition.getStart() < gracePeriod) {
+                                // not too old and do the health check here.
+                                // first get the health check object from the store.
+                                String healthString = healthStore.get(data.get("id"));
+                                Map<String, String> healthMap = null;
+                                if(healthString != null) {
+                                    // not the first time, let's convert this into a map and update it.
+                                    Map<String, Object> objects = JsonMapper.string2Map(healthString);
+                                    healthMap = objects.entrySet().stream()
+                                            .collect(Collectors.toMap(Map.Entry::getKey, e -> (String)e.getValue()));
+                                } else {
+                                    // first time to run the health check for this id. Create a map and populate it with the data.
+                                    healthMap = new HashMap<>(data);
+                                }
+                                String healthPath = data.get("healthPath");
+                                if(healthPath != null) {
+                                    // HTTP health check is used.
+                                    boolean res = ControllerClient.checkHealth(data.get("protocol"), data.get("address"), Integer.valueOf(data.get("port")), healthPath, data.get("serviceId"));
+                                    healthMap.put("lastExecuteTimestamp", String.valueOf(System.currentTimeMillis()));
+                                    if(res) {
+                                        // once the health check is successful, reset the last failedTimestamp to 0 so that it is not continue counting.
+                                        // also set the executeInterval to normal interval from the task definition interval.
+                                        healthMap.put("lastFailedTimestamp", "0");
+                                        healthMap.put("executeInterval", data.get("interval"));
+                                    } else {
+                                        // only set the failure flag if it is not set yet.
+                                        if("0".equals(healthMap.get("lastFailedTimestamp"))) healthMap.put("lastFailedTimestamp", String.valueOf(System.currentTimeMillis()));
+                                        // double the health check executeInterval to avoid hitting the failed server too fast.
+                                        healthMap.put("executeInterval", String.valueOf(Integer.valueOf(healthMap.get("executeInterval"))*2));
+                                    }
+                                    if(!"0".equals(healthMap.get("lastFailedTimestamp"))) {
+                                        // calculate if we need to remove the node.
+                                        removeNode(healthMap);
+                                    }
+                                } else {
+                                    // TTL health check is used.
+                                    if(!"0".equals(healthMap.get("lastFailedTimestamp"))) {
+                                        // calculate if we need to remove the node.
+                                        removeNode(healthMap);
+                                    } else {
+                                        // last failed time is 0, set it to current
+                                        healthMap.put("lastFailedTimestamp", String.valueOf(System.currentTimeMillis()));
+                                    }
+                                }
+                                // save the health check object to the key value store for query.
+                                healthStore.put(data.get("id"), JsonMapper.toJson(healthMap));
                             }
-                            if(!"0".equals(healthMap.get("lastFailedTimestamp"))) {
-                                // calculate if we need to remove the node.
-                                removeNode(healthMap);
+                            break;
+                        case UPDATE:
+                            // this can only be TTL health check put handler is called and the update message is pushed to the health check topic directly.
+                            String healthString = healthStore.get(data.get("id"));
+                            if(healthString != null) {
+                                // not the first time, let's convert this into a map and update it.
+                                Map<String, Object> objects = JsonMapper.string2Map(healthString);
+                                Map<String, String> healthMap = objects.entrySet().stream()
+                                        .collect(Collectors.toMap(Map.Entry::getKey, e -> (String)e.getValue()));
+                                if("true".equals(data.get("pass"))) {
+                                    // if the lastFailedTimestamp is not 0, then reset it to 0 as it is passed. If it doesn't exist, it
+                                    // means the node is removed already due to pass the de-register after period.
+                                    if(!"0".equals(healthMap.get("lastFailedTimestamp"))) {
+                                        healthMap.put("lastFailedTimestamp", "0");
+                                    }
+                                    healthMap.put("lastExecuteTimestamp", String.valueOf(System.currentTimeMillis()));
+                                } else {
+                                    // update the lastFailedTimestamp in the check object in health map. If it keeps failing, then don't
+                                    // update it. This will allow the job to remove the node if it fails for a long time greater than the
+                                    // de-register after setting in the check.
+                                    String timestamp = String.valueOf(System.currentTimeMillis());
+                                    if("0".equals(healthMap.get("lastFailedTimestamp"))) {
+                                        healthMap.put("lastFailedTimestamp", timestamp);
+                                    }
+                                    healthMap.put("lastExecuteTimestamp", timestamp);
+                                }
+                                healthStore.put(data.get("id"), JsonMapper.toJson(healthMap));
                             }
-                        } else {
-                            // TTL health check is used.
-                            if(!"0".equals(healthMap.get("lastFailedTimestamp"))) {
-                                // calculate if we need to remove the node.
-                                removeNode(healthMap);
-                            } else {
-                                // last failed time is 0, set it to current
-                                healthMap.put("lastFailedTimestamp", String.valueOf(System.currentTimeMillis()));
-                            }
-                        }
-                        // save the health check object to the key value store for query.
-                        healthStore.put(data.get("id"), JsonMapper.toJson(healthMap));
+                            break;
+                        case DELETE:
+                            // ignore any delete message if there is any.
+                            break;
                     }
                 }
             } catch (Exception e) {
