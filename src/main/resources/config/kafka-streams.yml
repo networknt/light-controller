@@ -13,6 +13,8 @@ properties:
   schema.registry.ssl.truststore.location: ${kafka-streams.schema.registry.ssl.truststore.location:/config/client.truststore}
   # Schema registry client truststore password
   schema.registry.ssl.truststore.password: ${kafka-streams.schema.registry.ssl.truststore.password:password}
+  # Schema registry auto register schema indicator for streams application. If true, the first request will register the schema auto automatically.
+  schema.registry.auto.register.schemas: ${kafka-streams.schema.registry.auto.register.schemas:true}
   # security configuration for enterprise deployment
   security.protocol: ${kafka-streams.security.protocol:SASL_SSL}
   sasl.mechanism: ${kafka-streams.sasl.mechanism:PLAIN}
