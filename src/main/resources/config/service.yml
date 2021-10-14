@@ -10,3 +10,6 @@ singletons:
 
 - com.networknt.kafka.producer.NativeLightProducer:
   - com.networknt.kafka.producer.SidecarProducer
+
+- io.confluent.kafka.schemaregistry.client.SchemaRegistryClient:
+  - com.networknt.kafka.common.LightSchemaRegistryClient
