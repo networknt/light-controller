@@ -1,7 +1,5 @@
 package com.networknt.controller.handler;
 
-import com.networknt.config.Config;
-import com.networknt.controller.ControllerConfig;
 import com.networknt.controller.ControllerConstants;
 import com.networknt.controller.ControllerStartupHook;
 import com.networknt.controller.ControllerUtil;
@@ -9,9 +7,7 @@ import com.networknt.controller.model.Check;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;
-import com.networknt.kafka.producer.QueuedLightProducer;
 import com.networknt.scheduler.*;
-import com.networknt.service.SingletonServiceFactory;
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -66,7 +62,6 @@ public class ServicesDeleteHandler implements LightHttpHandler {
             byte[] bytes = serializer.serialize(event);
 
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
-            QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
             final CountDownLatch latch = new CountDownLatch(1);
             ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
                 if (Objects.nonNull(e)) {

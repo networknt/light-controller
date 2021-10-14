@@ -8,7 +8,6 @@ import com.networknt.handler.LightHttpHandler;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.scheduler.*;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HttpString;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
