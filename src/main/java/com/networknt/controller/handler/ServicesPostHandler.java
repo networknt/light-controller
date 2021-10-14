@@ -1,9 +1,7 @@
 package com.networknt.controller.handler;
 
 import com.networknt.body.BodyHandler;
-import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.controller.ControllerConfig;
 import com.networknt.controller.ControllerConstants;
 import com.networknt.controller.ControllerStartupHook;
 import com.networknt.controller.model.Check;
