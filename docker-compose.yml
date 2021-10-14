@@ -1,0 +1,40 @@
+---
+version: '2'
+services:
+  controller-node1:
+    image: networknt/light-controller:2.0.32
+    volumes:
+      - ./config/node1:/config
+    ports:
+      - 8438:8438
+    hostname: controller-node1
+    container_name: controller-node1
+    networks:
+      - localnet
+
+  controller-node2:
+    image: networknt/light-controller:2.0.32
+    volumes:
+      - ./config/node2:/config
+    ports:
+      - 8439:8439
+    hostname: controller-node2
+    container_name: controller-node2
+    networks:
+      - localnet
+
+  controller-node3:
+    image: networknt/light-controller:2.0.32
+    volumes:
+      - ./config/node3:/config
+    ports:
+      - 8440:8440
+    hostname: controller-node3
+    container_name: controller-node3
+    networks:
+      - localnet
+
+networks:
+  localnet:
+    # driver: bridge
+    external: true
