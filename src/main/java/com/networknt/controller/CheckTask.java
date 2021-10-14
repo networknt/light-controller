@@ -1,6 +1,5 @@
 package com.networknt.controller;
 
-import com.networknt.config.Config;
 import com.networknt.controller.model.Check;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 
 public class CheckTask extends TimerTask {
     private static final Logger logger = LoggerFactory.getLogger(CheckTask.class);
-    public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
     @Override
     public void run() {
@@ -82,7 +80,7 @@ public class CheckTask extends TimerTask {
         if(System.currentTimeMillis() - check.getDeregisterCriticalServiceAfter() > check.getLastFailedTimestamp()) {
             // remove the node as it passed the de-register after.
             String key = check.getTag() == null ?  check.getServiceId() : check.getServiceId() + "|" + check.getTag();
-            if(config.isClusterMode()) {
+            if(ControllerStartupHook.config.isClusterMode()) {
                 EventId eventId = EventId.newBuilder()
                         .setId(ControllerConstants.USER_ID)
                         .setNonce(ControllerConstants.NONCE)
@@ -102,7 +100,7 @@ public class CheckTask extends TimerTask {
                 AvroSerializer serializer = new AvroSerializer();
                 byte[] bytes = serializer.serialize(event);
 
-                ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
+                ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
                 QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
                 BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
                 try {

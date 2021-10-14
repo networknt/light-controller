@@ -13,7 +13,6 @@ import com.networknt.scheduler.TaskDefinitionKey;
 import com.networknt.scheduler.TaskFrequency;
 import com.networknt.utility.TimeUtil;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.processor.AbstractProcessor;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
