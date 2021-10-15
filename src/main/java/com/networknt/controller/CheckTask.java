@@ -29,7 +29,7 @@ public class CheckTask extends TimerTask {
                     Check check = ControllerStartupHook.checks.get(key);
                     if (check!=null) {
                         if (check.getExecuteInterval()==0) check.setExecuteInterval(check.getInterval());
-                        if(logger.isTraceEnabled()) logger.trace("id = " + check.getId() + " lastFailed = " + check.getLastFailedTimestamp() + " lastExceute = " + check.getLastExecuteTimestamp() + " interval = " + check.getInterval() + " deregAfter = " + check.getDeregisterCriticalServiceAfter());
+                        if(logger.isTraceEnabled()) logger.trace("id = " + check.getId() + " lastFailed = " + check.getLastFailedTimestamp() + " lastExecute = " + check.getLastExecuteTimestamp() + " interval = " + check.getInterval() + " deregAfter = " + check.getDeregisterCriticalServiceAfter());
                         if(check.getLastExecuteTimestamp() == 0) {
                             if(logger.isTraceEnabled()) logger.trace("check " + check.getId() + " first time");
                             execute(check);
