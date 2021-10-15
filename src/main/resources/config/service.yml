@@ -13,3 +13,4 @@ singletons:
 
 - io.confluent.kafka.schemaregistry.client.SchemaRegistryClient:
   - com.networknt.kafka.common.LightSchemaRegistryClient
+
