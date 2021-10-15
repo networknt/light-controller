@@ -1,10 +1,9 @@
 package com.networknt.controller.handler;
 
+import com.networknt.controller.ControllerStartupHook;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.controller.ControllerConfig;
-import com.networknt.controller.ControllerStartupHook;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.monad.Failure;
 import com.networknt.monad.Result;

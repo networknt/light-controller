@@ -1,10 +1,10 @@
 package com.networknt.controller.handler;
 
-import com.networknt.body.BodyHandler;
-import com.networknt.config.JsonMapper;
 import com.networknt.controller.ControllerConstants;
 import com.networknt.controller.ControllerStartupHook;
 import com.networknt.controller.model.Check;
+import com.networknt.body.BodyHandler;
+import com.networknt.config.JsonMapper;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;

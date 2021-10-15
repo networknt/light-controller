@@ -1,7 +1,7 @@
 package com.networknt.controller;
 
-import com.networknt.config.Config;
 import com.networknt.controller.model.Check;
+import com.networknt.config.Config;
 import com.networknt.kafka.producer.NativeLightProducer;
 import com.networknt.server.Server;
 import com.networknt.server.StartupHookProvider;
