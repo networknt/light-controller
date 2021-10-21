@@ -64,7 +64,7 @@ public class ServicesCheckPutHandler implements LightHttpHandler {
                     .setName(id)
                     .setHost(ControllerConstants.HOST)
                     .setAction(DefinitionAction.UPDATE)   // use UPDATE action to differentiate with normal scheduled task.
-                    .setTopic(ControllerConstants.CHECK_TOPIC)
+                    .setTopic(ControllerStartupHook.config.getHealthCheckTopic())
                     .setFrequency(taskFrequency)
                     .setStart(System.currentTimeMillis())
                     .setData(data)
