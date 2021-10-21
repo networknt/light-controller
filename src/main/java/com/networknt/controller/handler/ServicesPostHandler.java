@@ -107,7 +107,7 @@ public class ServicesPostHandler implements LightHttpHandler {
                     .setName(check.getId())
                     .setHost(ControllerConstants.HOST)
                     .setAction(DefinitionAction.INSERT)
-                    .setTopic(ControllerConstants.CHECK_TOPIC)
+                    .setTopic(ControllerStartupHook.config.getHealthCheckTopic())
                     .setFrequency(taskFrequency)
                     .setStart(System.currentTimeMillis())
                     .setData(dataMap)

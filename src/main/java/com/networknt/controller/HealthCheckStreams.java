@@ -252,7 +252,7 @@ public class HealthCheckStreams implements LightStreams {
                         .setName(checkId)
                         .setHost(ControllerConstants.HOST)
                         .setAction(DefinitionAction.DELETE)
-                        .setTopic(ControllerConstants.CHECK_TOPIC)
+                        .setTopic(ControllerStartupHook.config.getHealthCheckTopic())
                         .setFrequency(taskFrequency)
                         .setStart(System.currentTimeMillis())
                         .build();
