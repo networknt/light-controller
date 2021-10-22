@@ -15,6 +15,7 @@ import com.networknt.utility.TimeUtil;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.apache.kafka.streams.processor.AbstractProcessor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.processor.To;
@@ -74,6 +75,11 @@ public class HealthCheckStreams implements LightStreams {
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, controllerConfig.getHealthApplicationId());
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
         healthStreams = new KafkaStreams(topology, streamsProps);
+        healthStreams.setUncaughtExceptionHandler(ex -> {
+            logger.error("Kafka-Streams uncaught exception occurred. Stream will be replaced with new thread", ex);
+            return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
+        });
+
         if(streamsConfig.isCleanUp()) {
             healthStreams.cleanUp();
         }

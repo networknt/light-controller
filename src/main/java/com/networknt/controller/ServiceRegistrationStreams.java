@@ -9,6 +9,7 @@ import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.apache.kafka.streams.processor.AbstractProcessor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.state.*;
@@ -64,6 +65,11 @@ public class ServiceRegistrationStreams implements LightStreams {
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, controllerConfig.getRegistryApplicationId());
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
         serviceStreams = new KafkaStreams(topology, streamsProps);
+        serviceStreams.setUncaughtExceptionHandler(ex -> {
+            logger.error("Kafka-Streams uncaught exception occurred. Stream will be replaced with new thread", ex);
+            return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
+        });
+
         if(streamsConfig.isCleanUp()) {
             serviceStreams.cleanUp();
         }
