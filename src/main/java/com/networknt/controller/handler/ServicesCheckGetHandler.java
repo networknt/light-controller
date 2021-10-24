@@ -28,10 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.xnio.OptionMap;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -79,7 +76,12 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
 
     public static Map<String, Object> getClusterHealthChecks(HttpServerExchange exchange, boolean stale) throws Exception {
         Collection<StreamsMetadata> metadataList = ControllerStartupHook.hcStreams.getAllHealthStreamsMetadata();
-        Map<String, Object> checks = new HashMap<>();
+        Map<String, Object> checks;
+        if(stale) {
+            checks = new TreeMap<>();
+        } else {
+            checks = new HashMap<>();
+        }
         for (StreamsMetadata metadata : metadataList) {
             if (logger.isDebugEnabled()) logger.debug("found one address in the collection " + metadata.host() + ":" + metadata.port());
             String url = "https://" + metadata.host() + ":" + metadata.port();
