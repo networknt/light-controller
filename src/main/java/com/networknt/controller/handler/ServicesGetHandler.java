@@ -88,12 +88,15 @@ public class ServicesGetHandler implements LightHttpHandler {
             String key = entry.getKey();
             String[] elements = StringUtils.split(key, ":");
             List<Map<String, Object>> instances = (List<Map<String, Object>>)services.get(elements[0]);
-            instances = ControllerUtil.delService(instances, elements[2], Integer.valueOf(elements[3]));
-            // remove the service is number of instances is 0
-            if(instances.size() > 0) {
-                services.put(elements[0], instances);
-            } else {
-                services.remove(elements[0]);
+            if(instances != null && instances.size() > 0) {
+                // only do that if there are instances available for the service.
+                instances = ControllerUtil.delService(instances, elements[2], Integer.valueOf(elements[3]));
+                // remove the service is number of instances is 0
+                if(instances.size() > 0) {
+                    services.put(elements[0], instances);
+                } else {
+                    services.remove(elements[0]);
+                }
             }
         }
         return services;
