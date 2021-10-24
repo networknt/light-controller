@@ -76,6 +76,7 @@ handlers:
   - com.networknt.controller.handler.ServicesDeleteHandler
   - com.networknt.controller.handler.ServicesGetHandler
   - com.networknt.controller.handler.ServicesLookupGetHandler
+  - com.networknt.controller.handler.ServicesCheckGetHandler
   - com.networknt.controller.handler.ServicesCheckPutHandler
   - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - com.networknt.controller.handler.ServicesInfoNodeGetHandler
@@ -135,6 +136,11 @@ paths:
     exec:
       - default
       - com.networknt.controller.handler.ServicesLookupGetHandler
+  - path: '/services/check'
+    method: 'GET'
+    exec:
+      - default
+      - com.networknt.controller.handler.ServicesCheckGetHandler
   - path: '/services/check'
     method: 'PUT'
     exec:

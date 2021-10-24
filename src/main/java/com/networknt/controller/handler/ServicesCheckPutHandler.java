@@ -33,6 +33,7 @@ import java.util.concurrent.CountDownLatch;
 public class ServicesCheckPutHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesCheckPutHandler.class);
     private static final String SUC10200 = "SUC10200";
+    private AvroSerializer serializer = new AvroSerializer();
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -70,7 +71,6 @@ public class ServicesCheckPutHandler implements LightHttpHandler {
                     .setData(data)
                     .build();
 
-            AvroSerializer serializer = new AvroSerializer();
             byte[] keyBytes = serializer.serialize(taskDefinitionKey);
             byte[] valueBytes = serializer.serialize(taskDefinition);
             // here we send to the health check topic directly. Not the scheduler topic.
