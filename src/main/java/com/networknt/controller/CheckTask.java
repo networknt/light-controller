@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 public class CheckTask extends TimerTask {
     private static final Logger logger = LoggerFactory.getLogger(CheckTask.class);
+    private AvroSerializer serializer = new AvroSerializer();
 
     @Override
     public void run() {
@@ -97,7 +98,6 @@ public class CheckTask extends TimerTask {
                         .setTimestamp(System.currentTimeMillis())
                         .build();
 
-                AvroSerializer serializer = new AvroSerializer();
                 byte[] bytes = serializer.serialize(event);
 
                 ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);

@@ -4,6 +4,7 @@ import com.networknt.controller.ControllerStartupHook;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
+import com.networknt.controller.ControllerUtil;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
@@ -11,6 +12,7 @@ import com.networknt.monad.Success;
 import com.networknt.server.Server;
 import com.networknt.status.Status;
 import com.networknt.utility.NetUtils;
+import com.networknt.utility.StringUtils;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
@@ -72,11 +74,29 @@ public class ServicesGetHandler implements LightHttpHandler {
                         }
                     }
                 }
-                exchange.getResponseSender().send(JsonMapper.toJson(services));
+                // get the stale health checks and filter out the un-healthy services
+                Map<String, Object> checks = ServicesCheckGetHandler.getClusterHealthChecks(exchange, true);
+                exchange.getResponseSender().send(JsonMapper.toJson(filterServiceByCheck(services, checks)));
             }
         } else {
             exchange.getResponseSender().send(JsonMapper.toJson(ControllerStartupHook.services));
         }
+    }
+
+    private Map<String, Object> filterServiceByCheck(Map<String, Object> services, Map<String, Object> checks) {
+        for (Map.Entry<String,Object> entry : checks.entrySet()) {
+            String key = entry.getKey();
+            String[] elements = StringUtils.split(key, ":");
+            List<Map<String, Object>> instances = (List<Map<String, Object>>)services.get(elements[0]);
+            instances = ControllerUtil.delService(instances, elements[2], Integer.valueOf(elements[3]));
+            // remove the service is number of instances is 0
+            if(instances.size() > 0) {
+                services.put(elements[0], instances);
+            } else {
+                services.remove(elements[0]);
+            }
+        }
+        return services;
     }
 
     private Map<String, Object> getLocalServices() {
