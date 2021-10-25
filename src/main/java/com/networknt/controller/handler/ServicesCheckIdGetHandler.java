@@ -107,6 +107,7 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
             final AtomicReference<ClientResponse> reference = new AtomicReference<>();
             // encode url as there is a vertical bar between the serviceId and the tag.
             String path = "/services/check/" + URLEncoder.encode(id, StandardCharsets.UTF_8.toString());
+            if(logger.isTraceEnabled()) logger.trace("encoded url = " + path);
             final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(path);
             String token = exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
             if(token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
