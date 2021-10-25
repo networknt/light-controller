@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.xnio.OptionMap;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -103,8 +105,9 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
             final CountDownLatch latch = new CountDownLatch(1);
             // Create an AtomicReference object to receive ClientResponse from callback function
             final AtomicReference<ClientResponse> reference = new AtomicReference<>();
-            String message = "/services/check/" + id;
-            final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(message);
+            // encode url as there is a vertical bar between the serviceId and the tag.
+            String path = "/services/check/" + URLEncoder.encode(id, StandardCharsets.UTF_8.toString());
+            final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(path);
             String token = exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
             if(token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
             request.getRequestHeaders().put(Headers.HOST, "localhost");
