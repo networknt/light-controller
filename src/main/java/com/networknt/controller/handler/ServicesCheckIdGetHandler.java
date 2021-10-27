@@ -87,6 +87,7 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
      *
      * @param exchange HttpServerExchange
      * @param url of the target server
+     * @param id of check id
      * @return Result the service map in JSON
      */
     public static Result<String> getHealthCheck(HttpServerExchange exchange, String url, String id) {
