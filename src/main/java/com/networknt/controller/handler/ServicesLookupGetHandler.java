@@ -135,6 +135,8 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
      *
      * @param exchange HttpServerExchange
      * @param url of the target server
+     * @param serviceId service id
+     * @param tag service tag
      * @return Result the service map in JSON
      */
     public static Result<String> getServiceRegistry(HttpServerExchange exchange, String url, String serviceId, String tag) {

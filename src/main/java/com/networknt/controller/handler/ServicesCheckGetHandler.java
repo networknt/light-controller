@@ -151,6 +151,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
      *
      * @param exchange HttpServerExchange
      * @param url of the target server
+     * @param stale indicate if the stale check should be returned
      * @return Result the check map in JSON
      */
     public static Result<String> getControllerChecks(HttpServerExchange exchange, String url, boolean stale) {
