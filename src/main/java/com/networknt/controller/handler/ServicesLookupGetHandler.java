@@ -96,7 +96,7 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
                 } else {
                     Result<String> resultEntity = getServiceRegistry(exchange, url, serviceId, tag);
                     if (resultEntity.isSuccess()) {
-                        if(checks.size() > 0) {
+                        if (checks.size() > 0) {
                             SortedMap<String, Object> tailMap = checks.tailMap(key);
                             if(!tailMap.isEmpty() && tailMap.firstKey().startsWith(key)) {
                                 List<Map<String, Object>> instances = filterInstanceByCheck(JsonMapper.string2List(resultEntity.getResult()), checks);
@@ -107,6 +107,7 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
                         } else {
                             exchange.getResponseSender().send(resultEntity.getResult());
                         }
+                        return;
                     }
                 }
                 setExchangeStatus(exchange, OBJECT_NOT_FOUND, "service registry", key);
