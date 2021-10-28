@@ -29,6 +29,7 @@ import java.util.concurrent.CountDownLatch;
 public class ServicesPostHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesPostHandler.class);
     private static final String SUC10200 = "SUC10200";
+    AvroSerializer serializer = new AvroSerializer();
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -59,10 +60,9 @@ public class ServicesPostHandler implements LightHttpHandler {
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
-            AvroSerializer serializer = new AvroSerializer();
             byte[] bytes = serializer.serialize(event);
 
-            ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
+            ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), key.getBytes(StandardCharsets.UTF_8), bytes);
             final CountDownLatch latch = new CountDownLatch(1);
             ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
                 if (Objects.nonNull(e)) {

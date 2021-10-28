@@ -12,7 +12,9 @@ import com.networknt.scheduler.TaskDefinition;
 import com.networknt.scheduler.TaskDefinitionKey;
 import com.networknt.scheduler.TaskFrequency;
 import com.networknt.utility.TimeUtil;
+import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import net.lightapi.portal.controller.ControllerDeregisteredEvent;
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
@@ -33,7 +35,7 @@ public class HealthCheckStreams implements LightStreams {
     static final KafkaStreamsConfig streamsConfig = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
     static final ControllerConfig controllerConfig = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
     static private final String health = "health-store";  // local health store between key and health check status
-
+    final Serde keySpecificAvroSerde = new SpecificAvroSerde<>();
     KafkaStreams healthStreams;
 
 
@@ -47,8 +49,8 @@ public class HealthCheckStreams implements LightStreams {
         return healthStreams.store(sqp);
     }
 
-    public KeyQueryMetadata getHealthStreamsMetadata(String key) {
-        return healthStreams.queryMetadataForKey(health, key, Serdes.String().serializer());
+    public KeyQueryMetadata getHealthStreamsMetadata(TaskDefinitionKey taskDefinitionKey) {
+        return healthStreams.queryMetadataForKey(health, taskDefinitionKey, keySpecificAvroSerde.serializer());
     }
 
     public Collection<StreamsMetadata> getAllHealthStreamsMetadata() {
@@ -79,6 +81,7 @@ public class HealthCheckStreams implements LightStreams {
             logger.error("Kafka-Streams uncaught exception occurred. Stream will be replaced with new thread", ex);
             return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
         });
+        keySpecificAvroSerde.configure(streamsConfig.getProperties(), true);
 
         if(streamsConfig.isCleanUp()) {
             healthStreams.cleanUp();

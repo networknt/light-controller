@@ -1,5 +1,6 @@
 package com.networknt.controller.handler;
 
+import com.networknt.controller.ControllerConstants;
 import com.networknt.controller.ControllerStartupHook;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
@@ -8,6 +9,7 @@ import com.networknt.handler.LightHttpHandler;
 import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
 import com.networknt.monad.Success;
+import com.networknt.scheduler.TaskDefinitionKey;
 import com.networknt.server.Server;
 import com.networknt.status.Status;
 import com.networknt.utility.NetUtils;
@@ -61,7 +63,11 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
             if(data != null) {
                 exchange.getResponseSender().send(data);
             } else {
-                KeyQueryMetadata metadata = ControllerStartupHook.hcStreams.getHealthStreamsMetadata(id);
+                TaskDefinitionKey taskDefinitionKey = TaskDefinitionKey.newBuilder()
+                        .setName(id)
+                        .setHost(ControllerConstants.HOST)
+                        .build();
+                KeyQueryMetadata metadata = ControllerStartupHook.hcStreams.getHealthStreamsMetadata(taskDefinitionKey);
                 HostInfo hostInfo = metadata.activeHost();
                 if(logger.isDebugEnabled()) logger.debug("found address in another instance " + hostInfo.host() + ":" + hostInfo.port());
                 String url = "https://" + hostInfo.host() + ":" + hostInfo.port();
@@ -73,6 +79,7 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
                     Result<String> resultEntity = getHealthCheck(exchange, url, id);
                     if (resultEntity.isSuccess()) {
                         exchange.getResponseSender().send(resultEntity.getResult());
+                        return;
                     }
                 }
                 setExchangeStatus(exchange, OBJECT_NOT_FOUND, "health check", id);
