@@ -14,6 +14,13 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Once a client is calling the lookup from the portal-registry module, it also subscribes from the controller
+ * to ask for any updates if interested service has instance changes. In the cluster mode, the subscribed node
+ * might be down, so the client needs to detect the WebSocket and reconnect again to another node.
+ *
+ * @author Steve Hu
+ */
 public class WebSocketHandler implements WebSocketConnectionCallback {
     static final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
 
