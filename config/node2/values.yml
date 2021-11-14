@@ -1,5 +1,5 @@
 # server configuration
-server.httpsPort: 8439
+server.httpsPort: 8437
 server.serviceId: com.networknt.controller-1.0.0
 
 # controller configuration
