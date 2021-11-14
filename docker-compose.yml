@@ -17,7 +17,7 @@ services:
     volumes:
       - ./config/node2:/config
     ports:
-      - 8439:8439
+      - 8437:8437
     hostname: controller-node2
     container_name: controller-node2
     networks:
@@ -28,7 +28,7 @@ services:
     volumes:
       - ./config/node3:/config
     ports:
-      - 8440:8440
+      - 8436:8436
     hostname: controller-node3
     container_name: controller-node3
     networks:
