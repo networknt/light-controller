@@ -64,6 +64,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             Deque<String> staleDeque = exchange.getQueryParameters().get("stale");
             if(staleDeque != null && !staleDeque.isEmpty()) stale = true;
             if(local) {
+                if(logger.isDebugEnabled()) logger.debug("local = " + local + " stale = " + stale);
                 exchange.getResponseSender().send(JsonMapper.toJson(getLocalChecks(stale)));
             } else {
                 exchange.getResponseSender().send(JsonMapper.toJson(getClusterHealthChecks(exchange, stale)));
@@ -126,6 +127,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
         boolean stale = false;
         long lastExecuteTimestamp = Long.valueOf((String)checkMap.get("lastExecuteTimestamp"));
         long deregisterCriticalServiceAfter = Long.valueOf((String)checkMap.get("deregisterCriticalServiceAfter"));
+        if(logger.isDebugEnabled()) logger.debug("lastExecuteTimestamp = " + lastExecuteTimestamp + " deregisterCriticalServiceAfter = " + deregisterCriticalServiceAfter);
         if(System.currentTimeMillis() - lastExecuteTimestamp > deregisterCriticalServiceAfter) {
             // it has been a long time that heath check status is not update. That means the health check event for missed.
             stale = true;
@@ -138,6 +140,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             int port = Integer.valueOf((String)checkMap.get("port"));
             String key = tag == null ? serviceId : serviceId + "|" + tag;
             AvroSerializer serializer = new AvroSerializer();
+            if(logger.isDebugEnabled()) logger.debug("push event to delete instance key = " + key + " protocol = " + protocol + " address = " + address + " port = " + port);
             ServicesDeleteHandler.pushDeregisterEvent(serializer, key, serviceId, protocol, tag, address, port);
             // the above statement will remove the service registry; however, the health check store is no cleaned and this
             // piece code will be running again and again. To avoid it, we can remove the health check task here.
@@ -180,6 +183,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            if(logger.isDebugEnabled()) logger.debug("status = " + statusCode + " body = " + body);
             if(statusCode != 200) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
                 result = Failure.of(status);
