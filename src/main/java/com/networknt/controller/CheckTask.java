@@ -83,7 +83,7 @@ public class CheckTask extends TimerTask {
             String key = check.getTag() == null ?  check.getServiceId() : check.getServiceId() + "|" + check.getTag();
             if(ControllerStartupHook.config.isClusterMode()) {
                 EventId eventId = EventId.newBuilder()
-                        .setId(ControllerConstants.USER_ID)
+                        .setId(key)
                         .setNonce(ControllerConstants.NONCE)
                         .build();
                 ControllerDeregisteredEvent event = ControllerDeregisteredEvent.newBuilder()
@@ -100,7 +100,7 @@ public class CheckTask extends TimerTask {
 
                 byte[] bytes = serializer.serialize(event);
 
-                ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
+                ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), key.getBytes(StandardCharsets.UTF_8), bytes);
                 QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
                 BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
                 try {

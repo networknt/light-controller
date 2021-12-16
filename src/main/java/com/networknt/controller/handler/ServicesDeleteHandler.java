@@ -67,7 +67,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
 
     public static void pushDeregisterEvent(AvroSerializer serializer, String key, String serviceId, String protocol, String tag, String address, int port) throws Exception {
         EventId eventId = EventId.newBuilder()
-                .setId(ControllerConstants.USER_ID)
+                .setId(key)
                 .setNonce(ControllerConstants.NONCE)
                 .build();
         ControllerDeregisteredEvent event = ControllerDeregisteredEvent.newBuilder()
@@ -84,7 +84,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
 
         byte[] bytes = serializer.serialize(event);
 
-        ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes);
+        ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), key.getBytes(StandardCharsets.UTF_8), bytes);
         final CountDownLatch latch = new CountDownLatch(1);
         ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
             if (Objects.nonNull(e)) {
