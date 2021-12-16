@@ -44,7 +44,7 @@ public class ServicesPostHandler implements LightHttpHandler {
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " protocol = " + protocol + " address = " + address + " port = " + port + " check = " + body.get(ControllerConstants.CHECK));
         if(ControllerStartupHook.config.isClusterMode()) {
             EventId eventId = EventId.newBuilder()
-                    .setId(ControllerConstants.USER_ID)
+                    .setId(key)
                     .setNonce(ControllerConstants.NONCE)
                     .build();
             ControllerRegisteredEvent event = ControllerRegisteredEvent.newBuilder()

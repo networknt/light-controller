@@ -226,7 +226,7 @@ public class HealthCheckStreams implements LightStreams {
                 // remove the node as it passed the de-register after.
                 String key = healthMap.get("tag") == null ?  healthMap.get("serviceId") : healthMap.get("serviceId") + "|" + healthMap.get("tag");
                 EventId eventId = EventId.newBuilder()
-                        .setId(ControllerConstants.USER_ID)
+                        .setId(key)
                         .setNonce(ControllerConstants.NONCE)
                         .build();
                 ControllerDeregisteredEvent event = ControllerDeregisteredEvent.newBuilder()
@@ -243,7 +243,7 @@ public class HealthCheckStreams implements LightStreams {
 
                 AvroSerializer serializer = new AvroSerializer();
                 byte[] bytes = serializer.serialize(event);
-                pc.forward(ControllerConstants.USER_ID.getBytes(StandardCharsets.UTF_8), bytes, To.child("ServiceEventProcessor"));
+                pc.forward(key.getBytes(StandardCharsets.UTF_8), bytes, To.child("ServiceEventProcessor"));
 
                 // stop the light-scheduler to for health check task creation.
                 String checkId = key + ":" + healthMap.get("protocol") + ":" + healthMap.get("address") + ":" + healthMap.get("port");
