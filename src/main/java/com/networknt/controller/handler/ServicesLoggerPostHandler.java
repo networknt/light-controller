@@ -7,10 +7,10 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.networknt.controller.ControllerConstants.*;
 
 /**
  * This is the endpoint to update logging levels for a list of loggers on a target service instance.
@@ -23,9 +23,10 @@ public class ServicesLoggerPostHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        String protocol = (String)body.get("protocol");
-        String address = (String)body.get("address");
-        Integer port = (Integer)body.get("port");
+        String protocol = (String)body.get(PROTOCOL);
+        String address = (String)body.get(ADDRESS);
+        Integer port = (Integer)body.get(PORT);
+
         List loggers = (List)body.get("loggers");
         if(logger.isTraceEnabled()) logger.trace("protocol = " + protocol + " address = " + address + " port = " + port);
         String result = ControllerClient.updateLoggerConfig(protocol, address, port, loggers);

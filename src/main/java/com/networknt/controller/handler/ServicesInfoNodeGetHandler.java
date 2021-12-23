@@ -7,6 +7,8 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.networknt.controller.ControllerConstants.*;
+
 /**
  * Query server info based on the serviceId and tag. There might be multiple instances that separated
  * by IP and Port. List all of them in an array of service info objects returned from the /server/info
@@ -20,9 +22,10 @@ public class ServicesInfoNodeGetHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         /* get server info */
-        String protocol = exchange.getQueryParameters().get("protocol").getFirst();
-        String address = exchange.getQueryParameters().get("address").getFirst();
-        int port = Integer.parseInt(exchange.getQueryParameters().get("port").getFirst());
+        String protocol = exchange.getQueryParameters().get(PROTOCOL).getFirst();
+        String address = exchange.getQueryParameters().get(ADDRESS).getFirst();
+        int port = Integer.parseInt(exchange.getQueryParameters().get(PORT).getFirst());
+
         String info = ControllerClient.getServerInfo(protocol, address, port);
 
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");

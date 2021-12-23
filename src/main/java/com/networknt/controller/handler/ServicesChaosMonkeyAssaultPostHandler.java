@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static com.networknt.controller.ControllerConstants.*;
+
 public class ServicesChaosMonkeyAssaultPostHandler implements LightHttpHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ServicesChaosMonkeyAssaultPostHandler.class);
@@ -19,14 +21,16 @@ public class ServicesChaosMonkeyAssaultPostHandler implements LightHttpHandler {
 
         // get data from body
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        String protocol = body.getOrDefault("protocol", "null").toString();
-        String address = body.getOrDefault("address", "null").toString();
+        String protocol = body.getOrDefault(PROTOCOL, "null").toString();
+        String address = body.getOrDefault(ADDRESS, "null").toString();
+        int port = Integer.parseInt(body.getOrDefault(PORT, "0").toString());
+
         String assaultType = body.getOrDefault("assaultType", "null").toString();
-        int port = Integer.parseInt(body.getOrDefault("port", "0").toString());
         int reqCount = Integer.parseInt(body.getOrDefault("requests", "0").toString());
         String endpointTest = body.getOrDefault("endpoint", "null").toString();
 
         String res = ControllerChaosMonkey.initChaosMonkeyAssault(assaultType, address, port, protocol, endpointTest, reqCount);
+
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.setStatusCode(200);
         exchange.getResponseSender().send(res);

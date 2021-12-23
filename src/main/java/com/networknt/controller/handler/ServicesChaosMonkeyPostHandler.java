@@ -8,8 +8,9 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.Map;
+
+import static com.networknt.controller.ControllerConstants.*;
 
 public class ServicesChaosMonkeyPostHandler implements LightHttpHandler {
 
@@ -19,10 +20,12 @@ public class ServicesChaosMonkeyPostHandler implements LightHttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         // get data from body
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        String protocol = body.getOrDefault("protocol", "null").toString();
-        String address = body.getOrDefault("address", "null").toString();
+        String protocol = body.getOrDefault(PROTOCOL, "null").toString();
+        String address = body.getOrDefault(ADDRESS, "null").toString();
+        int port = Integer.parseInt(body.getOrDefault(PORT, "null").toString());
+
         String assaultType = body.getOrDefault("assaultType", "null").toString();
-        int port = Integer.parseInt(body.getOrDefault("port", "null").toString());
+
         Object config = body.getOrDefault("assaultConfig", "null");
 
         // check if node exists

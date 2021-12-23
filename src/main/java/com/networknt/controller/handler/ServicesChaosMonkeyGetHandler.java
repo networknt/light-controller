@@ -6,6 +6,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static com.networknt.controller.ControllerConstants.*;
 
 public class ServicesChaosMonkeyGetHandler implements LightHttpHandler {
 
@@ -15,9 +16,9 @@ public class ServicesChaosMonkeyGetHandler implements LightHttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
 
         // get all params
-        String protocol = exchange.getQueryParameters().get("protocol").getFirst();
-        String address = exchange.getQueryParameters().get("address").getFirst();
-        int port = Integer.parseInt(exchange.getQueryParameters().get("port").getFirst());
+        String protocol = exchange.getQueryParameters().get(PROTOCOL).getFirst();
+        String address = exchange.getQueryParameters().get(ADDRESS).getFirst();
+        int port = Integer.parseInt(exchange.getQueryParameters().get(PORT).getFirst());
 
 
 
