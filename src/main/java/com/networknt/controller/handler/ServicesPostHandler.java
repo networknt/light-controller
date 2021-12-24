@@ -35,8 +35,8 @@ public class ServicesPostHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        String serviceId = (String)body.get("serviceId");
-        String tag = (String)body.get("tag");
+        String serviceId = (String)body.get(SERVICE_ID);
+        String tag = (String)body.get(TAG);
         String key = tag == null ? serviceId : serviceId + "|" + tag;
         String protocol = (String)body.get(PROTOCOL);
         String address = (String)body.get(ADDRESS);
@@ -99,9 +99,9 @@ public class ServicesPostHandler implements LightHttpHandler {
             dataMap.put("executeInterval", String.valueOf(check.getExecuteInterval()));
             dataMap.put("lastExecuteTimestamp", String.valueOf(check.getLastExecuteTimestamp()));
             dataMap.put("lastFailedTimestamp", String.valueOf(check.getLastFailedTimestamp()));
-            dataMap.put("serviceId", check.getServiceId());
-            dataMap.put("tag", check.getTag());
 
+            dataMap.put(SERVICE_ID, check.getServiceId());
+            dataMap.put(TAG, check.getTag());
             dataMap.put(PROTOCOL, check.getProtocol());
             dataMap.put(ADDRESS, check.getAddress());
             dataMap.put(PORT, String.valueOf(check.getPort()));

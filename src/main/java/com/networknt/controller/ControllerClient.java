@@ -42,20 +42,14 @@ public class ControllerClient {
     }
 
     public static String getLogContents(String protocol, String address, int port, LoggerInfo loggerInfo, String startTime, String endTime) {
-        ServiceRequest.Builder serviceRequestBuilder = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
+        ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
                 .addQueryParam("startTime", startTime)
                 .addQueryParam("endTime", endTime)
-                .buildFullPath(LOGGER_CONTENT_ENDPOINT);
+                .addQueryParam("loggerName", loggerInfo.getName())
+                .addQueryParam("loggerLevel", loggerInfo.getLevel().toString())
+                .buildFullPath(LOGGER_CONTENT_ENDPOINT)
+                .build();
 
-        if(loggerInfo.getName() != null) {
-            serviceRequestBuilder.addQueryParam("loggerName", loggerInfo.getName());
-        }
-
-        if(loggerInfo.getLevel() != null) {
-            serviceRequestBuilder.addQueryParam("loggerLevel", loggerInfo.getLevel().toString());
-        }
-
-        ServiceRequest serviceRequest = serviceRequestBuilder.build();
         serviceRequest.sendRequest();
         return serviceRequest.getResponseBody();
     }

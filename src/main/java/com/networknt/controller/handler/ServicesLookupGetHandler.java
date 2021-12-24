@@ -6,6 +6,7 @@ import com.networknt.controller.ControllerStartupHook;
 import com.networknt.config.JsonMapper;
 import com.networknt.controller.ControllerUtil;
 import com.networknt.handler.LightHttpHandler;
+import com.networknt.http.MediaType;
 import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
 import com.networknt.monad.Success;
@@ -33,6 +34,8 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.networknt.controller.ControllerConstants.*;
+
 /**
  * Get all healthy nodes for a registered service from the controller. This endpoint is used for
  * service discovery from the portal-registry. A serviceId query parameter is required and a tag
@@ -57,13 +60,13 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
+        String serviceId = exchange.getQueryParameters().get(SERVICE_ID).getFirst();
         String tag = null;
-        Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
+        Deque<String> tagDeque = exchange.getQueryParameters().get(TAG);
         if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
         String key = tag == null ? serviceId : serviceId + "|" + tag;
         if(logger.isDebugEnabled()) logger.debug("key = " + key  + " serviceId = " + serviceId + " tag = " + tag);
-        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
+        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
        if(ControllerStartupHook.config.isClusterMode()) {
            // get the stale health checks and potentially filter out the un-healthy services in the result.
            if(checks == null || System.currentTimeMillis() - lastLoadChecks > checkCachePeriod) {

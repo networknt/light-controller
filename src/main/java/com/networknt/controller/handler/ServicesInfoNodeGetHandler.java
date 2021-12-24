@@ -2,8 +2,9 @@ package com.networknt.controller.handler;
 
 import com.networknt.controller.ControllerClient;
 import com.networknt.handler.LightHttpHandler;
+import com.networknt.http.MediaType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HttpString;
+import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import static com.networknt.controller.ControllerConstants.*;
  * @author Steve Hu
  */
 public class ServicesInfoNodeGetHandler implements LightHttpHandler {
+
     private static final Logger logger = LoggerFactory.getLogger(ServicesDeleteHandler.class);
 
     @Override
@@ -28,7 +30,7 @@ public class ServicesInfoNodeGetHandler implements LightHttpHandler {
 
         String info = ControllerClient.getServerInfo(protocol, address, port);
 
-        exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
+        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         exchange.setStatusCode(200);
         exchange.getResponseSender().send(info);
     }

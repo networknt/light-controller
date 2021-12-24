@@ -63,6 +63,8 @@ public class ServiceRequest {
         private final Map<String, String> pathParams = new HashMap<>();
         private final Map<String, String> queryParams = new HashMap<>();
 
+        private final static String PATH_PARAM_PATTERN = "[{]+[a-zA-Z-0-9]+[}]";
+
         public Builder(String protocol, String address, String port, HttpString method) {
             this.protocol = protocol;
             this.method = method;
@@ -71,17 +73,41 @@ public class ServiceRequest {
             this.connection = establishBaseConnection(protocol, address, port);
         }
 
-
+        /**
+         * Add a path param to our request.
+         *
+         * @param k - the key name of the param.
+         * @param v - the value of the param.
+         * @return - this.
+         */
         public Builder addPathParam(String k, Object v) {
-            this.pathParams.put(k, v.toString());
+            if(v != null) {
+                this.pathParams.put(k, v.toString());
+            }
             return this;
         }
 
+        /**
+         * Add a query param to our request.
+         *
+         * @param k - the key name of the param.
+         * @param v - the value of the param
+         * @return - this.
+         */
         public Builder addQueryParam(String k, Object v) {
-            this.queryParams.put(k, v.toString());
+            if(v != null) {
+                this.queryParams.put(k, v.toString());
+            }
             return this;
         }
 
+        /**
+         * Bring all parts of our request uri together.
+         * solve our base path first, then append our query params.
+         *
+         * @param inPath - The endpoint given to the builder.
+         * @return - this.
+         */
         public Builder buildFullPath(String inPath) {
             String solvedBasePath = this.getSolvedBasePath(inPath);
             String solvedQueryParams = this.getSolvedQueryParams();
@@ -89,6 +115,15 @@ public class ServiceRequest {
             return this;
         }
 
+        /**
+         * Get the base url of our request (protocol + address + port).
+         *
+         * @param inProtocol - given protocol.
+         * @param inAddress - given address.
+         * @param inPort - given port.
+         *
+         * @return - string base path.
+         */
         private static String getBaseUrl(String inProtocol, String inAddress, String inPort) {
             StringBuilder url = new StringBuilder();
 
@@ -125,7 +160,7 @@ public class ServiceRequest {
         private String getSolvedBasePath(String inPath) {
             String rawPath = inPath;
             if(!this.pathParams.isEmpty() && rawPath.contains("{")) {
-                Matcher m = Pattern.compile("[{]+[a-zA-Z-0-9]+[}]").matcher(rawPath);
+                Matcher m = Pattern.compile(PATH_PARAM_PATTERN).matcher(rawPath);
                 while(m.find()){
                     String match = m.group();
                     String pathParamValue = this.pathParams.get(match);
@@ -137,6 +172,12 @@ public class ServiceRequest {
             return rawPath;
         }
 
+        /**
+         * Build the query param part of our request.
+         * For each query param, add ?keyname + = + value to our uri.
+         *
+         * @return - query string for uri.
+         */
         private String getSolvedQueryParams() {
             StringBuilder queryParamBuilder = new StringBuilder();
             if(!this.queryParams.isEmpty()) {
@@ -180,6 +221,9 @@ public class ServiceRequest {
         }
     }
 
+    /**
+     * Send our built request. We do not confirm results here.
+     */
     public void sendRequest() {
         AtomicReference<ClientResponse> reference = null;
         this.requestTime = System.currentTimeMillis();
@@ -267,5 +311,41 @@ public class ServiceRequest {
             totalTime = this.responseTime - this.requestTime;
         }
         return totalTime;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public HttpString getMethod() {
+        return method;
+    }
+
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    public Map<String, String> getPathParams() {
+        return pathParams;
+    }
+
+    public Map<String, String> getQueryParams() {
+        return queryParams;
+    }
+
+    public AtomicReference<ClientResponse> getResponseReference() {
+        return responseReference;
     }
 }

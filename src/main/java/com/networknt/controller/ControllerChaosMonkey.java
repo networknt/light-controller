@@ -8,10 +8,13 @@ import com.networknt.chaos.KillappAssaultConfig;
 import com.networknt.chaos.LatencyAssaultConfig;
 import com.networknt.chaos.MemoryAssaultConfig;
 import com.networknt.config.JsonMapper;
+import com.networknt.controller.model.LoggerInfo;
 import com.networknt.status.HttpStatus;
 import io.undertow.util.Methods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.networknt.controller.ControllerConstants.*;
 
 public class ControllerChaosMonkey {
 
@@ -21,10 +24,11 @@ public class ControllerChaosMonkey {
     private static final String LATENCY_ASSAULT = "com.networknt.chaos.LatencyAssaultHandler";
     private static final String MEMORY_ASSAULT = "com.networknt.chaos.MemoryAssaultHandler";
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final long TIMEOUT = 3000;
 
     public static String getChaosMonkeyInfo(String protocol, String address, int port) {
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
-                .buildFullPath("/chaosmonkey")
+                .buildFullPath(CHAOS_MONKEY_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
         return serviceRequest.getResponseBody();
@@ -35,7 +39,7 @@ public class ControllerChaosMonkey {
         ServiceRequest serviceRequest = new ServiceRequest.Builder(body.getProtocol(), body.getAddress(), String.valueOf(body.getPort()), Methods.POST)
                 .withRequestBody(body.getAssaultConfig())
                 .addPathParam("{assaultType}", body.getAssaultType())
-                .buildFullPath("/chaosmonkey/{assaultType}")
+                .buildFullPath(CHAOS_MONKEY_ASSAULT_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
         return serviceRequest.getResponseBody();
@@ -74,6 +78,7 @@ public class ControllerChaosMonkey {
     public static String initChaosMonkeyAssault(String assaultType, String address, int port, String protocol, String endpoint, int reqCount) {
         boolean testCompleted;
         String assaultHandlerName;
+        String startTime = String.valueOf(System.currentTimeMillis());
         switch (assaultType) {
             case EXCEPTION_ASSAULT:
                 testCompleted = initExceptionAssault(protocol, address, String.valueOf(port), endpoint, reqCount);
@@ -96,13 +101,33 @@ public class ControllerChaosMonkey {
                 testCompleted = false;
                 break;
         }
+        String endTime = String.valueOf(System.currentTimeMillis());
 
-        // TODO detail this more (maybe return some stats?)
         if(testCompleted) {
-            return "Test completed for triggered assault: " + assaultHandlerName;
+            return confirmLog(address, port, protocol, startTime, endTime);
         } else {
             return "Test was not completed for triggered assault: " + assaultHandlerName + "\n" + "Is the handler name correct? Is the specified handler enabled with bypass disabled?";
         }
+    }
+
+    private static String confirmLog(String address, int port, String protocol, String startTime, String endTime) {
+        long currentTime = System.currentTimeMillis();
+        long timeout = currentTime + TIMEOUT;
+        while(currentTime < timeout) {
+            ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
+                    .addQueryParam("startTime", startTime)
+                    .addQueryParam("endTime", endTime)
+                    .buildFullPath(LOGGER_CONTENT_ENDPOINT)
+                    .build();
+            serviceRequest.sendRequest();
+
+            if(serviceRequest.getStatusCode() == HttpStatus.OK.value()){
+                return serviceRequest.getResponseBody();
+            }
+            currentTime = System.currentTimeMillis();
+        }
+        return "Timeout reached " + TIMEOUT + "ms, cannot retrieve logs.";
+
     }
 
     private static boolean initExceptionAssault(String protocol, String address, String port, String endpoint, int reqCount) {
