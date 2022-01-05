@@ -18,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
+import static com.networknt.controller.ControllerConstants.*;
+
 /**
  * Remove a service from the registry with this put request. If the service doesn't exist, then no action
  * is taken. It is normally called during the service shutdown phase.
@@ -32,14 +34,14 @@ public class ServicesDeleteHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
-        String protocol = exchange.getQueryParameters().get("protocol").getFirst();
+        String protocol = exchange.getQueryParameters().get(PROTOCOL).getFirst();
         String checkInterval = exchange.getQueryParameters().get("checkInterval").getFirst();
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
         if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
         String key = tag == null ?  serviceId : serviceId + "|" + tag;
 
-        String address = exchange.getQueryParameters().get("address").getFirst();
+        String address = exchange.getQueryParameters().get(ADDRESS).getFirst();
         int port = Integer.valueOf(exchange.getQueryParameters().get("port").getFirst());
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " protocol = " + protocol + " tag = " + tag + " address = " + address + " port = " + port);
         if(ControllerStartupHook.config.isClusterMode()) {

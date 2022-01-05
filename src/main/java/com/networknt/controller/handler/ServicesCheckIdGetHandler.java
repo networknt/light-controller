@@ -6,6 +6,7 @@ import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.handler.LightHttpHandler;
+import com.networknt.http.MediaType;
 import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
 import com.networknt.monad.Success;
@@ -19,14 +20,10 @@ import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.apache.kafka.streams.KeyQueryMetadata;
-import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.state.HostInfo;
-import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
-import org.apache.kafka.streams.state.StreamsMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.OptionMap;
@@ -34,7 +31,6 @@ import org.xnio.OptionMap;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -55,7 +51,7 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String id = exchange.getQueryParameters().get("id").getFirst();
         if(logger.isTraceEnabled()) logger.trace("id = " + id);
-        exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
+        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         if(ControllerStartupHook.config.isClusterMode()) {
             // get from the Kafka Streams store.
             ReadOnlyKeyValueStore<String, String> healthStore = ControllerStartupHook.hcStreams.getHealthStore();

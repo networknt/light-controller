@@ -73,6 +73,7 @@ public class ServicesCheckPutHandler implements LightHttpHandler {
 
             byte[] keyBytes = serializer.serialize(taskDefinitionKey);
             byte[] valueBytes = serializer.serialize(taskDefinition);
+
             // here we send to the health check topic directly. Not the scheduler topic.
             ProducerRecord<byte[], byte[]> tdRecord = new ProducerRecord<>(ControllerStartupHook.config.getHealthCheckTopic(), keyBytes, valueBytes);
             final CountDownLatch schedulerLatch = new CountDownLatch(1);
