@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import static com.networknt.controller.ControllerConstants.*;
 
 /**
  * Register a service to the controller to indicate it is alive. It is normally called
@@ -34,12 +35,13 @@ public class ServicesPostHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        String serviceId = (String)body.get("serviceId");
-        String tag = (String)body.get("tag");
+        String serviceId = (String)body.get(SERVICE_ID);
+        String tag = (String)body.get(TAG);
         String key = tag == null ? serviceId : serviceId + "|" + tag;
-        String protocol = (String)body.get("protocol");
-        String address = (String)body.get("address");
-        int port = (Integer)body.get("port");
+        String protocol = (String)body.get(PROTOCOL);
+        String address = (String)body.get(ADDRESS);
+        int port = (Integer)body.get(PORT);
+
         Check check = JsonMapper.objectMapper.convertValue(body.get(ControllerConstants.CHECK), Check.class);
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " protocol = " + protocol + " address = " + address + " port = " + port + " check = " + body.get(ControllerConstants.CHECK));
         if(ControllerStartupHook.config.isClusterMode()) {
@@ -97,11 +99,12 @@ public class ServicesPostHandler implements LightHttpHandler {
             dataMap.put("executeInterval", String.valueOf(check.getExecuteInterval()));
             dataMap.put("lastExecuteTimestamp", String.valueOf(check.getLastExecuteTimestamp()));
             dataMap.put("lastFailedTimestamp", String.valueOf(check.getLastFailedTimestamp()));
-            dataMap.put("serviceId", check.getServiceId());
-            dataMap.put("tag", check.getTag());
-            dataMap.put("protocol", check.getProtocol());
-            dataMap.put("address", check.getAddress());
-            dataMap.put("port", String.valueOf(check.getPort()));
+
+            dataMap.put(SERVICE_ID, check.getServiceId());
+            dataMap.put(TAG, check.getTag());
+            dataMap.put(PROTOCOL, check.getProtocol());
+            dataMap.put(ADDRESS, check.getAddress());
+            dataMap.put(PORT, String.valueOf(check.getPort()));
 
             TaskDefinition taskDefinition = TaskDefinition.newBuilder()
                     .setName(check.getId())
@@ -131,9 +134,9 @@ public class ServicesPostHandler implements LightHttpHandler {
 
         } else {
             Map<String, Object> nodeMap = new ConcurrentHashMap<>();
-            nodeMap.put("protocol", protocol);
-            nodeMap.put("address", address);
-            nodeMap.put("port", port);
+            nodeMap.put(PROTOCOL, protocol);
+            nodeMap.put(ADDRESS, address);
+            nodeMap.put(PORT, port);
 
             List nodes = (List) ControllerStartupHook.services.get(key);
             nodes = addService(nodes, nodeMap);
@@ -153,12 +156,12 @@ public class ServicesPostHandler implements LightHttpHandler {
             nodes.add(nodeMap);
         } else {
             // delete the nodeMap if it is already there before adding it.
-            String address = (String)nodeMap.get("address");
-            int port = (Integer)nodeMap.get("port");
+            String address = (String)nodeMap.get(ADDRESS);
+            int port = (Integer)nodeMap.get(PORT);
             for(Iterator<Map<String, Object>> iter = nodes.iterator(); iter.hasNext(); ) {
                 Map<String, Object> map = iter.next();
-                String a = (String)map.get("address");
-                int p = (Integer)map.get("port");
+                String a = (String)map.get(ADDRESS);
+                int p = (Integer)map.get(PORT);
                 if (address.equals(a) && port == p)
                     iter.remove();
             }

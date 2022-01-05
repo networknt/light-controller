@@ -5,6 +5,7 @@ import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.controller.ControllerStartupHook;
 import com.networknt.handler.LightHttpHandler;
+import com.networknt.http.MediaType;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
@@ -32,6 +33,8 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.networknt.controller.ControllerConstants.*;
+
 
 /**
  * This is a handler to get all the health check results in the cluster. If a parameter local is true,
@@ -53,7 +56,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
+        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         exchange.setStatusCode(200);
         if(ControllerStartupHook.config.isClusterMode()) {
             // get query parameter for the local indicator.
@@ -63,6 +66,8 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             boolean stale = false;
             Deque<String> staleDeque = exchange.getQueryParameters().get("stale");
             if(staleDeque != null && !staleDeque.isEmpty()) stale = true;
+
+            // TODO: local will always be true in this case!
             if(local) {
                 if(logger.isDebugEnabled()) logger.debug("local = " + local + " stale = " + stale);
                 exchange.getResponseSender().send(JsonMapper.toJson(getLocalChecks(stale)));
@@ -134,10 +139,10 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             // de-register the service when health check task is dead.
             String serviceId = (String)checkMap.get("serviceId");
             String tag = (String)checkMap.get("tag");
-            String protocol = (String)checkMap.get("protocol");
-            String address = (String)checkMap.get("address");
+            String protocol = (String)checkMap.get(PROTOCOL);
+            String address = (String)checkMap.get(ADDRESS);
             String executeInterval = (String)checkMap.get("executeInterval");
-            int port = Integer.valueOf((String)checkMap.get("port"));
+            int port = Integer.parseInt((String)checkMap.get(PORT));
             String key = tag == null ? serviceId : serviceId + "|" + tag;
             AvroSerializer serializer = new AvroSerializer();
             if(logger.isDebugEnabled()) logger.debug("push event to delete instance key = " + key + " protocol = " + protocol + " address = " + address + " port = " + port);

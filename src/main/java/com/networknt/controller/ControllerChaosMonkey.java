@@ -13,6 +13,8 @@ import io.undertow.util.Methods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.networknt.controller.ControllerConstants.*;
+
 public class ControllerChaosMonkey {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerChaosMonkey.class);
@@ -21,10 +23,11 @@ public class ControllerChaosMonkey {
     private static final String LATENCY_ASSAULT = "com.networknt.chaos.LatencyAssaultHandler";
     private static final String MEMORY_ASSAULT = "com.networknt.chaos.MemoryAssaultHandler";
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final long TIMEOUT = 30000;
 
     public static String getChaosMonkeyInfo(String protocol, String address, int port) {
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
-                .buildFullPath("/chaosmonkey")
+                .buildFullPath(CHAOS_MONKEY_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
         return serviceRequest.getResponseBody();
@@ -35,7 +38,7 @@ public class ControllerChaosMonkey {
         ServiceRequest serviceRequest = new ServiceRequest.Builder(body.getProtocol(), body.getAddress(), String.valueOf(body.getPort()), Methods.POST)
                 .withRequestBody(body.getAssaultConfig())
                 .addPathParam("{assaultType}", body.getAssaultType())
-                .buildFullPath("/chaosmonkey/{assaultType}")
+                .buildFullPath(CHAOS_MONKEY_ASSAULT_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
         return serviceRequest.getResponseBody();
@@ -71,9 +74,22 @@ public class ControllerChaosMonkey {
         return config;
     }
 
+    /**
+     * Initiate a specified chaos monkey assault and get the logs of the service after.
+     * We do not want to try to grab logs of killapp or exception, because this means the service is shutdown.
+     *
+     * @param assaultType - chaos monkey assault handler.
+     * @param address - address of service we are going to assault.
+     * @param port - port of service we are going to assault.
+     * @param protocol - protocol of service we are going to assault.
+     * @param endpoint - endpoint of service we are going to hit
+     * @param reqCount - the amount of times we are going to request until the assault is complete.
+     * @return - return confirmation string that the assault happened or the log entries.
+     */
     public static String initChaosMonkeyAssault(String assaultType, String address, int port, String protocol, String endpoint, int reqCount) {
         boolean testCompleted;
         String assaultHandlerName;
+        String startTime = String.valueOf(System.currentTimeMillis());
         switch (assaultType) {
             case EXCEPTION_ASSAULT:
                 testCompleted = initExceptionAssault(protocol, address, String.valueOf(port), endpoint, reqCount);
@@ -96,13 +112,43 @@ public class ControllerChaosMonkey {
                 testCompleted = false;
                 break;
         }
+        String endTime = String.valueOf(System.currentTimeMillis());
 
-        // TODO detail this more (maybe return some stats?)
         if(testCompleted) {
-            return "Test completed for triggered assault: " + assaultHandlerName;
+            return confirmLog(address, port, protocol, startTime, endTime);
         } else {
             return "Test was not completed for triggered assault: " + assaultHandlerName + "\n" + "Is the handler name correct? Is the specified handler enabled with bypass disabled?";
         }
+    }
+
+    /**
+     * Retrieve the logs after chaos monkey assault to confirm the test happened.
+     *
+     * @param address - address of service
+     * @param port - port of service
+     * @param protocol - protocol of service.
+     * @param startTime - startTime of log
+     * @param endTime - endTime of log
+     * @return - return JSON string of log entries from service.
+     */
+    private static String confirmLog(String address, int port, String protocol, String startTime, String endTime) {
+        long currentTime = System.currentTimeMillis();
+        long timeout = currentTime + TIMEOUT;
+        while(currentTime < timeout) {
+            ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
+                    .addQueryParam("startTime", startTime)
+                    .addQueryParam("endTime", endTime)
+                    .buildFullPath(LOGGER_CONTENT_ENDPOINT)
+                    .build();
+            serviceRequest.sendRequest();
+
+            if(serviceRequest.getStatusCode() == HttpStatus.OK.value()){
+                return serviceRequest.getResponseBody();
+            }
+            currentTime = System.currentTimeMillis();
+        }
+        return "Timeout reached " + TIMEOUT + "ms, cannot retrieve logs.";
+
     }
 
     private static boolean initExceptionAssault(String protocol, String address, String port, String endpoint, int reqCount) {

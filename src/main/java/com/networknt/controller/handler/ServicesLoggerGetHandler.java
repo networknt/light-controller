@@ -7,8 +7,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import static com.networknt.controller.ControllerConstants.*;
 
 /**
  * This endpoint is used to get a list of loggers with their levels for a target server instance. This is
@@ -21,9 +20,10 @@ public class ServicesLoggerGetHandler implements LightHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        String protocol = exchange.getQueryParameters().get("protocol").getFirst();
-        String address = exchange.getQueryParameters().get("address").getFirst();
-        String port = exchange.getQueryParameters().get("port").getFirst();
+        String protocol = exchange.getQueryParameters().get(PROTOCOL).getFirst();
+        String address = exchange.getQueryParameters().get(ADDRESS).getFirst();
+        String port = exchange.getQueryParameters().get(PORT).getFirst();
+
         if(logger.isTraceEnabled()) logger.trace("protocol = " + protocol + " address = " + address + " port = " + port);
         // use the above info to call the service to get the loggers.
         String result = ControllerClient.getLoggerConfig(protocol, address, port);
