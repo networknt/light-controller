@@ -42,11 +42,17 @@ public class ControllerClient {
     }
 
     public static String getLogContents(String protocol, String address, int port, LoggerInfo loggerInfo, String startTime, String endTime) {
+
+        String loggerLevel = LoggerInfo.LevelEnum.ERROR.toString();
+        if(loggerInfo.getLevel() != null) {
+            loggerLevel = loggerInfo.getLevel().toString();
+        }
+
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
                 .addQueryParam("startTime", startTime)
                 .addQueryParam("endTime", endTime)
                 .addQueryParam("loggerName", loggerInfo.getName())
-                .addQueryParam("loggerLevel", loggerInfo.getLevel().toString())
+                .addQueryParam("loggerLevel", loggerLevel)
                 .buildFullPath(LOGGER_CONTENT_ENDPOINT)
                 .build();
 
