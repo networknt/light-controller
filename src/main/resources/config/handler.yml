@@ -181,7 +181,7 @@ paths:
     exec:
       - basic
       - com.networknt.controller.handler.ServicesLoggerGetHandler
-  - path: '/services/logger/contents'
+  - path: '/services/logger/content'
     method: 'GET'
     exec:
       - basic
