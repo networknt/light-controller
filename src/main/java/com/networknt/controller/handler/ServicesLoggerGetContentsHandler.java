@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 
+import java.util.Deque;
+
 import static com.networknt.controller.ControllerConstants.*;
 
 public class ServicesLoggerGetContentsHandler implements LightHttpHandler {
@@ -27,10 +29,21 @@ public class ServicesLoggerGetContentsHandler implements LightHttpHandler {
         String address = exchange.getQueryParameters().get(ADDRESS).getFirst();
         String port = exchange.getQueryParameters().get(PORT).getFirst();
 
-        String loggerName = exchange.getQueryParameters().get(LOGGER_NAME_PARAM).getFirst();
-        String loggerLevel = exchange.getQueryParameters().get(LOGGER_LEVEL_PARAM).getFirst();
-        String startTime = exchange.getQueryParameters().get(START_TIME_PARAM).getFirst();
-        String endTime = exchange.getQueryParameters().get(END_TIME_PARAM).getFirst();
+        String loggerName = null;
+        Deque<String> loggerNameDeque = exchange.getQueryParameters().get(LOGGER_NAME_PARAM);
+        if(loggerNameDeque != null) loggerName = loggerNameDeque.getFirst();
+
+        String loggerLevel = null;
+        Deque<String> loggerLevelDeque = exchange.getQueryParameters().get(LOGGER_LEVEL_PARAM);
+        if(loggerLevelDeque != null) loggerLevel = loggerLevelDeque.getFirst();
+
+        String startTime = null;
+        Deque<String> startTimeDeque = exchange.getQueryParameters().get(START_TIME_PARAM);
+        if(startTimeDeque != null) startTime = startTimeDeque.getFirst();
+
+        String endTime = null;
+        Deque<String> endTimeDeque = exchange.getQueryParameters().get(END_TIME_PARAM);
+        if(endTimeDeque != null) endTime = endTimeDeque.getFirst();
 
         LoggerInfo loggerInfo = new LoggerInfo();
         if(loggerName != null) {

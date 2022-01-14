@@ -16,7 +16,7 @@ public final class ControllerConstants {
     /* Client Controller Path Strings */
     public static final String SERVER_INFO_ENDPOINT = "/server/info";
     public static final String LOGGER_ENDPOINT = "/logger";
-    public static final String LOGGER_CONTENT_ENDPOINT = "/logger/contents";
+    public static final String LOGGER_CONTENT_ENDPOINT = "/logger/content";
     public static final String CHAOS_MONKEY_ASSAULT_ENDPOINT = "/chaosmonkey/{assaultType}";
     public static final String CHAOS_MONKEY_ENDPOINT = "/chaosmonkey";
 
