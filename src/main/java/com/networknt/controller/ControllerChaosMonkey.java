@@ -8,7 +8,11 @@ import com.networknt.chaos.KillappAssaultConfig;
 import com.networknt.chaos.LatencyAssaultConfig;
 import com.networknt.chaos.MemoryAssaultConfig;
 import com.networknt.config.JsonMapper;
+import com.networknt.monad.Failure;
+import com.networknt.monad.Result;
+import com.networknt.monad.Success;
 import com.networknt.status.HttpStatus;
+import com.networknt.status.Status;
 import io.undertow.util.Methods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,23 +29,36 @@ public class ControllerChaosMonkey {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final long TIMEOUT = 30000;
 
-    public static String getChaosMonkeyInfo(String protocol, String address, int port) {
+    public static Result<String> getChaosMonkeyInfo(String protocol, String address, int port) {
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
                 .buildFullPath(CHAOS_MONKEY_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
-        return serviceRequest.getResponseBody();
-
+        int statusCode = serviceRequest.getStatusCode();
+        String responseBody = serviceRequest.getResponseBody();
+        if(statusCode >= 400) {
+            // error response with a status
+            return Failure.of(JsonMapper.fromJson(responseBody, Status.class));
+        } else {
+            return Success.of(responseBody);
+        }
     }
 
-    public static String postChaosMonkeyAssault(ChaosMonkeyAssaultConfigPost body) {
+    public static Result<String> postChaosMonkeyAssault(ChaosMonkeyAssaultConfigPost body) {
         ServiceRequest serviceRequest = new ServiceRequest.Builder(body.getProtocol(), body.getAddress(), String.valueOf(body.getPort()), Methods.POST)
                 .withRequestBody(body.getAssaultConfig())
                 .addPathParam("{assaultType}", body.getAssaultType())
                 .buildFullPath(CHAOS_MONKEY_ASSAULT_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
-        return serviceRequest.getResponseBody();
+
+        int statusCode = serviceRequest.getStatusCode();
+        String responseBody = serviceRequest.getResponseBody();
+        if(statusCode >= 400) {
+            return Failure.of(JsonMapper.fromJson(responseBody, Status.class));
+        } else {
+            return Success.of(responseBody);
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
