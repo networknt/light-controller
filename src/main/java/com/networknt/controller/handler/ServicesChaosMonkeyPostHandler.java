@@ -5,6 +5,7 @@ import com.networknt.controller.model.ChaosMonkeyAssaultConfigPost;
 import com.networknt.body.BodyHandler;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.http.MediaType;
+import com.networknt.monad.Result;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
@@ -13,6 +14,10 @@ import java.util.Map;
 
 import static com.networknt.controller.ControllerConstants.*;
 
+/**
+ * This is the post request to update the configuration and trigger the Chaos Monkey attacks on the
+ * target server.
+ */
 public class ServicesChaosMonkeyPostHandler implements LightHttpHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ServicesChaosMonkeyPostHandler.class);
@@ -36,10 +41,15 @@ public class ServicesChaosMonkeyPostHandler implements LightHttpHandler {
 
         // query chaos monkey handlers from service
         if(postBody != null) {
-            String res = ControllerChaosMonkey.postChaosMonkeyAssault(postBody);
+            Result<String> res = ControllerChaosMonkey.postChaosMonkeyAssault(postBody);
             exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            exchange.setStatusCode(200);
-            exchange.getResponseSender().send(res);
+            if(res.isSuccess()) {
+                exchange.setStatusCode(200);
+                exchange.getResponseSender().send(res.getResult());
+            } else {
+                exchange.setStatusCode(res.getError().getStatusCode());
+                exchange.getResponseSender().send(res.getError().toString());
+            }
         } else {
             exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             exchange.setStatusCode(404);
