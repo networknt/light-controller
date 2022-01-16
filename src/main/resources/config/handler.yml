@@ -69,7 +69,6 @@ handlers:
   - com.networknt.logging.handler.LoggerPostHandler@postLogger
   - com.networknt.specification.SpecDisplayHandler@spec
   - com.networknt.specification.SpecSwaggerUIHandler@swaggerui
-  - com.networknt.resource.PathResourceHandler@resource
   # - com.networknt.metrics.prometheus.PrometheusGetHandler@getprometheus
   # Business Handlers
   - com.networknt.controller.handler.ServicesPostHandler
@@ -240,6 +239,3 @@ paths:
     method: 'get'
     exec:
       - swaggerui
-
-defaultHandlers:
-  - resource
