@@ -82,7 +82,7 @@ handlers:
   - com.networknt.controller.handler.WebSocketHandler
   - com.networknt.controller.handler.ServicesLoggerGetHandler
   - com.networknt.controller.handler.ServicesLoggerPostHandler
-  - com.networknt.controller.handler.ServicesLoggerGetContentsHandler
+  - com.networknt.controller.handler.ServicesLoggerContentPostHandler
   - com.networknt.controller.handler.ServicesChaosMonkeyGetHandler
   - com.networknt.controller.handler.ServicesChaosMonkeyPostHandler
   - com.networknt.controller.handler.ServicesChaosMonkeyAssaultPostHandler
@@ -170,10 +170,10 @@ paths:
       - default
       - com.networknt.controller.handler.ServicesLoggerGetHandler
   - path: '/services/logger/content'
-    method: 'GET'
+    method: 'POST'
     exec:
       - default
-      - com.networknt.controller.handler.ServicesLoggerGetContentsHandler
+      - com.networknt.controller.handler.ServicesLoggerContentPostHandler
   - path: '/services/logger'
     method: 'POST'
     exec:
