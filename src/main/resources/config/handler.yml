@@ -45,7 +45,7 @@ handlers:
   - com.networknt.metrics.MetricsHandler@metrics
   - com.networknt.traceability.TraceabilityHandler@traceability
   - com.networknt.correlation.CorrelationHandler@correlation
-  - com.networknt.basicauth.BasicAuthHandler@basic
+  # - com.networknt.basicauth.BasicAuthHandler@basic
   - com.networknt.openapi.OpenApiHandler@specification
   - com.networknt.openapi.JwtVerifyHandler@security
   - com.networknt.body.BodyHandler@body
@@ -103,17 +103,6 @@ chains:
     - audit
     - sanitizer
     - validator
-  basic:
-    - exception
-    - metrics
-    - traceability
-    - correlation
-    - basic
-    - specification
-    - body
-    - audit
-    - sanitizer
-    - validator
 
 paths:
   - path: '/services'
@@ -129,7 +118,7 @@ paths:
   - path: '/services'
     method: 'GET'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesGetHandler
   - path: '/services/lookup'
     method: 'GET'
@@ -149,27 +138,27 @@ paths:
   - path: '/services/check/{id}'
     method: 'GET'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesCheckIdGetHandler
   - path: '/services/info'
     method: 'GET'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesInfoNodeGetHandler
   - path: '/services/chaosmonkey'
     method: 'GET'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesChaosMonkeyGetHandler
   - path: '/services/chaosmonkey'
     method: 'POST'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesChaosMonkeyPostHandler
   - path: '/services/chaosmonkey/assault'
     method: 'POST'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesChaosMonkeyAssaultPostHandler
   - path: '/ws'
     method: 'get'
@@ -178,17 +167,17 @@ paths:
   - path: '/services/logger'
     method: 'GET'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesLoggerGetHandler
   - path: '/services/logger/content'
     method: 'GET'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesLoggerGetContentsHandler
   - path: '/services/logger'
     method: 'POST'
     exec:
-      - basic
+      - default
       - com.networknt.controller.handler.ServicesLoggerPostHandler
 
   - path: '/health/readiness/${server.serviceId:com.networknt.controller-1.0.0}'
