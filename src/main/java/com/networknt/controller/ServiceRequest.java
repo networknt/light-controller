@@ -140,7 +140,6 @@ public class ServiceRequest {
         }
 
         private static ClientConnection establishBaseConnection(String inProtocol, String inAddress, String inPort) {
-            logger.info("trying connection");
             ClientConnection connection = null;
             try {
                 URI uri = new URI(getBaseUrl(inProtocol, inAddress, inPort));
