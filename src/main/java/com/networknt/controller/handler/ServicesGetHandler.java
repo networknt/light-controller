@@ -21,6 +21,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
 import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.errors.InvalidStateStoreException;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.apache.kafka.streams.state.StreamsMetadata;
@@ -45,6 +46,7 @@ public class ServicesGetHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesGetHandler.class);
     static Http2Client client = Http2Client.getInstance();
     static final String GENERIC_EXCEPTION = "ERR10014";
+    static final long WAIT_THRESHOLD = 30000;
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -104,9 +106,21 @@ public class ServicesGetHandler implements LightHttpHandler {
 
     private Map<String, Object> getLocalServices() {
         Map<String, Object> services = new HashMap<>();
-        // local store access.
         ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
-        KeyValueIterator<String, String> iterator = serviceStore.all();
+        KeyValueIterator<String, String> iterator = null;
+        long timeout = System.currentTimeMillis() + WAIT_THRESHOLD;
+        do {
+            try {
+                iterator = serviceStore.all();
+            } catch (InvalidStateStoreException e) {
+                try {
+                    logger.debug(e.getMessage());
+                    Thread.sleep(100L);
+                } catch (InterruptedException interruptedException) {
+                    logger.error(interruptedException.getMessage(), interruptedException);
+                }
+            }
+        } while (iterator == null || System.currentTimeMillis() < timeout);
         while(iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;
