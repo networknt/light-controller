@@ -52,19 +52,20 @@ public class ServicesGetHandler implements LightHttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         exchange.setStatusCode(200);
-        if(ControllerStartupHook.config.isClusterMode()) {
+        if (ControllerStartupHook.config.isClusterMode()) {
             // get query parameter for the local indicator.
             boolean local = false;
             Deque<String> localDeque = exchange.getQueryParameters().get("local");
-            if(localDeque != null && !localDeque.isEmpty()) local = true;
-            if(local) {
+            if (localDeque != null && !localDeque.isEmpty()) local = true;
+            if (local) {
                 exchange.getResponseSender().send(JsonMapper.toJson(getLocalServices()));
             } else {
                 Collection<StreamsMetadata> metadataList = ControllerStartupHook.srStreams.getAllServiceStreamsMetadata();
                 Map<String, Object> services = new HashMap<>();
 
                 for (StreamsMetadata metadata : metadataList) {
-                    if (logger.isDebugEnabled()) logger.debug("found one address in the collection " + metadata.host() + ":" + metadata.port());
+                    if (logger.isDebugEnabled())
+                        logger.debug("found one address in the collection " + metadata.host() + ":" + metadata.port());
                     String url = "https://" + metadata.host() + ":" + metadata.port();
                     if (NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.getServerConfig().getHttpsPort() == metadata.port()) {
                         services.putAll(getLocalServices());
@@ -86,15 +87,15 @@ public class ServicesGetHandler implements LightHttpHandler {
     }
 
     private Map<String, Object> filterServiceByCheck(Map<String, Object> services, Map<String, Object> checks) {
-        for (Map.Entry<String,Object> entry : checks.entrySet()) {
+        for (Map.Entry<String, Object> entry : checks.entrySet()) {
             String key = entry.getKey();
             String[] elements = StringUtils.split(key, ":");
-            List<Map<String, Object>> instances = (List<Map<String, Object>>)services.get(elements[0]);
-            if(instances != null && instances.size() > 0) {
+            List<Map<String, Object>> instances = (List<Map<String, Object>>) services.get(elements[0]);
+            if (instances != null && instances.size() > 0) {
                 // only do that if there are instances available for the service.
                 instances = ControllerUtil.delService(instances, elements[2], Integer.valueOf(elements[3]));
                 // remove the service is number of instances is 0
-                if(instances.size() > 0) {
+                if (instances.size() > 0) {
                     services.put(elements[0], instances);
                 } else {
                     services.remove(elements[0]);
@@ -110,6 +111,9 @@ public class ServicesGetHandler implements LightHttpHandler {
         KeyValueIterator<String, String> iterator = null;
         long timeout = System.currentTimeMillis() + WAIT_THRESHOLD;
         do {
+            if (System.currentTimeMillis() < timeout) {
+                break;
+            }
             try {
                 iterator = serviceStore.all();
             } catch (InvalidStateStoreException e) {
@@ -120,17 +124,18 @@ public class ServicesGetHandler implements LightHttpHandler {
                     logger.error(interruptedException.getMessage(), interruptedException);
                 }
             }
-        } while (iterator == null || System.currentTimeMillis() < timeout);
-        while(iterator.hasNext()) {
+        } while (iterator == null);
+        
+        while (iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;
             String value = keyValue.value;
-            if(value != null) {
+            if (value != null) {
                 List nodes = JsonMapper.string2List(value);
                 services.put(key, nodes);
             }
         }
-        if(logger.isDebugEnabled()) logger.debug("The number of services at local is " + services.size());
+        if (logger.isDebugEnabled()) logger.debug("The number of services at local is " + services.size());
         return services;
     }
 
@@ -138,7 +143,7 @@ public class ServicesGetHandler implements LightHttpHandler {
      * Get registered controller services from other nodes with exchange and url. The result contains a map of services.
      *
      * @param exchange HttpServerExchange
-     * @param url of the target server
+     * @param url      of the target server
      * @return Result the service map in JSON
      */
     public static Result<String> getControllerServices(HttpServerExchange exchange, String url) {
@@ -149,7 +154,7 @@ public class ServicesGetHandler implements LightHttpHandler {
         Result<String> result = null;
         try {
             ClientConnection conn = ControllerStartupHook.connCache.get(url);
-            if(conn == null || !conn.isOpen()) {
+            if (conn == null || !conn.isOpen()) {
                 conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
                 ControllerStartupHook.connCache.put(url, conn);
             }
@@ -160,13 +165,13 @@ public class ServicesGetHandler implements LightHttpHandler {
             String message = "/services?local=true";
             final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(message);
             String token = exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
-            if(token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
+            if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
             request.getRequestHeaders().put(Headers.HOST, "localhost");
             conn.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-            if(statusCode != 200) {
+            if (statusCode != 200) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
                 result = Failure.of(status);
             } else result = Success.of(body);
