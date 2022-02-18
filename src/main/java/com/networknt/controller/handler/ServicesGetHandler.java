@@ -111,7 +111,7 @@ public class ServicesGetHandler implements LightHttpHandler {
         KeyValueIterator<String, String> iterator = null;
         long timeout = System.currentTimeMillis() + WAIT_THRESHOLD;
         do {
-            if (System.currentTimeMillis() < timeout) {
+            if (System.currentTimeMillis() >= timeout) {
                 break;
             }
             try {
@@ -125,7 +125,7 @@ public class ServicesGetHandler implements LightHttpHandler {
                 }
             }
         } while (iterator == null);
-        
+
         while (iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;
