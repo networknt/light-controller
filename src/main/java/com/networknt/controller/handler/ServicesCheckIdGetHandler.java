@@ -55,7 +55,7 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
         if(ControllerStartupHook.config.isClusterMode()) {
             // get from the Kafka Streams store.
             ReadOnlyKeyValueStore<String, String> healthStore = ControllerStartupHook.hcStreams.getHealthStore();
-            String data = healthStore.get(id);
+            String data = (String) ControllerStartupHook.hcStreams.getKafkaValueByKey(healthStore, id);
             if(data != null) {
                 exchange.getResponseSender().send(data);
             } else {
