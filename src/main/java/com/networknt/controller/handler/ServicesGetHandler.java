@@ -108,24 +108,7 @@ public class ServicesGetHandler implements LightHttpHandler {
     private Map<String, Object> getLocalServices() {
         Map<String, Object> services = new HashMap<>();
         ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
-        KeyValueIterator<String, String> iterator = null;
-        long timeout = System.currentTimeMillis() + WAIT_THRESHOLD;
-        do {
-            if (System.currentTimeMillis() >= timeout) {
-                break;
-            }
-            try {
-                iterator = serviceStore.all();
-            } catch (InvalidStateStoreException e) {
-                try {
-                    logger.debug(e.getMessage());
-                    Thread.sleep(100L);
-                } catch (InterruptedException interruptedException) {
-                    logger.error(interruptedException.getMessage(), interruptedException);
-                }
-            }
-        } while (iterator == null);
-
+        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>)ControllerStartupHook.srStreams.getAllKafkaValue(serviceStore);
         while (iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;
