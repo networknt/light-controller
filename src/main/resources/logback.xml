@@ -119,7 +119,7 @@
         </triggeringPolicy>
     </appender>
 
-    <root level="info">
+    <root level="error">
         <appender-ref ref="stdout"/>
         <appender-ref ref="stdout-file"/>
     </root>
@@ -137,7 +137,7 @@
         <appender-ref ref="dump"/>
     </logger>
 
-    <logger name="com.networknt.controller" level="trace" additivity="false">
+    <logger name="com.networknt.controller" level="error" additivity="false">
         <appender-ref ref="stdout"/>
     </logger>
 

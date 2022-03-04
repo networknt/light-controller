@@ -4,6 +4,7 @@ server.serviceId: com.networknt.controller-1.0.0
 
 # controller configuration
 controller.clusterMode: true
+controller.bootstrapToken: eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTk2MDMwOTk4MywianRpIjoiSllkbExici16Qm8tOF9sb3RyODNQdyIsImlhdCI6MTY0NDk0OTk4MywibmJmIjoxNjQ0OTQ5ODYzLCJ2ZXJzaW9uIjoiMS4wIiwiY2xpZW50X2lkIjoiZjdkNDIzNDgtYzY0Ny00ZWZiLWE1MmQtNGM1Nzg3NDIxZTczIiwic2NvcGUiOlsicG9ydGFsLnIiLCJwb3J0YWwudyJdfQ.rhwozi6h2RxxYFECS0xusuZLui9STpKP-tipnTSTKU45EXP5k_OBXUWiTJ9m30yFC_GC6vY5gRgHprjCx0s2dOERZXf4xxsolHJ0jkqZuBoxyemqHsIeo5grJahZps58cz6m_kj9IMoG9uReVLYSIwjTprURSAWORGCOOCuzS7v4JG_iGA9fFs2hkA06pifAcu-UGJTbGlkjff6FgJExPTLHXUwsxcmAm1CMCPleRl38wUINbPXtOMCaJ_nb3wyZwYAoYkc2dGDry01lRCW0jj0P_1xykv_OCzebq7r3pz48ZDdmXRCeQYWTfHGentX2C-Gn5HCz9TW205LYuLYaJg
 
 # producer format configuration
 kafka-producer.bootstrap.servers: localhost:9092
@@ -13,3 +14,9 @@ kafka-producer.schema.registry.url: http://localhost:8081
 kafka-streams.bootstrap.servers: localhost:9092
 kafka-streams.schema.registry.url: http://localhost:8081
 kafka-streams.cleanUp: false
+
+# rule loader
+ruleLoader.portalHost: https://localhost:8440
+
+# openapi security
+openapi-security.enableVerifyJwt: true
