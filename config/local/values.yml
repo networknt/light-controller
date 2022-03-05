@@ -17,6 +17,3 @@ kafka-streams.cleanUp: false
 
 # rule loader
 ruleLoader.portalHost: https://localhost:8440
-
-# openapi security
-openapi-security.enableVerifyJwt: true
