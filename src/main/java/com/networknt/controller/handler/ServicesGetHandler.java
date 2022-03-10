@@ -109,7 +109,6 @@ public class ServicesGetHandler implements LightHttpHandler {
         Map<String, Object> services = new HashMap<>();
         ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
         KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.hcStreams.getAllKafkaValue(serviceStore);
-
         while (iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;

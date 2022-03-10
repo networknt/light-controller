@@ -20,7 +20,6 @@ import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.apache.kafka.streams.KeyQueryMetadata;
 import org.apache.kafka.streams.state.HostInfo;
@@ -63,33 +62,29 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
         String serviceId = exchange.getQueryParameters().get(SERVICE_ID).getFirst();
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get(TAG);
-
-        if (tagDeque != null && !tagDeque.isEmpty())
-            tag = tagDeque.getFirst();
-
+        if (tagDeque != null && !tagDeque.isEmpty()) 
+          tag = tagDeque.getFirst();
+          
         String key = tag == null ? serviceId : serviceId + "|" + tag;
-
-        if (logger.isDebugEnabled())
-            logger.debug("key = " + key + " serviceId = " + serviceId + " tag = " + tag);
-
+          
+        if (logger.isDebugEnabled()) logger.debug("key = " + key + " serviceId = " + serviceId + " tag = " + tag);
+          
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-
-        if (ControllerStartupHook.config.isClusterMode()) {
-
+        
+          if (ControllerStartupHook.config.isClusterMode()) {
             // get the stale health checks and potentially filter out the un-healthy services in the result.
             if (checks == null || System.currentTimeMillis() - lastLoadChecks > checkCachePeriod) {
                 checks = (SortedMap<String, Object>) ServicesCheckGetHandler.getClusterHealthChecks(exchange, true);
                 lastLoadChecks = System.currentTimeMillis();
             }
-
+            
             ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
-            String data = (String) ControllerStartupHook.hcStreams.getKafkaValueByKey(serviceStore, key);
-
+            String data = (String) ControllerStartupHook.srStreams.getKafkaValueByKey(serviceStore, key);
+            
             if (data != null) {
-
-                if (checks.size() > 0) {
+                
+              if (checks.size() > 0) {
                     SortedMap<String, Object> tailMap = checks.tailMap(key);
-
                     if (!tailMap.isEmpty() && tailMap.firstKey().startsWith(key)) {
                         List<Map<String, Object>> instances = filterInstanceByCheck(JsonMapper.string2List(data), checks);
                         exchange.getResponseSender().send(JsonMapper.toJson(instances));
@@ -104,11 +99,9 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
             } else {
                 KeyQueryMetadata metadata = ControllerStartupHook.srStreams.getServiceStreamsMetadata(key);
                 HostInfo hostInfo = metadata.activeHost();
-
                 if (logger.isDebugEnabled())
                     logger.debug("found address in another instance " + hostInfo.host() + ":" + hostInfo.port());
                 String url = "https://" + hostInfo.host() + ":" + hostInfo.port();
-
                 if (NetUtils.getLocalAddressByDatagram().equals(hostInfo.host()) && Server.getServerConfig().getHttpsPort() == hostInfo.port()) {
                     logger.error("******Kafka returns the same instance!");
                     setExchangeStatus(exchange, OBJECT_NOT_FOUND, "service registry", key);
@@ -119,7 +112,6 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
 
                         if (checks.size() > 0) {
                             SortedMap<String, Object> tailMap = checks.tailMap(key);
-
                             if (!tailMap.isEmpty() && tailMap.firstKey().startsWith(key)) {
                                 List<Map<String, Object>> instances = filterInstanceByCheck(JsonMapper.string2List(resultEntity.getResult()), checks);
                                 exchange.getResponseSender().send(JsonMapper.toJson(instances));
@@ -136,14 +128,13 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
             }
 
         } else {
-            List nodes = (List) ControllerStartupHook.services.get(key);
+            List<?> nodes = (List<?>) ControllerStartupHook.services.get(key);
             exchange.getResponseSender().send(JsonMapper.toJson(nodes));
         }
     }
 
 
     private List<Map<String, Object>> filterInstanceByCheck(List<Map<String, Object>> instances, Map<String, Object> checks) {
-
         for (Map.Entry<String, Object> entry : checks.entrySet()) {
             String key = entry.getKey();
             String[] elements = StringUtils.split(key, ":");
@@ -174,7 +165,6 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
 
         try {
             ClientConnection conn = ControllerStartupHook.connCache.get(url);
-
             if (conn == null || !conn.isOpen()) {
                 conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
                 ControllerStartupHook.connCache.put(url, conn);
