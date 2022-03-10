@@ -2,6 +2,7 @@ package com.networknt.controller;
 
 import com.networknt.controller.model.LoggerInfo;
 import io.undertow.util.Methods;
+
 import java.util.List;
 
 import static com.networknt.controller.ControllerConstants.*;
@@ -44,7 +45,7 @@ public class ControllerClient {
     public static String getLogContents(String protocol, String address, int port, LoggerInfo loggerInfo, String startTime, String endTime) {
 
         String loggerLevel = LoggerInfo.LevelEnum.ERROR.toString();
-        if(loggerInfo.getLevel() != null) {
+        if (loggerInfo.getLevel() != null) {
             loggerLevel = loggerInfo.getLevel().toString();
         }
 

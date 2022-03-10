@@ -62,20 +62,28 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
         String serviceId = exchange.getQueryParameters().get(SERVICE_ID).getFirst();
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get(TAG);
-        if (tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
+        if (tagDeque != null && !tagDeque.isEmpty()) 
+          tag = tagDeque.getFirst();
+          
         String key = tag == null ? serviceId : serviceId + "|" + tag;
+          
         if (logger.isDebugEnabled()) logger.debug("key = " + key + " serviceId = " + serviceId + " tag = " + tag);
+          
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        if (ControllerStartupHook.config.isClusterMode()) {
+        
+          if (ControllerStartupHook.config.isClusterMode()) {
             // get the stale health checks and potentially filter out the un-healthy services in the result.
             if (checks == null || System.currentTimeMillis() - lastLoadChecks > checkCachePeriod) {
                 checks = (SortedMap<String, Object>) ServicesCheckGetHandler.getClusterHealthChecks(exchange, true);
                 lastLoadChecks = System.currentTimeMillis();
             }
+            
             ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
             String data = (String) ControllerStartupHook.srStreams.getKafkaValueByKey(serviceStore, key);
+            
             if (data != null) {
-                if (checks.size() > 0) {
+                
+              if (checks.size() > 0) {
                     SortedMap<String, Object> tailMap = checks.tailMap(key);
                     if (!tailMap.isEmpty() && tailMap.firstKey().startsWith(key)) {
                         List<Map<String, Object>> instances = filterInstanceByCheck(JsonMapper.string2List(data), checks);
@@ -83,9 +91,11 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
                     } else {
                         exchange.getResponseSender().send(data);
                     }
+
                 } else {
                     exchange.getResponseSender().send(data);
                 }
+
             } else {
                 KeyQueryMetadata metadata = ControllerStartupHook.srStreams.getServiceStreamsMetadata(key);
                 HostInfo hostInfo = metadata.activeHost();
@@ -99,6 +109,7 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
                 } else {
                     Result<String> resultEntity = getServiceRegistry(exchange, url, serviceId, tag);
                     if (resultEntity.isSuccess()) {
+
                         if (checks.size() > 0) {
                             SortedMap<String, Object> tailMap = checks.tailMap(key);
                             if (!tailMap.isEmpty() && tailMap.firstKey().startsWith(key)) {
@@ -115,6 +126,7 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
                 }
                 setExchangeStatus(exchange, OBJECT_NOT_FOUND, "service registry", key);
             }
+
         } else {
             List<?> nodes = (List<?>) ControllerStartupHook.services.get(key);
             exchange.getResponseSender().send(JsonMapper.toJson(nodes));
@@ -126,6 +138,7 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
         for (Map.Entry<String, Object> entry : checks.entrySet()) {
             String key = entry.getKey();
             String[] elements = StringUtils.split(key, ":");
+
             if (instances != null && instances.size() > 0) {
                 // only do that if there are instances available for the service.
                 instances = ControllerUtil.delService(instances, elements[2], Integer.valueOf(elements[3]));
@@ -149,32 +162,45 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
 
     public static Result<String> callQueryExchangeUrl(HttpServerExchange exchange, String url, String serviceId, String tag) {
         Result<String> result = null;
+
         try {
             ClientConnection conn = ControllerStartupHook.connCache.get(url);
             if (conn == null || !conn.isOpen()) {
                 conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
                 ControllerStartupHook.connCache.put(url, conn);
             }
+
             // Create one CountDownLatch that will be reset in the callback function
             final CountDownLatch latch = new CountDownLatch(1);
+
             // Create an AtomicReference object to receive ClientResponse from callback function
             final AtomicReference<ClientResponse> reference = new AtomicReference<>();
             String path = "/services/lookup?serviceId=" + serviceId;
-            if (tag != null) path = path + "&tag=" + tag;
+
+            if (tag != null)
+                path = path + "&tag=" + tag;
+
             final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(path);
             String token = exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
-            if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
+
+            if (token != null)
+                request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
+
             request.getRequestHeaders().put(Headers.HOST, "localhost");
             conn.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
+
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+
             if (statusCode != 200) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
                 result = Failure.of(status);
-            } else result = Success.of(body);
+            } else
+                result = Success.of(body);
+
         } catch (Exception e) {
-            logger.error("Exception:", e);
+            logger.error(e.getMessage(), e);
             Status status = new Status(GENERIC_EXCEPTION, e.getMessage());
             result = Failure.of(status);
         }

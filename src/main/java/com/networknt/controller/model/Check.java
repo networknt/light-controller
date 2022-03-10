@@ -5,14 +5,16 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.networknt.utility.StringUtils;
 
-public class Check  {
+public class Check {
 
     private Boolean tlsSkipVerify;
     private String notes;
     private String name;
     private Integer interval;
+
     //In case health check failed already, the interval will increase
-    private Integer executeInterval=0;
+    private Integer executeInterval = 0;
+
     private String id;
     private Integer deregisterCriticalServiceAfter;
     private long lastExecuteTimestamp = 0L;
@@ -24,7 +26,7 @@ public class Check  {
     private String healthPath;
     private int port;
 
-    public Check () {
+    public Check() {
     }
 
     @JsonProperty("tlsSkipVerify")
@@ -55,9 +57,13 @@ public class Check  {
     }
 
     @JsonProperty("healthPath")
-    public String getHealthPath() { return healthPath; }
+    public String getHealthPath() {
+        return healthPath;
+    }
 
-    public void setHealthPath(String healthPath) { this.healthPath = healthPath; }
+    public void setHealthPath(String healthPath) {
+        this.healthPath = healthPath;
+    }
 
     @JsonProperty("interval")
     public Integer getInterval() {
@@ -85,7 +91,7 @@ public class Check  {
         this.id = id;
         String[] parts = StringUtils.split(id, ":");
         int index = parts[0].indexOf("|");
-        if(index > 0) {
+        if (index > 0) {
             this.serviceId = parts[0].substring(0, index);
             this.tag = parts[0].substring(index + 1);
         } else {
@@ -118,12 +124,12 @@ public class Check  {
         Check Check = (Check) o;
 
         return Objects.equals(tlsSkipVerify, Check.tlsSkipVerify) &&
-               Objects.equals(notes, Check.notes) &&
-               Objects.equals(name, Check.name) &&
-               Objects.equals(healthPath, Check.healthPath) &&
-               Objects.equals(interval, Check.interval) &&
-               Objects.equals(id, Check.id) &&
-               Objects.equals(deregisterCriticalServiceAfter, Check.deregisterCriticalServiceAfter);
+                Objects.equals(notes, Check.notes) &&
+                Objects.equals(name, Check.name) &&
+                Objects.equals(healthPath, Check.healthPath) &&
+                Objects.equals(interval, Check.interval) &&
+                Objects.equals(id, Check.id) &&
+                Objects.equals(deregisterCriticalServiceAfter, Check.deregisterCriticalServiceAfter);
     }
 
     @Override
@@ -135,7 +141,13 @@ public class Check  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Check {\n");
-        sb.append("    tlsSkipVerify: ").append(toIndentedString(tlsSkipVerify)).append("\n");        sb.append("    notes: ").append(toIndentedString(notes)).append("\n");        sb.append("    name: ").append(toIndentedString(name)).append("\n");        sb.append("    healthPath: ").append(toIndentedString(healthPath)).append("\n");       sb.append("    interval: ").append(toIndentedString(interval)).append("\n");        sb.append("    id: ").append(toIndentedString(id)).append("\n");        sb.append("    deregisterCriticalServiceAfter: ").append(toIndentedString(deregisterCriticalServiceAfter)).append("\n");
+        sb.append("    tlsSkipVerify: ").append(toIndentedString(tlsSkipVerify)).append("\n");
+        sb.append("    notes: ").append(toIndentedString(notes)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    healthPath: ").append(toIndentedString(healthPath)).append("\n");
+        sb.append("    interval: ").append(toIndentedString(interval)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    deregisterCriticalServiceAfter: ").append(toIndentedString(deregisterCriticalServiceAfter)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class ControllerShutdownHook implements ShutdownHookProvider {
     private static final Logger logger = LoggerFactory.getLogger(ControllerShutdownHook.class);
+
     // controller configuration.
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
@@ -17,14 +18,20 @@ public class ControllerShutdownHook implements ShutdownHookProvider {
     public void onShutdown() {
         logger.info("ControllerShutdownHook onStartup begins.");
         ControllerStartupHook.executor.shutdown();
+
         if(config.isClusterMode()) {
+
             // close the Kafka Sidecar producer before the server is shutdown
             NativeLightProducer producer = SingletonServiceFactory.getBean(NativeLightProducer.class);
             try { if(producer != null) producer.close(); } catch(Exception e) {e.printStackTrace();}
+
             // close the service registration streams
-            if(ControllerStartupHook.srStreams != null) ControllerStartupHook.srStreams.close();
+            if(ControllerStartupHook.srStreams != null)
+                ControllerStartupHook.srStreams.close();
+
             // close the health check streams
-            if(ControllerStartupHook.hcStreams != null) ControllerStartupHook.hcStreams.close();
+            if(ControllerStartupHook.hcStreams != null)
+                ControllerStartupHook.hcStreams.close();
         }
         logger.info("ControllerShutdownHook onStartup ends.");
     }

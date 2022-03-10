@@ -10,6 +10,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 
 import static com.networknt.controller.ControllerConstants.*;
@@ -27,7 +28,7 @@ public class ServicesChaosMonkeyPostHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         // get data from body
-        Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
+        Map<String, Object> body = (Map<String, Object>) exchange.getAttachment(BodyHandler.REQUEST_BODY);
         String protocol = body.getOrDefault(PROTOCOL, "null").toString();
         String address = body.getOrDefault(ADDRESS, "null").toString();
         int port = Integer.parseInt(body.getOrDefault(PORT, "null").toString());
@@ -40,10 +41,10 @@ public class ServicesChaosMonkeyPostHandler implements LightHttpHandler {
         ChaosMonkeyAssaultConfigPost<?> postBody = ControllerChaosMonkey.getChaosMonkeyAssaultConfigPostBody(assaultType, address, port, protocol, config);
 
         // query chaos monkey handlers from service
-        if(postBody != null) {
+        if (postBody != null) {
             Result<String> res = ControllerChaosMonkey.postChaosMonkeyAssault(postBody);
             exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            if(res.isSuccess()) {
+            if (res.isSuccess()) {
                 exchange.setStatusCode(200);
                 exchange.getResponseSender().send(res.getResult());
             } else {

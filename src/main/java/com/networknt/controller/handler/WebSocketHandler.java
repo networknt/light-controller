@@ -35,33 +35,42 @@ public class WebSocketHandler implements WebSocketConnectionCallback {
     public void onConnect(WebSocketHttpExchange exchange, WebSocketChannel channel) {
         ServerWebSocketClient client = new ServerWebSocketClient(channel);
         clients.put(channel, client);
-        if(logger.isDebugEnabled()) logger.debug("A new channel is opened and added to the clients for " + channel.toString());
+
+        if (logger.isDebugEnabled())
+            logger.debug("A new channel is opened and added to the clients for " + channel.toString());
+
         channel.getReceiveSetter().set(new AbstractReceiveListener() {
+
             @Override
             protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) {
                 final String messageData = message.getData();
-                if(logger.isDebugEnabled()) logger.debug("subscription message received " + messageData);
-                // The format of the subscription is https://localhost:443/com.networknt.ac-1.0.0?environment=test1&
+
+                if (logger.isDebugEnabled())
+                    logger.debug("subscription message received " + messageData);
+
+                // The format of the subscription is
+                // https://localhost:443/com.networknt.ac-1.0.0?environment=test1&
                 try {
                     URL url = new URL(messageData);
                     String serviceId = url.getPath().substring(1);
                     String query = url.getQuery();
                     String tag = null;
-                    if(query.indexOf("=") > 0) {
-                        tag = query.substring(query.indexOf("=") + 1, query.length() -1);
+                    if (query.indexOf("=") > 0) {
+                        tag = query.substring(query.indexOf("=") + 1, query.length() - 1);
                     }
                     String key = tag == null ? serviceId : serviceId + "|" + tag;
                     List<ServerWebSocketClient> list = subscriptions.get(key);
-                    if(logger.isDebugEnabled()) logger.debug("key = " +  key + " subscription list size = " + (list == null ? 0 : list.size()));
-                    if(list != null) {
-                        list.add(clients.get(channel));
-                    } else {
+
+                    if (logger.isDebugEnabled())
+                        logger.debug("key = " + key + " subscription list size = " + (list == null ? 0 : list.size()));
+
+                    if (list == null) {
                         list = new ArrayList<>();
-                        list.add(clients.get(channel));
                     }
+                    list.add(clients.get(channel));
                     subscriptions.put(key, list);
                 } catch (MalformedURLException e) {
-                    logger.error("MalformatURLException", e);
+                    logger.error(e.getMessage(), e);
                 }
             }
 
@@ -81,17 +90,22 @@ public class WebSocketHandler implements WebSocketConnectionCallback {
     public static void sendUpdatedNodes(String key, List nodes) {
         // find a list of clients who subscribe the key.
         List<ServerWebSocketClient> list = subscriptions.get(key);
-        if(list != null) {
+
+        if (list != null) {
             Map<String, List> nodeMap = new HashMap<>();
             nodeMap.put(key, nodes);
             Iterator<ServerWebSocketClient> iterator = list.iterator();
-            while(iterator.hasNext()) {
+
+            while (iterator.hasNext()) {
                 ServerWebSocketClient client = iterator.next();
                 boolean sent = client.send(JsonMapper.toJson(nodeMap));
-                if(logger.isDebugEnabled()) logger.debug("nodes changed for key " + key + " values = " + nodes);
-                if(!sent) {
+
+                if (logger.isDebugEnabled())
+                    logger.debug("nodes changed for key " + key + " values = " + nodes);
+
+                if (!sent) {
                     // the client is gone and it should be removed from the subscription list.
-                    if(logger.isDebugEnabled()) logger.debug("client is closed, remove from the list");
+                    if (logger.isDebugEnabled()) logger.debug("client is closed, remove from the list");
                     iterator.remove();
                 }
             }

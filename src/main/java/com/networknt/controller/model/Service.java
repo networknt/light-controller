@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Service  {
+public class Service {
 
     private String name;
     private String tag;
@@ -14,7 +14,7 @@ public class Service  {
     private String serviceId;
     private Integer port;
 
-    public Service () {
+    public Service() {
     }
 
     @JsonProperty("name")
@@ -84,11 +84,11 @@ public class Service  {
         Service Service = (Service) o;
 
         return Objects.equals(name, Service.name) &&
-               Objects.equals(tag, Service.tag) &&
-               Objects.equals(address, Service.address) &&
-               Objects.equals(check, Service.check) &&
-               Objects.equals(serviceId, Service.serviceId) &&
-               Objects.equals(port, Service.port);
+                Objects.equals(tag, Service.tag) &&
+                Objects.equals(address, Service.address) &&
+                Objects.equals(check, Service.check) &&
+                Objects.equals(serviceId, Service.serviceId) &&
+                Objects.equals(port, Service.port);
     }
 
     @Override
@@ -100,7 +100,12 @@ public class Service  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Service {\n");
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");        sb.append("    tag: ").append(toIndentedString(tag)).append("\n");        sb.append("    address: ").append(toIndentedString(address)).append("\n");        sb.append("    check: ").append(toIndentedString(check)).append("\n");        sb.append("    serviceId: ").append(toIndentedString(serviceId)).append("\n");        sb.append("    port: ").append(toIndentedString(port)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
+        sb.append("    address: ").append(toIndentedString(address)).append("\n");
+        sb.append("    check: ").append(toIndentedString(check)).append("\n");
+        sb.append("    serviceId: ").append(toIndentedString(serviceId)).append("\n");
+        sb.append("    port: ").append(toIndentedString(port)).append("\n");
         sb.append("}");
         return sb.toString();
     }
