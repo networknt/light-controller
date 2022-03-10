@@ -5,23 +5,23 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LoggerInfo  {
+public class LoggerInfo {
 
     private String name;
-    
-    
+
+
     public enum LevelEnum {
-        
-        TRACE ("TRACE"), 
-        
-        ERROR ("ERROR"), 
-        
-        INFO ("INFO"), 
-        
-        DEBUG ("DEBUG"), 
-        
-        WARN ("WARN"); 
-        
+
+        TRACE("TRACE"),
+
+        ERROR("ERROR"),
+
+        INFO("INFO"),
+
+        DEBUG("DEBUG"),
+
+        WARN("WARN");
+
 
         private final String value;
 
@@ -37,7 +37,7 @@ public class LoggerInfo  {
         public static LevelEnum fromValue(String text) {
             for (LevelEnum b : LevelEnum.values()) {
                 if (String.valueOf(b.value).equals(text)) {
-                return b;
+                    return b;
                 }
             }
             return null;
@@ -46,9 +46,8 @@ public class LoggerInfo  {
 
     private LevelEnum level;
 
-    
 
-    public LoggerInfo () {
+    public LoggerInfo() {
     }
 
     @JsonProperty("name")
@@ -82,7 +81,7 @@ public class LoggerInfo  {
         LoggerInfo LoggerInfo = (LoggerInfo) o;
 
         return Objects.equals(name, LoggerInfo.name) &&
-               Objects.equals(level, LoggerInfo.level);
+                Objects.equals(level, LoggerInfo.level);
     }
 
     @Override
@@ -94,7 +93,8 @@ public class LoggerInfo  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class LoggerInfo {\n");
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");        sb.append("    level: ").append(toIndentedString(level)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    level: ").append(toIndentedString(level)).append("\n");
         sb.append("}");
         return sb.toString();
     }

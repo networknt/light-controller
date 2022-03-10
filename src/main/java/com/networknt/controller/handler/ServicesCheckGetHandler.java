@@ -108,7 +108,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
         Map<String, Object> checks = new HashMap<>();
         // local store access.
         ReadOnlyKeyValueStore<String, String> healthStore = ControllerStartupHook.hcStreams.getHealthStore();
-        KeyValueIterator<String, String> iterator = healthStore.all();
+        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.hcStreams.getAllKafkaValue(healthStore);
         while(iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;
@@ -124,6 +124,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
                 }
             }
         }
+        iterator.close();
         if(logger.isDebugEnabled()) logger.debug("The number of checks at local is " + checks.size());
         return checks;
     }

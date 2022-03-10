@@ -108,7 +108,7 @@ public class ServicesGetHandler implements LightHttpHandler {
     private Map<String, Object> getLocalServices() {
         Map<String, Object> services = new HashMap<>();
         ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
-        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>)ControllerStartupHook.srStreams.getAllKafkaValue(serviceStore);
+        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.hcStreams.getAllKafkaValue(serviceStore);
         while (iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;
@@ -118,6 +118,7 @@ public class ServicesGetHandler implements LightHttpHandler {
                 services.put(key, nodes);
             }
         }
+        iterator.close();
         if (logger.isDebugEnabled()) logger.debug("The number of services at local is " + services.size());
         return services;
     }

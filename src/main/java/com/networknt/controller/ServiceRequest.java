@@ -81,7 +81,7 @@ public class ServiceRequest {
          * @return - this.
          */
         public Builder addPathParam(String k, Object v) {
-            if(v != null) {
+            if (v != null) {
                 this.pathParams.put(k, v.toString());
             }
             return this;
@@ -95,7 +95,7 @@ public class ServiceRequest {
          * @return - this.
          */
         public Builder addQueryParam(String k, Object v) {
-            if(v != null) {
+            if (v != null) {
                 this.queryParams.put(k, v.toString());
             }
             return this;
@@ -119,20 +119,21 @@ public class ServiceRequest {
          * Get the base url of our request (protocol + address + port).
          *
          * @param inProtocol - given protocol.
-         * @param inAddress - given address.
-         * @param inPort - given port.
-         *
+         * @param inAddress  - given address.
+         * @param inPort     - given port.
          * @return - string base path.
          */
         private static String getBaseUrl(String inProtocol, String inAddress, String inPort) {
             StringBuilder url = new StringBuilder();
 
-            if(inProtocol != null) {
+            if (inProtocol != null) {
                 url.append(inProtocol);
                 url.append("://");
             }
+
             url.append(inAddress);
-            if(inPort != null) {
+
+            if (inPort != null) {
                 url.append(":");
                 url.append(inPort);
             }
@@ -143,11 +144,13 @@ public class ServiceRequest {
             ClientConnection connection = null;
             try {
                 URI uri = new URI(getBaseUrl(inProtocol, inAddress, inPort));
-                if("https".equals(inProtocol)) {
+
+                if ("https".equals(inProtocol)) {
                     connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, optionMap).get();
                 } else {
                     connection = client.borrowConnection(uri, Http2Client.WORKER, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
                 }
+
             } catch (URISyntaxException e) {
                 logger.error("URI Exception occurred", e);
             } catch (IOException e) {
@@ -158,12 +161,14 @@ public class ServiceRequest {
 
         private String getSolvedBasePath(String inPath) {
             String rawPath = inPath;
-            if(!this.pathParams.isEmpty() && rawPath.contains("{")) {
+
+            if (!this.pathParams.isEmpty() && rawPath.contains("{")) {
                 Matcher m = Pattern.compile(PATH_PARAM_PATTERN).matcher(rawPath);
-                while(m.find()){
+
+                while (m.find()) {
                     String match = m.group();
                     String pathParamValue = this.pathParams.get(match);
-                    if(pathParamValue != null) {
+                    if (pathParamValue != null) {
                         rawPath = rawPath.replace(match, pathParamValue);
                     }
                 }
@@ -179,10 +184,10 @@ public class ServiceRequest {
          */
         private String getSolvedQueryParams() {
             StringBuilder queryParamBuilder = new StringBuilder();
-            if(!this.queryParams.isEmpty()) {
+            if (!this.queryParams.isEmpty()) {
                 AtomicInteger i = new AtomicInteger(0);
-                this.queryParams.forEach((k,v) -> {
-                    if(i.get() == 0) {
+                this.queryParams.forEach((k, v) -> {
+                    if (i.get() == 0) {
                         queryParamBuilder.append("?");
                     } else {
                         queryParamBuilder.append("&");
@@ -197,7 +202,7 @@ public class ServiceRequest {
         }
 
         public Builder withRequestBody(Object requestBody) {
-            if(requestBody != null) {
+            if (requestBody != null) {
                 this.requestBody = JsonMapper.toJson(requestBody);
             } else {
                 this.requestBody = null;
@@ -226,9 +231,11 @@ public class ServiceRequest {
     public void sendRequest() {
         AtomicReference<ClientResponse> reference = null;
         this.requestTime = System.currentTimeMillis();
+
         try {
             reference = send(this.connection, this.method, this.path, config.getBootstrapToken(), this.requestBody);
-            if(reference.get() != null) {
+
+            if (reference.get() != null) {
                 int statusCode = reference.get().getResponseCode();
                 if (statusCode >= UNUSUAL_STATUS_CODE) {
                     logger.error("Error: {} : {}", statusCode, reference.get().getAttachment(Http2Client.RESPONSE_BODY));
@@ -237,7 +244,8 @@ public class ServiceRequest {
         } catch (Exception e) {
             logger.error("Request exception", e);
         } finally {
-            if(reference != null) {
+
+            if (reference != null) {
                 this.statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
                 client.returnConnection(connection);
             }
@@ -254,30 +262,40 @@ public class ServiceRequest {
      * @param token      token to put in header
      * @param method     method of the request
      * @param json       json body
-     * @throws InterruptedException int. exception
      * @return AtomicReference{ClientResponse} response
+     * @throws InterruptedException int. exception
      */
     @SuppressWarnings("rawtypes")
     private static AtomicReference<ClientResponse> send(ClientConnection connection, HttpString method, String path, String token, String json) throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         ClientRequest request = new ClientRequest().setMethod(method).setPath(path);
+
         // add host header for HTTP/1.1 server when HTTP is used.
         request.getRequestHeaders().put(Headers.HOST, "localhost");
 
         // TODO: Does this save dynamic token? where does it go?
-        if(config.isDynamicToken()) {
+        if (config.isDynamicToken()) {
             Result result = client.addCcToken(request);
-            if(result.isFailure()) {
+
+            if (result.isFailure()) {
                 logger.error(result.getError().toString());
             } else {
-                if (logger.isTraceEnabled()) logger.trace("Dynamic token  = " + ((Jwt)result.getResult()).getJwt());
+
+                if (logger.isTraceEnabled())
+                    logger.trace("Dynamic token  = " + ((Jwt) result.getResult()).getJwt());
             }
         } else {
-            if(logger.isTraceEnabled()) logger.trace("Static token = " + token);
-            if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer "  + token);
+
+            if (logger.isTraceEnabled())
+                logger.trace("Static token = " + token);
+
+            if (token != null)
+                request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer " + token);
+
         }
-        if(StringUtils.isBlank(json)) {
+
+        if (StringUtils.isBlank(json)) {
             connection.sendRequest(request, client.createClientCallback(reference, latch));
         } else {
             request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
@@ -290,7 +308,8 @@ public class ServiceRequest {
 
     public String getResponseBody() {
         String res = "{}";
-        if(this.responseReference!= null && this.responseReference.get()!= null) {
+
+        if (this.responseReference != null && this.responseReference.get() != null) {
             res = responseReference.get().getAttachment(Http2Client.RESPONSE_BODY);
             logger.info("{}", this.getResponseTime());
         }
@@ -298,7 +317,7 @@ public class ServiceRequest {
     }
 
     public int getStatusCode() {
-        if(this.responseReference!= null && this.responseReference.get()!= null) {
+        if (this.responseReference != null && this.responseReference.get() != null) {
             this.statusCode = responseReference.get().getResponseCode();
         }
         return this.statusCode;
@@ -306,7 +325,8 @@ public class ServiceRequest {
 
     public long getResponseTime() {
         long totalTime = 0L;
-        if(this.responseReference != null && this.responseReference.get()!= null) {
+
+        if (this.responseReference != null && this.responseReference.get() != null) {
             totalTime = this.responseTime - this.requestTime;
         }
         return totalTime;

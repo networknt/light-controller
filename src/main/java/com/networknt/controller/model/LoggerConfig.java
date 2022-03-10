@@ -5,14 +5,14 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LoggerConfig  {
+public class LoggerConfig {
 
     private String protocol;
     private String address;
     private Integer port;
     private java.util.List<LoggerInfo> loggers;
 
-    public LoggerConfig () {
+    public LoggerConfig() {
     }
 
     @JsonProperty("protocol")
@@ -64,9 +64,9 @@ public class LoggerConfig  {
         LoggerConfig LoggerConfig = (LoggerConfig) o;
 
         return Objects.equals(protocol, LoggerConfig.protocol) &&
-               Objects.equals(address, LoggerConfig.address) &&
-               Objects.equals(port, LoggerConfig.port) &&
-               Objects.equals(loggers, LoggerConfig.loggers);
+                Objects.equals(address, LoggerConfig.address) &&
+                Objects.equals(port, LoggerConfig.port) &&
+                Objects.equals(loggers, LoggerConfig.loggers);
     }
 
     @Override
@@ -78,7 +78,10 @@ public class LoggerConfig  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class LoggerConfig {\n");
-        sb.append("    protocol: ").append(toIndentedString(protocol)).append("\n");        sb.append("    address: ").append(toIndentedString(address)).append("\n");        sb.append("    port: ").append(toIndentedString(port)).append("\n");        sb.append("    loggers: ").append(toIndentedString(loggers)).append("\n");
+        sb.append("    protocol: ").append(toIndentedString(protocol)).append("\n");
+        sb.append("    address: ").append(toIndentedString(address)).append("\n");
+        sb.append("    port: ").append(toIndentedString(port)).append("\n");
+        sb.append("    loggers: ").append(toIndentedString(loggers)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -24,7 +24,7 @@ public class ServicesChaosMonkeyAssaultPostHandler implements LightHttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
 
         // get data from body
-        Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
+        Map<String, Object> body = (Map<String, Object>) exchange.getAttachment(BodyHandler.REQUEST_BODY);
         String protocol = body.getOrDefault(PROTOCOL, "null").toString();
         String address = body.getOrDefault(ADDRESS, "null").toString();
         int port = Integer.parseInt(body.getOrDefault(PORT, "0").toString());

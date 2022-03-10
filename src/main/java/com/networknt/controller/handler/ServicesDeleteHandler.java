@@ -38,15 +38,20 @@ public class ServicesDeleteHandler implements LightHttpHandler {
         String checkInterval = exchange.getQueryParameters().get("checkInterval").getFirst();
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get("tag");
-        if(tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
-        String key = tag == null ?  serviceId : serviceId + "|" + tag;
+        if (tagDeque != null && !tagDeque.isEmpty()) tag = tagDeque.getFirst();
+        String key = tag == null ? serviceId : serviceId + "|" + tag;
 
         String address = exchange.getQueryParameters().get(ADDRESS).getFirst();
         int port = Integer.valueOf(exchange.getQueryParameters().get("port").getFirst());
-        if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " protocol = " + protocol + " tag = " + tag + " address = " + address + " port = " + port);
-        if(ControllerStartupHook.config.isClusterMode()) {
+
+        if (logger.isDebugEnabled())
+            logger.debug("serviceId = " + serviceId + " protocol = " + protocol + " tag = " + tag + " address = " + address + " port = " + port);
+
+        if (ControllerStartupHook.config.isClusterMode()) {
+
             // push the de-registered event to portal-event.
             pushDeregisterEvent(serializer, key, serviceId, protocol, tag, address, port);
+
             // send task definition with delete action to stop the task scheduling. Send to the light-scheduler topic directly.
             pushDeleteTaskDefinition(serializer, key, protocol, address, port, checkInterval);
         } else {
@@ -57,6 +62,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
             } else {
                 ControllerStartupHook.services.remove(key);
             }
+
             // delete from the checks, cancel the timer task before deleting.
             String checkId = key + ":" + protocol + ":" + address + ":" + port;
             Check check = ControllerStartupHook.checks.remove(checkId);
@@ -106,6 +112,7 @@ public class ServicesDeleteHandler implements LightHttpHandler {
                 .setName(checkId)
                 .setHost(ControllerConstants.HOST)
                 .build();
+
         // Task frequency definition triggers the task every 10 sec once
         TaskFrequency taskFrequency = TaskFrequency.newBuilder()
                 .setTimeUnit(TimeUnit.SECONDS)

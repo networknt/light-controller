@@ -58,6 +58,7 @@ public class ServiceRegistrationStreams implements LightStreams {
         topology.addSource("SourceTopicProcessor", controllerConfig.getTopic());
         topology.addProcessor("ServiceEventProcessor", ServiceEventProcessor::new, "SourceTopicProcessor");
         topology.addStateStore(keyValueServiceStoreBuilder, "ServiceEventProcessor");
+
         // topology.addSink("NonceProcessor", "portal-nonce", "ServiceEventProcessor");
         // topology.addSink("NotificationProcessor", "portal-notification", "ServiceEventProcessor");
         Properties streamsProps = new Properties();
@@ -70,7 +71,7 @@ public class ServiceRegistrationStreams implements LightStreams {
             return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
         });
 
-        if(streamsConfig.isCleanUp()) {
+        if (streamsConfig.isCleanUp()) {
             serviceStreams.cleanUp();
         }
         serviceStreams.start();
@@ -90,14 +91,17 @@ public class ServiceRegistrationStreams implements LightStreams {
             this.pc = pc;
             this.serviceStore = (KeyValueStore<String, String>) pc.getStateStore(service);
 
-            if(logger.isInfoEnabled()) logger.info("Processor initialized");
+            if (logger.isInfoEnabled())
+                logger.info("Processor initialized");
+
         }
 
         @Override
         public void process(byte[] key, byte[] value) {
-            if(logger.isDebugEnabled()) logger.debug("ServiceRegistrationStreams.process is called!");
+            if (logger.isDebugEnabled()) logger.debug("ServiceRegistrationStreams.process is called!");
             AvroDeserializer deserializer = new AvroDeserializer(true);
             Object object;
+
             // we need to ignore any message that cannot be deserialized. For example Unknown magic byte!
             try {
                 object = deserializer.deserialize(value);
@@ -106,9 +110,11 @@ public class ServiceRegistrationStreams implements LightStreams {
                 return;
             }
             try {
-                if(object instanceof ControllerRegisteredEvent) {
+                if (object instanceof ControllerRegisteredEvent) {
                     ControllerRegisteredEvent controllerRegisteredEvent = (ControllerRegisteredEvent) object;
-                    if (logger.isTraceEnabled()) logger.trace("Event = " + controllerRegisteredEvent);
+
+                    if (logger.isTraceEnabled())
+                        logger.trace("Event = " + controllerRegisteredEvent);
 
                     Map<String, Object> nodeMap = new ConcurrentHashMap<>();
                     nodeMap.put("protocol", controllerRegisteredEvent.getProtocol());
@@ -117,35 +123,35 @@ public class ServiceRegistrationStreams implements LightStreams {
 
                     String nodesString = serviceStore.get(controllerRegisteredEvent.getKey());
                     List<Map<String, Object>> nodes;
-                    if(nodesString == null) {
+                    if (nodesString == null) {
                         nodes = new ArrayList<>();
                     } else {
                         nodes = JsonMapper.string2List(nodesString);
                     }
                     // before we add a new entry to the list, we need to make sure that the same entry doesn't exist.
-                    nodes.removeIf(e -> (e.get("protocol").equals(controllerRegisteredEvent.getProtocol()) && e.get("address").equals(controllerRegisteredEvent.getAddress()) && controllerRegisteredEvent.getPort() == (Integer)e.get("port")));
+                    nodes.removeIf(e -> (e.get("protocol").equals(controllerRegisteredEvent.getProtocol()) && e.get("address").equals(controllerRegisteredEvent.getAddress()) && controllerRegisteredEvent.getPort() == (Integer) e.get("port")));
                     nodes.add(nodeMap);
                     nodesString = JsonMapper.toJson(nodes);
                     serviceStore.put(controllerRegisteredEvent.getKey(), nodesString);
-                } else if(object instanceof ControllerDeregisteredEvent) {
+                } else if (object instanceof ControllerDeregisteredEvent) {
                     ControllerDeregisteredEvent controllerDeregisteredEvent = (ControllerDeregisteredEvent) object;
                     if (logger.isTraceEnabled()) logger.trace("Event = " + controllerDeregisteredEvent);
 
                     String nodesString = serviceStore.get(controllerDeregisteredEvent.getKey());
-                    if(nodesString != null) {
+                    if (nodesString != null) {
                         List<Map<String, Object>> nodes = JsonMapper.string2List(nodesString);
                         String protocol = controllerDeregisteredEvent.getProtocol();
                         String address = controllerDeregisteredEvent.getAddress();
                         int port = controllerDeregisteredEvent.getPort();
-                        nodes.removeIf(e -> (e.get("protocol").equals(protocol) && e.get("address").equals(address) && port == (Integer)e.get("port")));
-                        if(nodes.size() == 0) {
+                        nodes.removeIf(e -> (e.get("protocol").equals(protocol) && e.get("address").equals(address) && port == (Integer) e.get("port")));
+                        if (nodes.size() == 0) {
                             // set it null in order to remove the service from the store.
                             nodesString = null;
                         } else {
                             nodesString = JsonMapper.toJson(nodes);
                         }
                     }
-                    if(nodesString == null) {
+                    if (nodesString == null) {
                         // when the last node is removed for the service, remove it from the store.
                         serviceStore.delete(controllerDeregisteredEvent.getKey());
                     } else {
@@ -160,18 +166,27 @@ public class ServiceRegistrationStreams implements LightStreams {
 
         @Override
         public void close() {
-            if(logger.isInfoEnabled()) logger.info("Closing processor...");
+
+            if (logger.isInfoEnabled())
+                logger.info("Closing processor...");
         }
     }
+
     @Override
     public void start(String ip, int port) {
-        if(logger.isDebugEnabled()) logger.debug("ServiceStreams is starting...");
+
+        if (logger.isDebugEnabled())
+            logger.debug("ServiceStreams is starting...");
+
         startServiceStreams(ip, port);
     }
 
     @Override
     public void close() {
-        if(logger.isDebugEnabled()) logger.debug("ServiceStreams is closing...");
+
+        if (logger.isDebugEnabled())
+            logger.debug("ServiceStreams is closing...");
+
         serviceStreams.close();
     }
 
