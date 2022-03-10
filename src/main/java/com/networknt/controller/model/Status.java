@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Status  {
+public class Status {
 
     private String severity;
     private String description;
@@ -13,7 +13,7 @@ public class Status  {
     private String message;
     private Integer statusCode;
 
-    public Status () {
+    public Status() {
     }
 
     @JsonProperty("severity")
@@ -74,10 +74,10 @@ public class Status  {
         Status Status = (Status) o;
 
         return Objects.equals(severity, Status.severity) &&
-               Objects.equals(description, Status.description) &&
-               Objects.equals(code, Status.code) &&
-               Objects.equals(message, Status.message) &&
-               Objects.equals(statusCode, Status.statusCode);
+                Objects.equals(description, Status.description) &&
+                Objects.equals(code, Status.code) &&
+                Objects.equals(message, Status.message) &&
+                Objects.equals(statusCode, Status.statusCode);
     }
 
     @Override
@@ -89,7 +89,11 @@ public class Status  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Status {\n");
-        sb.append("    severity: ").append(toIndentedString(severity)).append("\n");        sb.append("    description: ").append(toIndentedString(description)).append("\n");        sb.append("    code: ").append(toIndentedString(code)).append("\n");        sb.append("    message: ").append(toIndentedString(message)).append("\n");        sb.append("    statusCode: ").append(toIndentedString(statusCode)).append("\n");
+        sb.append("    severity: ").append(toIndentedString(severity)).append("\n");
+        sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    code: ").append(toIndentedString(code)).append("\n");
+        sb.append("    message: ").append(toIndentedString(message)).append("\n");
+        sb.append("    statusCode: ").append(toIndentedString(statusCode)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -5,12 +5,12 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CheckStatus  {
+public class CheckStatus {
 
     private Boolean pass;
     private String id;
 
-    public CheckStatus () {
+    public CheckStatus() {
     }
 
     @JsonProperty("pass")
@@ -44,7 +44,7 @@ public class CheckStatus  {
         CheckStatus CheckStatus = (CheckStatus) o;
 
         return Objects.equals(pass, CheckStatus.pass) &&
-               Objects.equals(id, CheckStatus.id);
+                Objects.equals(id, CheckStatus.id);
     }
 
     @Override
@@ -56,7 +56,8 @@ public class CheckStatus  {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class CheckStatus {\n");
-        sb.append("    pass: ").append(toIndentedString(pass)).append("\n");        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    pass: ").append(toIndentedString(pass)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("}");
         return sb.toString();
     }

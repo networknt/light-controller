@@ -50,13 +50,13 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String id = exchange.getQueryParameters().get("id").getFirst();
-        if(logger.isTraceEnabled()) logger.trace("id = " + id);
+        if (logger.isTraceEnabled()) logger.trace("id = " + id);
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        if(ControllerStartupHook.config.isClusterMode()) {
+        if (ControllerStartupHook.config.isClusterMode()) {
             // get from the Kafka Streams store.
             ReadOnlyKeyValueStore<String, String> healthStore = ControllerStartupHook.hcStreams.getHealthStore();
-            String data = healthStore.get(id);
-            if(data != null) {
+            String data = (String) ControllerStartupHook.hcStreams.getKafkaValueByKey(healthStore, id);
+            if (data != null) {
                 exchange.getResponseSender().send(data);
             } else {
                 TaskDefinitionKey taskDefinitionKey = TaskDefinitionKey.newBuilder()
@@ -65,9 +65,10 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
                         .build();
                 KeyQueryMetadata metadata = ControllerStartupHook.hcStreams.getHealthStreamsMetadata(taskDefinitionKey);
                 HostInfo hostInfo = metadata.activeHost();
-                if(logger.isDebugEnabled()) logger.debug("found address in another instance " + hostInfo.host() + ":" + hostInfo.port());
+                if (logger.isDebugEnabled())
+                    logger.debug("found address in another instance " + hostInfo.host() + ":" + hostInfo.port());
                 String url = "https://" + hostInfo.host() + ":" + hostInfo.port();
-                if(NetUtils.getLocalAddressByDatagram().equals(hostInfo.host()) && Server.getServerConfig().getHttpsPort() == hostInfo.port()) {
+                if (NetUtils.getLocalAddressByDatagram().equals(hostInfo.host()) && Server.getServerConfig().getHttpsPort() == hostInfo.port()) {
                     logger.error("******Kafka returns the same instance!");
                     setExchangeStatus(exchange, OBJECT_NOT_FOUND, "health check", id);
                     return;
@@ -89,8 +90,8 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
      * Get registered controller services from other nodes with exchange and url. The result contains a map of services.
      *
      * @param exchange HttpServerExchange
-     * @param url of the target server
-     * @param id of check id
+     * @param url      of the target server
+     * @param id       of check id
      * @return Result the service map in JSON
      */
     public static Result<String> getHealthCheck(HttpServerExchange exchange, String url, String id) {
@@ -101,7 +102,7 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
         Result<String> result = null;
         try {
             ClientConnection conn = ControllerStartupHook.connCache.get(url);
-            if(conn == null || !conn.isOpen()) {
+            if (conn == null || !conn.isOpen()) {
                 conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
                 ControllerStartupHook.connCache.put(url, conn);
             }
@@ -111,16 +112,16 @@ public class ServicesCheckIdGetHandler implements LightHttpHandler {
             final AtomicReference<ClientResponse> reference = new AtomicReference<>();
             // encode url as there is a vertical bar between the serviceId and the tag.
             String path = "/services/check/" + URLEncoder.encode(id, StandardCharsets.UTF_8.toString());
-            if(logger.isTraceEnabled()) logger.trace("encoded url = " + path);
+            if (logger.isTraceEnabled()) logger.trace("encoded url = " + path);
             final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(path);
             String token = exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
-            if(token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
+            if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
             request.getRequestHeaders().put(Headers.HOST, "localhost");
             conn.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-            if(statusCode != 200) {
+            if (statusCode != 200) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
                 result = Failure.of(status);
             } else result = Success.of(body);

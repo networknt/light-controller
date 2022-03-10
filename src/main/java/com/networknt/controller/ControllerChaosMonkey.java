@@ -36,7 +36,7 @@ public class ControllerChaosMonkey {
         serviceRequest.sendRequest();
         int statusCode = serviceRequest.getStatusCode();
         String responseBody = serviceRequest.getResponseBody();
-        if(statusCode >= 400) {
+        if (statusCode >= 400) {
             // error response with a status
             return Failure.of(JsonMapper.fromJson(responseBody, Status.class));
         } else {
@@ -54,7 +54,7 @@ public class ControllerChaosMonkey {
 
         int statusCode = serviceRequest.getStatusCode();
         String responseBody = serviceRequest.getResponseBody();
-        if(statusCode >= 400) {
+        if (statusCode >= 400) {
             return Failure.of(JsonMapper.fromJson(responseBody, Status.class));
         } else {
             return Success.of(responseBody);
@@ -96,11 +96,11 @@ public class ControllerChaosMonkey {
      * We do not want to try to grab logs of killapp or exception, because this means the service is shutdown.
      *
      * @param assaultType - chaos monkey assault handler.
-     * @param address - address of service we are going to assault.
-     * @param port - port of service we are going to assault.
-     * @param protocol - protocol of service we are going to assault.
-     * @param endpoint - endpoint of service we are going to hit
-     * @param reqCount - the amount of times we are going to request until the assault is complete.
+     * @param address     - address of service we are going to assault.
+     * @param port        - port of service we are going to assault.
+     * @param protocol    - protocol of service we are going to assault.
+     * @param endpoint    - endpoint of service we are going to hit
+     * @param reqCount    - the amount of times we are going to request until the assault is complete.
      * @return - return confirmation string that the assault happened or the log entries.
      */
     public static String initChaosMonkeyAssault(String assaultType, String address, int port, String protocol, String endpoint, int reqCount) {
@@ -131,7 +131,7 @@ public class ControllerChaosMonkey {
         }
         String endTime = String.valueOf(System.currentTimeMillis());
 
-        if(testCompleted) {
+        if (testCompleted) {
             return confirmLog(address, port, protocol, startTime, endTime);
         } else {
             return "Test was not completed for triggered assault: " + assaultHandlerName + "\n" + "Is the handler name correct? Is the specified handler enabled with bypass disabled?";
@@ -141,17 +141,17 @@ public class ControllerChaosMonkey {
     /**
      * Retrieve the logs after chaos monkey assault to confirm the test happened.
      *
-     * @param address - address of service
-     * @param port - port of service
-     * @param protocol - protocol of service.
+     * @param address   - address of service
+     * @param port      - port of service
+     * @param protocol  - protocol of service.
      * @param startTime - startTime of log
-     * @param endTime - endTime of log
+     * @param endTime   - endTime of log
      * @return - return JSON string of log entries from service.
      */
     private static String confirmLog(String address, int port, String protocol, String startTime, String endTime) {
         long currentTime = System.currentTimeMillis();
         long timeout = currentTime + TIMEOUT;
-        while(currentTime < timeout) {
+        while (currentTime < timeout) {
             ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
                     .addQueryParam("startTime", startTime)
                     .addQueryParam("endTime", endTime)
@@ -159,7 +159,7 @@ public class ControllerChaosMonkey {
                     .build();
             serviceRequest.sendRequest();
 
-            if(serviceRequest.getStatusCode() == HttpStatus.OK.value()){
+            if (serviceRequest.getStatusCode() == HttpStatus.OK.value()) {
                 return serviceRequest.getResponseBody();
             }
             currentTime = System.currentTimeMillis();
@@ -169,16 +169,16 @@ public class ControllerChaosMonkey {
     }
 
     private static boolean initExceptionAssault(String protocol, String address, String port, String endpoint, int reqCount) {
-        for(int i = 0; i < reqCount; i++) {
+        for (int i = 0; i < reqCount; i++) {
             ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, port, Methods.GET)
                     .buildFullPath(endpoint)
                     .build();
             serviceRequest.sendRequest();
-            if(serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            if (serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 logger.info("Service responded with 500 and is no longer reachable");
                 return true;
             }
-            if(serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            if (serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 return true;
             }
         }
@@ -187,16 +187,16 @@ public class ControllerChaosMonkey {
     }
 
     private static boolean initLatencyAssault(String protocol, String address, String port, String endpoint, int reqCount) {
-        for(int i = 0; i < reqCount; i++) {
+        for (int i = 0; i < reqCount; i++) {
             ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, port, Methods.GET)
                     .buildFullPath(endpoint)
                     .build();
             serviceRequest.sendRequest();
-            if(serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            if (serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 logger.info("Service responded with 500 and is no longer reachable");
                 return true;
             }
-            if(serviceRequest.getStatusCode() == HttpStatus.REQUEST_TIMEOUT.value()) {
+            if (serviceRequest.getStatusCode() == HttpStatus.REQUEST_TIMEOUT.value()) {
                 return true;
             }
         }
@@ -204,16 +204,16 @@ public class ControllerChaosMonkey {
     }
 
     private static boolean initKillAppAssault(String protocol, String address, String port, String endpoint, int reqCount) {
-        for(int i = 0; i < reqCount; i++) {
+        for (int i = 0; i < reqCount; i++) {
             ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, port, Methods.GET)
                     .buildFullPath(endpoint)
                     .build();
             serviceRequest.sendRequest();
-            if(serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            if (serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 logger.info("Service responded with 500 and is no longer reachable");
                 return true;
             }
-            if(serviceRequest.getStatusCode() == HttpStatus.BAD_GATEWAY.value() ||
+            if (serviceRequest.getStatusCode() == HttpStatus.BAD_GATEWAY.value() ||
                     serviceRequest.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE.value()) {
                 return true;
             }
@@ -222,16 +222,16 @@ public class ControllerChaosMonkey {
     }
 
     private static boolean initMemoryAssault(String protocol, String address, String port, String endpoint, int reqCount) {
-        for(int i = 0; i < reqCount; i++) {
+        for (int i = 0; i < reqCount; i++) {
             ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, port, Methods.GET)
                     .buildFullPath(endpoint)
                     .build();
             serviceRequest.sendRequest();
-            if(serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            if (serviceRequest.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
                 logger.info("Service responded with 500 and is no longer reachable");
                 return true;
             }
-            if(serviceRequest.getStatusCode() == HttpStatus.BAD_REQUEST.value() ||
+            if (serviceRequest.getStatusCode() == HttpStatus.BAD_REQUEST.value() ||
                     serviceRequest.getStatusCode() == HttpStatus.BAD_GATEWAY.value() ||
                     serviceRequest.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE.value()) {
                 return true;

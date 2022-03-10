@@ -22,23 +22,42 @@ public class CheckTask extends TimerTask {
 
     @Override
     public void run() {
+
         // iterate the checks map and run the check based on the parameters in check object
         try {
-            if(ControllerStartupHook.checks != null) {
+            if (ControllerStartupHook.checks != null) {
                 List<String> keys = ControllerStartupHook.checks.keySet().stream().collect(Collectors.toList());
-                for(String key: keys) {
+
+                for (String key : keys) {
                     Check check = ControllerStartupHook.checks.get(key);
-                    if (check!=null) {
-                        if (check.getExecuteInterval()==0) check.setExecuteInterval(check.getInterval());
-                        if(logger.isTraceEnabled()) logger.trace("id = " + check.getId() + " lastFailed = " + check.getLastFailedTimestamp() + " lastExecute = " + check.getLastExecuteTimestamp() + " interval = " + check.getInterval() + " deregAfter = " + check.getDeregisterCriticalServiceAfter());
-                        if(check.getLastExecuteTimestamp() == 0) {
-                            if(logger.isTraceEnabled()) logger.trace("check " + check.getId() + " first time");
+
+                    if (check != null) {
+
+                        if (check.getExecuteInterval() == 0)
+                            check.setExecuteInterval(check.getInterval());
+
+                        if (logger.isTraceEnabled())
+                            logger.trace("id = " + check.getId() +
+                                    " lastFailed = " + check.getLastFailedTimestamp() +
+                                    " lastExecute = " + check.getLastExecuteTimestamp() +
+                                    " interval = " + check.getInterval() +
+                                    " deregAfter = " + check.getDeregisterCriticalServiceAfter());
+
+                        if (check.getLastExecuteTimestamp() == 0) {
+
+                            if (logger.isTraceEnabled())
+                                logger.trace("check " + check.getId() + " first time");
+
                             execute(check);
-                        } else if(System.currentTimeMillis() - check.getExecuteInterval() > check.getLastExecuteTimestamp()){
-                            if(logger.isTraceEnabled()) logger.trace("check " + check.getId() + " interval reached");
+                        } else if (System.currentTimeMillis() - check.getExecuteInterval() > check.getLastExecuteTimestamp()) {
+
+                            if (logger.isTraceEnabled())
+                                logger.trace("check " + check.getId() + " interval reached");
+
                             execute(check);
                         } else {
-                            if(logger.isTraceEnabled()) logger.trace("check " + check.getId() + " not reach interval yet");
+                            if (logger.isTraceEnabled())
+                                logger.trace("check " + check.getId() + " not reach interval yet");
                         }
                     }
                 }
@@ -49,28 +68,43 @@ public class CheckTask extends TimerTask {
     }
 
     private void execute(Check check) {
-        if(check.getHealthPath() != null) {
-            boolean res = ControllerClient.checkHealth(check.getProtocol(), check.getAddress(), check.getPort(), check.getHealthPath(), check.getServiceId());
+
+        if (check.getHealthPath() != null) {
+
+            boolean res = ControllerClient.checkHealth(
+                    check.getProtocol(),
+                    check.getAddress(),
+                    check.getPort(),
+                    check.getHealthPath(),
+                    check.getServiceId());
+
             check.setLastExecuteTimestamp(System.currentTimeMillis());
-            if(res) {
+
+            if (res) {
+
                 // once the health check is successful, reset the last failedTimestamp to 0 so that it is not continue counting.
                 // also set the executeInterval to normal interval from the task definition interval.
                 check.setLastFailedTimestamp(0L);
                 check.setExecuteInterval(check.getInterval());
             } else {
+
                 // only set the failure flag if it is not set yet.
-                if(check.getLastFailedTimestamp() == 0L) check.setLastFailedTimestamp(System.currentTimeMillis());
+                if (check.getLastFailedTimestamp() == 0L)
+                    check.setLastFailedTimestamp(System.currentTimeMillis());
+
                 // double the health check executeInterval to avoid hitting the failed server too fast.
-                check.setExecuteInterval(check.getExecuteInterval()*2);
+                check.setExecuteInterval(check.getExecuteInterval() * 2);
             }
-            if(check.getLastFailedTimestamp() != 0L) {
+            if (check.getLastFailedTimestamp() != 0L) {
                 removeNode(check);
             }
         } else {
+
             // ttl check so we need to check the last failed time to decide if the node should be removed.
-            if(check.getLastFailedTimestamp() != 0L) {
+            if (check.getLastFailedTimestamp() != 0L) {
                 removeNode(check);
             } else {
+
                 // last failed time is 0, set it to current
                 check.setLastFailedTimestamp(System.currentTimeMillis());
             }
@@ -78,10 +112,12 @@ public class CheckTask extends TimerTask {
     }
 
     private void removeNode(Check check) {
-        if(System.currentTimeMillis() - check.getDeregisterCriticalServiceAfter() > check.getLastFailedTimestamp()) {
+
+        if (System.currentTimeMillis() - check.getDeregisterCriticalServiceAfter() > check.getLastFailedTimestamp()) {
+
             // remove the node as it passed the de-register after.
-            String key = check.getTag() == null ?  check.getServiceId() : check.getServiceId() + "|" + check.getTag();
-            if(ControllerStartupHook.config.isClusterMode()) {
+            String key = check.getTag() == null ? check.getServiceId() : check.getServiceId() + "|" + check.getTag();
+            if (ControllerStartupHook.config.isClusterMode()) {
                 EventId eventId = EventId.newBuilder()
                         .setId(key)
                         .setNonce(ControllerConstants.NONCE)
@@ -103,22 +139,28 @@ public class CheckTask extends TimerTask {
                 ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), key.getBytes(StandardCharsets.UTF_8), bytes);
                 QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
                 BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
+
                 try {
                     txQueue.put(record);
                 } catch (InterruptedException e) {
                     logger.error("Exception:", e);
                 }
             } else {
-                if(logger.isDebugEnabled()) logger.debug("remove service key: " + key);
+
+                if (logger.isDebugEnabled())
+                    logger.debug("remove service key: " + key);
+
                 List nodes = (List) ControllerStartupHook.services.get(key);
                 nodes = ControllerUtil.delService(nodes, check.getAddress(), check.getPort());
+
                 if (nodes != null && nodes.size() > 0) {
                     ControllerStartupHook.services.put(key, nodes);
                 } else {
                     ControllerStartupHook.services.remove(key);
                 }
+
                 Check unusedCheck = ControllerStartupHook.checks.remove(check.getId());
-                if(logger.isDebugEnabled()) logger.debug("remove check for id: " + unusedCheck.getId());
+                if (logger.isDebugEnabled()) logger.debug("remove check for id: " + unusedCheck.getId());
             }
         }
     }

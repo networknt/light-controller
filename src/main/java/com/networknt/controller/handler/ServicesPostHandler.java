@@ -43,7 +43,9 @@ public class ServicesPostHandler implements LightHttpHandler {
         int port = (Integer)body.get(PORT);
 
         Check check = JsonMapper.objectMapper.convertValue(body.get(ControllerConstants.CHECK), Check.class);
+
         if(logger.isDebugEnabled()) logger.debug("serviceId = " + serviceId + " tag = " + tag + " protocol = " + protocol + " address = " + address + " port = " + port + " check = " + body.get(ControllerConstants.CHECK));
+
         if(ControllerStartupHook.config.isClusterMode()) {
             EventId eventId = EventId.newBuilder()
                     .setId(key)
@@ -66,6 +68,7 @@ public class ServicesPostHandler implements LightHttpHandler {
 
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(ControllerStartupHook.config.getTopic(), key.getBytes(StandardCharsets.UTF_8), bytes);
             final CountDownLatch latch = new CountDownLatch(1);
+
             ControllerStartupHook.producer.send(record, (recordMetadata, e) -> {
                 if (Objects.nonNull(e)) {
                     logger.error("Exception occurred while pushing the event", e);
@@ -75,6 +78,7 @@ public class ServicesPostHandler implements LightHttpHandler {
                 }
                 latch.countDown();
             });
+
             latch.await();
             // schedule health check task with light-scheduler service. There are two ways to do that:
             // 1. call the light-scheduler REST API to create a task definition.
@@ -151,9 +155,9 @@ public class ServicesPostHandler implements LightHttpHandler {
     }
 
     private List addService(List nodes, Map<String, Object> nodeMap) {
+
         if(nodes == null) {
             nodes = new ArrayList<>();
-            nodes.add(nodeMap);
         } else {
             // delete the nodeMap if it is already there before adding it.
             String address = (String)nodeMap.get(ADDRESS);
@@ -165,8 +169,9 @@ public class ServicesPostHandler implements LightHttpHandler {
                 if (address.equals(a) && port == p)
                     iter.remove();
             }
-            nodes.add(nodeMap);
         }
+
+        nodes.add(nodeMap);
         return nodes;
     }
 }

@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class ControllerStartupHook implements StartupHookProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerStartupHook.class);
+
     // this is the service map. The key is serviceId or serviceId + | + tag and the value is a
     // list of map with address and port as keys. The list can only be updated with service post
     // and service delete handlers. Also, node can be removed after the check is failed after
@@ -34,6 +35,7 @@ public class ControllerStartupHook implements StartupHookProvider {
 
     // scheduled executor service for multiple threading.
     public static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
     // controller configuration.
     public static ControllerConfig config = (ControllerConfig) Config.getInstance().getJsonObjectConfig(ControllerConfig.CONFIG_NAME, ControllerConfig.class);
 
@@ -47,7 +49,9 @@ public class ControllerStartupHook implements StartupHookProvider {
     @Override
     public void onStartup() {
         logger.info("ControllerStartupHook onStartup begins.");
-        if(config.isClusterMode()) {
+
+        if (config.isClusterMode()) {
+
             // create Kafka transactional producer for publishing events to portal-event topic
             NativeLightProducer lightProducer = SingletonServiceFactory.getBean(NativeLightProducer.class);
             lightProducer.open();
@@ -56,18 +60,21 @@ public class ControllerStartupHook implements StartupHookProvider {
             int port = Server.getServerConfig().getHttpsPort();
             String ip = NetUtils.getLocalAddressByDatagram();
             logger.info("ip = " + ip + " port = " + port);
+
             // start the service registration streams
             srStreams = new ServiceRegistrationStreams();
             srStreams.start(ip, port);
+
             // start the health check streams
             hcStreams = new HealthCheckStreams();
             hcStreams.start(ip, port);
         } else {
-            long delay  = 1000L;
+            long delay = 1000L;
             long period = 1000L;
             CheckTask checkTask = new CheckTask();
             executor.scheduleAtFixedRate(checkTask, delay, period, TimeUnit.MILLISECONDS);
         }
+
         logger.info("ControllerStartupHook onStartup ends.");
     }
 }
