@@ -141,6 +141,7 @@ public class ServiceRequest {
         }
 
         private static ClientConnection establishBaseConnection(String inProtocol, String inAddress, String inPort) {
+            if(logger.isTraceEnabled()) logger.trace("inProtocol = " + inProtocol + " inAddress = " + inAddress + " inPort = " + inPort);
             ClientConnection connection = null;
             try {
                 URI uri = new URI(getBaseUrl(inProtocol, inAddress, inPort));
