@@ -1,15 +1,20 @@
 package com.networknt.controller;
 
+import com.networknt.config.JsonMapper;
 import com.networknt.controller.model.LoggerInfo;
 import io.undertow.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static com.networknt.controller.ControllerConstants.*;
 
 public class ControllerClient {
+    public static final Logger logger = LoggerFactory.getLogger(ControllerClient.class);
 
     public static boolean checkHealth(String protocol, String address, int port, String healthPath, String serviceId) {
+        if(logger.isTraceEnabled()) logger.trace("checkHealth protocol = " + protocol + " address = " + address + " port = " + port + " healthPath = " + healthPath + " serviceId = " + serviceId);
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
                 .buildFullPath(healthPath + serviceId)
                 .build();
@@ -18,14 +23,17 @@ public class ControllerClient {
     }
 
     public static String getServerInfo(String protocol, String address, int port) {
+        if(logger.isTraceEnabled()) logger.trace("getServerInfo protocol = " + protocol + " address = " + address + " port = " + port);
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
                 .buildFullPath(SERVER_INFO_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
+        if(logger.isTraceEnabled()) logger.trace("response code = " + serviceRequest.getStatusCode() + " body size = " + (serviceRequest.getResponseBody() == null ? 0 : serviceRequest.getResponseBody().length()));
         return serviceRequest.getResponseBody();
     }
 
     public static String getLoggerConfig(String protocol, String address, String port) {
+        if(logger.isTraceEnabled()) logger.trace("protocol = " + protocol + " address = " + address + " port = " + port);
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
                 .buildFullPath(LOGGER_ENDPOINT)
                 .build();
@@ -34,6 +42,7 @@ public class ControllerClient {
     }
 
     public static String updateLoggerConfig(String protocol, String address, int port, List<?> loggers) {
+        if(logger.isTraceEnabled()) logger.trace("protocol = " + protocol + " address = " + address + " port = " + port + " loggers = " + JsonMapper.toJson(loggers));
         ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.POST)
                 .withRequestBody(loggers)
                 .buildFullPath(LOGGER_ENDPOINT)
@@ -43,7 +52,10 @@ public class ControllerClient {
     }
 
     public static String getLogContents(String protocol, String address, int port, LoggerInfo loggerInfo, String startTime, String endTime) {
-
+        if(logger.isTraceEnabled()) {
+            logger.trace("protocol = " + protocol + " address = " + address + " port = " + port);
+            logger.trace("loggerInfo = " + loggerInfo + " startTime = " +  startTime + " endTime = " + endTime);
+        }
         String loggerLevel = LoggerInfo.LevelEnum.ERROR.toString();
         if (loggerInfo.getLevel() != null) {
             loggerLevel = loggerInfo.getLevel().toString();
