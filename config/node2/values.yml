@@ -14,3 +14,26 @@ kafka-streams.bootstrap.servers: broker:29092
 kafka-streams.schema.registry.url: http://schema-registry:8081
 kafka-streams.application.id: light-controller
 kafka-streams.cleanUp: false
+
+# rule loader
+ruleLoader.enabled: true
+ruleLoader.portalHost: https://localhost:8440
+
+# access-control
+accessControl.enabled: true
+
+# service
+service.singletons:
+  # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
+  - com.networknt.server.StartupHookProvider:
+      - com.networknt.controller.ControllerStartupHook
+      - com.networknt.rule.RuleLoaderStartupHook
+
+  # ShutdownHookProvider implementations, there are one to many and they are called in the same sequence defined.
+  - com.networknt.server.ShutdownHookProvider:
+      - com.networknt.controller.ControllerShutdownHook
+  - com.networknt.kafka.producer.NativeLightProducer:
+      - com.networknt.kafka.producer.SidecarProducer
+  - io.confluent.kafka.schemaregistry.client.SchemaRegistryClient:
+      - com.networknt.kafka.common.LightSchemaRegistryClient
+
