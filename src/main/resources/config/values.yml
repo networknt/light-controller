@@ -1,3 +1,21 @@
 server.serviceId: com.networknt.controller-1.0.0
-server.httpsPort: 8431
+server.httpsPort: 8438
 kafka-producer.transactional.id: T1001
+
+# access-control
+accessControl.enabled: false
+
+# service
+service.singletons:
+  # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
+  - com.networknt.server.StartupHookProvider:
+      - com.networknt.controller.ControllerStartupHook
+      - com.networknt.rule.RuleLoaderStartupHook
+  # ShutdownHookProvider implementations, there are one to many and they are called in the same sequence defined.
+  - com.networknt.server.ShutdownHookProvider:
+      - com.networknt.controller.ControllerShutdownHook
+#  - com.networknt.kafka.producer.NativeLightProducer:
+#      - com.networknt.kafka.producer.SidecarProducer
+#  - io.confluent.kafka.schemaregistry.client.SchemaRegistryClient:
+#      - com.networknt.kafka.common.LightSchemaRegistryClient
+
