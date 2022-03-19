@@ -81,6 +81,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
     }
 
     public static Map<String, Object> getClusterHealthChecks(HttpServerExchange exchange, boolean stale) throws Exception {
+        if(logger.isTraceEnabled()) logger.trace("getClusterHealthChecks is called with stale = " + stale);
         Collection<StreamsMetadata> metadataList = ControllerStartupHook.hcStreams.getAllHealthStreamsMetadata();
         Map<String, Object> checks;
         if(stale) {
@@ -93,11 +94,15 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             String url = "https://" + metadata.host() + ":" + metadata.port();
             if (NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.getServerConfig().getHttpsPort() == metadata.port()) {
                 checks.putAll(getLocalChecks(stale));
+                if(logger.isTraceEnabled()) logger.trace("got local checks with url " + url);
             } else {
                 // remote store through API access.
                 Result<String> resultChecks = getControllerChecks(exchange, url, stale);
                 if (resultChecks.isSuccess()) {
                     checks.putAll(JsonMapper.string2Map(resultChecks.getResult()));
+                    if(logger.isTraceEnabled()) logger.trace("get remote checks with url " + url);
+                } else {
+                    logger.error("Failed to get remote checks with error status = " + resultChecks.getError());
                 }
             }
         }
@@ -125,7 +130,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             }
         }
         iterator.close();
-        if(logger.isDebugEnabled()) logger.debug("The number of checks at local is " + checks.size());
+        if(logger.isTraceEnabled()) logger.trace("The number of checks at local is " + checks.size());
         return checks;
     }
 
@@ -151,6 +156,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             // the above statement will remove the service registry; however, the health check store is no cleaned and this
             // piece code will be running again and again. To avoid it, we can remove the health check task here.
             ServicesDeleteHandler.pushDeleteTaskDefinition(serializer, key, protocol, address, port, executeInterval);
+            if(logger.isTraceEnabled()) logger.trace("pushed two events to deregister service and delete task definition");
         }
         return stale;
     }
@@ -172,6 +178,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
         try {
             ClientConnection conn = ControllerStartupHook.connCache.get(url);
             if(conn == null || !conn.isOpen()) {
+                if(logger.isTraceEnabled()) logger.trace("Connection from catch is null or not open for url" + url);
                 conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
                 ControllerStartupHook.connCache.put(url, conn);
             }
@@ -189,7 +196,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-            if(logger.isDebugEnabled()) logger.debug("status = " + statusCode + " body = " + body);
+            if(logger.isDebugEnabled()) logger.debug("status = " + statusCode + " body size = " + body.length());
             if(statusCode != 200) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
                 result = Failure.of(status);
