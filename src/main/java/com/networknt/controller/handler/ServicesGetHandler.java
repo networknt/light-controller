@@ -46,47 +46,59 @@ public class ServicesGetHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(ServicesGetHandler.class);
     static Http2Client client = Http2Client.getInstance();
     static final String GENERIC_EXCEPTION = "ERR10014";
-    static final long WAIT_THRESHOLD = 30000;
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         exchange.setStatusCode(200);
         if (ControllerStartupHook.config.isClusterMode()) {
+            if(logger.isTraceEnabled()) logger.trace("Running in cluster mode");
             // get query parameter for the local indicator.
             boolean local = false;
             Deque<String> localDeque = exchange.getQueryParameters().get("local");
             if (localDeque != null && !localDeque.isEmpty()) local = true;
             if (local) {
+                if(logger.isTraceEnabled()) logger.trace("Local call, get the data from the current instance");
                 exchange.getResponseSender().send(JsonMapper.toJson(getLocalServices()));
             } else {
+                if(logger.isTraceEnabled()) logger.trace("Called by client, iterate all instances");
                 Collection<StreamsMetadata> metadataList = ControllerStartupHook.srStreams.getAllServiceStreamsMetadata();
                 Map<String, Object> services = new HashMap<>();
-
+                if(logger.isTraceEnabled()) logger.trace("found {} instances", metadataList.size());
                 for (StreamsMetadata metadata : metadataList) {
                     if (logger.isDebugEnabled())
-                        logger.debug("found one address in the collection " + metadata.host() + ":" + metadata.port());
+                        logger.debug("Found one address in the collection " + metadata.host() + ":" + metadata.port());
                     String url = "https://" + metadata.host() + ":" + metadata.port();
                     if (NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.getServerConfig().getHttpsPort() == metadata.port()) {
+                        if(logger.isTraceEnabled()) logger.trace("On the same host. Get the local service");
                         services.putAll(getLocalServices());
                     } else {
                         // remote store through API access.
+                        if(logger.isTraceEnabled()) logger.trace("Get services from remote store with url {}", url);
                         Result<String> resultServices = getControllerServices(exchange, url);
                         if (resultServices.isSuccess()) {
+                            if(logger.isTraceEnabled()) logger.trace("Success result string length = " + resultServices.getResult().length());
                             services.putAll(JsonMapper.string2Map(resultServices.getResult()));
+                        } else {
+                            logger.error("Failure result = " + resultServices.getError());
                         }
                     }
                 }
                 // get the stale health checks and filter out the un-healthy services
-                Map<String, Object> checks = ServicesCheckGetHandler.getClusterHealthChecks(exchange, true);
-                exchange.getResponseSender().send(JsonMapper.toJson(filterServiceByCheck(services, checks)));
+                // TODO this action is very slow on 5 instance cluster with a lot of registered services. skip it for now.
+                ///Map<String, Object> checks = ServicesCheckGetHandler.getClusterHealthChecks(exchange, true);
+                ///if(logger.isTraceEnabled()) logger.trace("Get stale health checks size = " + checks.size());
+                ///exchange.getResponseSender().send(JsonMapper.toJson(filterServiceByCheck(services, checks)));
+                exchange.getResponseSender().send(JsonMapper.toJson(services));
             }
         } else {
+            if(logger.isTraceEnabled()) logger.trace("Not running in cluster mode. Get services from ControllerStartupHook");
             exchange.getResponseSender().send(JsonMapper.toJson(ControllerStartupHook.services));
         }
     }
 
     private Map<String, Object> filterServiceByCheck(Map<String, Object> services, Map<String, Object> checks) {
+        if(logger.isTraceEnabled()) logger.trace("Before filter services size = " + services.size());
         for (Map.Entry<String, Object> entry : checks.entrySet()) {
             String key = entry.getKey();
             String[] elements = StringUtils.split(key, ":");
@@ -102,13 +114,16 @@ public class ServicesGetHandler implements LightHttpHandler {
                 }
             }
         }
+        if(logger.isTraceEnabled()) logger.trace("After filter services size = " + services.size());
         return services;
     }
 
     private Map<String, Object> getLocalServices() {
         Map<String, Object> services = new HashMap<>();
         ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
-        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.hcStreams.getAllKafkaValue(serviceStore);
+        if(logger.isTraceEnabled()) logger.trace("Got serviceStore from the srStreams");
+        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.srStreams.getAllKafkaValue(serviceStore);
+        if(logger.isTraceEnabled()) logger.trace("Start iterate KeyValue pairs");
         while (iterator.hasNext()) {
             KeyValue<String, String> keyValue = iterator.next();
             String key = keyValue.key;
@@ -119,7 +134,7 @@ public class ServicesGetHandler implements LightHttpHandler {
             }
         }
         iterator.close();
-        if (logger.isDebugEnabled()) logger.debug("The number of services at local is " + services.size());
+        if (logger.isTraceEnabled()) logger.trace("The number of services at local is " + services.size());
         return services;
     }
 
@@ -139,6 +154,7 @@ public class ServicesGetHandler implements LightHttpHandler {
         try {
             ClientConnection conn = ControllerStartupHook.connCache.get(url);
             if (conn == null || !conn.isOpen()) {
+                if(logger.isTraceEnabled()) logger.trace("Connection from catch is null or not open for url" + url);
                 conn = client.connect(new URI(url), Http2Client.WORKER, client.getDefaultXnioSsl(), Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
                 ControllerStartupHook.connCache.put(url, conn);
             }
@@ -149,6 +165,7 @@ public class ServicesGetHandler implements LightHttpHandler {
             String message = "/services?local=true";
             final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(message);
             String token = exchange.getRequestHeaders().getFirst(Headers.AUTHORIZATION);
+            if(logger.isTraceEnabled() && token != null) logger.trace("Got a token from the incoming request token size = " + token.length() + "last chars = " + token.substring(token.length() - 10));
             if (token != null) request.getRequestHeaders().put(Headers.AUTHORIZATION, token);
             request.getRequestHeaders().put(Headers.HOST, "localhost");
             conn.sendRequest(request, client.createClientCallback(reference, latch));
@@ -156,6 +173,7 @@ public class ServicesGetHandler implements LightHttpHandler {
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             if (statusCode != 200) {
+                if(logger.isTraceEnabled()) logger.trace("Error statusCode = {} and body = {}", statusCode, body);
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
                 result = Failure.of(status);
             } else result = Success.of(body);
