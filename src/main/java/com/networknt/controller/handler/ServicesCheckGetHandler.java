@@ -113,23 +113,23 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
         Map<String, Object> checks = new HashMap<>();
         // local store access.
         ReadOnlyKeyValueStore<String, String> healthStore = ControllerStartupHook.hcStreams.getHealthStore();
-        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.hcStreams.getAllKafkaValue(healthStore);
-        while(iterator.hasNext()) {
-            KeyValue<String, String> keyValue = iterator.next();
-            String key = keyValue.key;
-            String value = keyValue.value;
-            if(value != null) {
-                Map<String, Object> check = JsonMapper.string2Map(value);
-                if(stale) {
-                    // only put the stale check into the map.
-                    if(isStaleCheck(check)) checks.put(key, check);
-                } else {
-                    // only put the non-stale check into the map.
-                    if(!isStaleCheck(check)) checks.put(key, check);
+        try(KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.hcStreams.getAllKafkaValue(healthStore)) {
+            while(iterator.hasNext()) {
+                KeyValue<String, String> keyValue = iterator.next();
+                String key = keyValue.key;
+                String value = keyValue.value;
+                if(value != null) {
+                    Map<String, Object> check = JsonMapper.string2Map(value);
+                    if(stale) {
+                        // only put the stale check into the map.
+                        if(isStaleCheck(check)) checks.put(key, check);
+                    } else {
+                        // only put the non-stale check into the map.
+                        if(!isStaleCheck(check)) checks.put(key, check);
+                    }
                 }
             }
         }
-        iterator.close();
         if(logger.isTraceEnabled()) logger.trace("The number of checks at local is " + checks.size());
         return checks;
     }
