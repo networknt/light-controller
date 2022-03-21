@@ -122,18 +122,18 @@ public class ServicesGetHandler implements LightHttpHandler {
         Map<String, Object> services = new HashMap<>();
         ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
         if(logger.isTraceEnabled()) logger.trace("Got serviceStore from the srStreams");
-        KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.srStreams.getAllKafkaValue(serviceStore);
-        if(logger.isTraceEnabled()) logger.trace("Start iterate KeyValue pairs");
-        while (iterator.hasNext()) {
-            KeyValue<String, String> keyValue = iterator.next();
-            String key = keyValue.key;
-            String value = keyValue.value;
-            if (value != null) {
-                List nodes = JsonMapper.string2List(value);
-                services.put(key, nodes);
+        try(KeyValueIterator<String, String> iterator = (KeyValueIterator<String, String>) ControllerStartupHook.srStreams.getAllKafkaValue(serviceStore)) {
+            if(logger.isTraceEnabled()) logger.trace("Start iterate KeyValue pairs");
+            while (iterator.hasNext()) {
+                KeyValue<String, String> keyValue = iterator.next();
+                String key = keyValue.key;
+                String value = keyValue.value;
+                if (value != null) {
+                    List nodes = JsonMapper.string2List(value);
+                    services.put(key, nodes);
+                }
             }
         }
-        iterator.close();
         if (logger.isTraceEnabled()) logger.trace("The number of services at local is " + services.size());
         return services;
     }
