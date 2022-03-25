@@ -87,6 +87,8 @@ handlers:
   - com.networknt.controller.handler.ServicesChaosMonkeyGetHandler
   - com.networknt.controller.handler.ServicesChaosMonkeyPostHandler
   - com.networknt.controller.handler.ServicesChaosMonkeyAssaultPostHandler
+  - com.networknt.controller.handler.ServicesModuleGetHandler
+  - com.networknt.controller.handler.ServicesModulePostHandler
 
 chains:
   default:
@@ -181,6 +183,16 @@ paths:
     exec:
       - default
       - com.networknt.controller.handler.ServicesLoggerPostHandler
+  - path: '/services/module'
+    method: 'GET'
+    exec:
+      - default
+      - com.networknt.controller.handler.ServicesModuleGetHandler
+  - path: '/services/module'
+    method: 'POST'
+    exec:
+      - default
+      - com.networknt.controller.handler.ServicesModulePostHandler
 
   - path: '/health/readiness/${server.serviceId:com.networknt.controller-1.0.0}'
     method: 'get'
