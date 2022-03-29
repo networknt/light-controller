@@ -38,6 +38,7 @@ public class ServicesModulePostHandler implements LightHttpHandler {
 		String result = ControllerClient.reloadModuleConfig(protocol, address, port, modules);
 		exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 		exchange.setStatusCode(200);
+		exchange.getResponseSender().send(result);
 
 	}
 }

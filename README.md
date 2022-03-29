@@ -136,3 +136,50 @@ And result:
 ```
 {"lastExecuteTimestamp":1605563379912,"lastFailedTimestamp":0,"serviceId":"com.networknt.petstore-3.0.1","address":"172.18.0.1","port":8443,"tlsSkipVerify":true,"http":"https://172.18.0.1:8443/health/com.networknt.petstore-3.0.1","interval":10000,"id":"com.networknt.petstore-3.0.1:172.18.0.1:8443","deregisterCriticalServiceAfter":120000}
 ```
+### Get: All modules
+
+```
+curl -k https://localhost:8438/services/modules?protocol=https&address=172.18.0.1&port=9443
+```
+
+And result:
+
+```
+[
+    "com.networknt.correlation.CorrelationHandler",
+    "com.networknt.server.Server",
+    "com.networknt.handler.Handler",
+    "com.networknt.audit.AuditHandler",
+    "com.networknt.traceability.TraceabilityHandler",
+    ...
+]
+```
+
+### Post: Reload Module Configuration
+
+```
+curl -k https://localhost:8438/services/modules
+```
+Request Body:
+```
+{
+		"protocol": "https",
+        "address": "172.18.0.1",
+        "port": 9443,
+		"modules": [	"com.networknt.audit.AuditHandler",
+					    "com.networknt.traceability.TraceabilityHandler",
+					    "com.networknt.service.SingletonServiceFactory"
+				]
+}
+```
+
+And result:
+
+```
+[
+    "com.networknt.audit.AuditHandler",
+    "com.networknt.traceability.TraceabilityHandler",
+]
+```
+Response 200
+```
