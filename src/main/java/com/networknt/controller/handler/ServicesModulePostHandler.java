@@ -1,32 +1,43 @@
 package com.networknt.controller.handler;
 
-import com.networknt.body.BodyHandler;
-import com.networknt.config.Config;
-import com.networknt.controller.model.ReloadModule;
-import com.networknt.handler.LightHttpHandler;
-import com.networknt.http.HttpMethod;
-import com.networknt.http.RequestEntity;
-import com.networknt.http.ResponseEntity;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HeaderMap;
-import java.util.Deque;
+import static com.networknt.controller.ControllerConstants.ADDRESS;
+import static com.networknt.controller.ControllerConstants.PORT;
+import static com.networknt.controller.ControllerConstants.PROTOCOL;
+
+import java.util.List;
 import java.util.Map;
 
+import com.networknt.body.BodyHandler;
+import com.networknt.controller.ControllerClient;
+import com.networknt.handler.LightHttpHandler;
+import com.networknt.http.MediaType;
+
+import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
+
 /**
-For more information on how to write business handlers, please check the link below.
-https://doc.networknt.com/development/business-handler/rest/
-*/
+ * 
+ * This is the endpoint to reload the configuration of all or a list of selected
+ * modules on a target service instance.
+ * 
+ */
 public class ServicesModulePostHandler implements LightHttpHandler {
 
-    @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
-        HeaderMap requestHeaders = exchange.getRequestHeaders();
-        Map<String, Deque<String>> queryParameters = exchange.getQueryParameters();
-        Map<String, Deque<String>> pathParameters = exchange.getPathParameters();
-        HttpMethod httpMethod = HttpMethod.resolve(exchange.getRequestMethod().toString());
-        Map<String, Object> bodyMap = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        ReloadModule requestBody = Config.getInstance().getMapper().convertValue(bodyMap, ReloadModule.class);
-        exchange.setStatusCode(200);
-        exchange.getResponseSender().send("");
-    }
+	@Override
+	public void handleRequest(HttpServerExchange exchange) throws Exception {
+		Map<String, Object> bodyMap = (Map<String, Object>) exchange.getAttachment(BodyHandler.REQUEST_BODY);
+
+		String protocol = (String) bodyMap.get(PROTOCOL);
+		String address = (String) bodyMap.get(ADDRESS);
+		Integer port = (Integer) bodyMap.get(PORT);
+
+		List modules = (List) bodyMap.get("modules");
+		if (logger.isTraceEnabled())
+			logger.trace("protocol = " + protocol + " address = " + address + " port = " + port);
+
+		String result = ControllerClient.reloadModuleConfig(protocol, address, port, modules);
+		exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+		exchange.setStatusCode(200);
+
+	}
 }
