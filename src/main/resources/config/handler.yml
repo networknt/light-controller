@@ -89,6 +89,8 @@ handlers:
   - com.networknt.controller.handler.ServicesChaosMonkeyAssaultPostHandler
   - com.networknt.controller.handler.ServicesModuleGetHandler
   - com.networknt.controller.handler.ServicesModulePostHandler
+  - com.networknt.controller.handler.ServicesShutdownPostHandler
+
 
 chains:
   default:
@@ -183,12 +185,12 @@ paths:
     exec:
       - default
       - com.networknt.controller.handler.ServicesLoggerPostHandler
-  - path: '/services/modules'
+  - path: '/services/module'
     method: 'GET'
     exec:
       - default
       - com.networknt.controller.handler.ServicesModuleGetHandler
-  - path: '/services/modules'
+  - path: '/services/module'
     method: 'POST'
     exec:
       - default
@@ -232,6 +234,12 @@ paths:
     exec:
       - security
       - chaosget
+
+  - path: '/services/shutdown'
+    method: 'POST'
+    exec:
+      - default
+      - com.networknt.controller.handler.ServicesShutdownPostHandler
 
   - path: '/spec.yaml'
     method: 'get'
