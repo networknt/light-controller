@@ -72,5 +72,24 @@ public class ControllerClient {
         serviceRequest.sendRequest();
         return serviceRequest.getResponseBody();
     }
+    
+    public static String getModuleList(String protocol, String address, String port) {
+        if(logger.isTraceEnabled()) logger.trace("protocol = " + protocol + " address = " + address + " port = " + port);
+        ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.GET)
+                .buildFullPath(RELOAD_CONFIG_ENDPOINT)
+                .build();
+        serviceRequest.sendRequest();
+        return serviceRequest.getResponseBody();
+    }
+    
+    public static String reloadModuleConfig(String protocol, String address, int port, List<String> modules) {
+        if(logger.isTraceEnabled()) logger.trace("protocol = " + protocol + " address = " + address + " port = " + port + " loggers = " + JsonMapper.toJson(modules));
+        ServiceRequest serviceRequest = new ServiceRequest.Builder(protocol, address, String.valueOf(port), Methods.POST)
+                .withRequestBody(modules)
+                .buildFullPath(RELOAD_CONFIG_ENDPOINT)
+                .build();
+        serviceRequest.sendRequest();
+        return serviceRequest.getResponseBody();
+    }
 
 }
