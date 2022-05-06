@@ -474,7 +474,7 @@ paths:
       security:
       - portal_auth:
         - "portal.w"
-  /services/module:
+  /services/modules:
     get:
       summary: "Query the active modules for a particular instance"
       description: "Returns a list of active modules from the target server"

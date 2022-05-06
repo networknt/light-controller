@@ -185,12 +185,12 @@ paths:
     exec:
       - default
       - com.networknt.controller.handler.ServicesLoggerPostHandler
-  - path: '/services/module'
+  - path: '/services/modules'
     method: 'GET'
     exec:
       - default
       - com.networknt.controller.handler.ServicesModuleGetHandler
-  - path: '/services/module'
+  - path: '/services/modules'
     method: 'POST'
     exec:
       - default
