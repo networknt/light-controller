@@ -2,6 +2,12 @@ package com.networknt.controller;
 
 import com.networknt.config.JsonMapper;
 import com.networknt.controller.model.LoggerInfo;
+import com.networknt.controller.model.ServerShutdownRequest;
+import com.networknt.monad.Failure;
+import com.networknt.monad.Result;
+import com.networknt.monad.Success;
+import com.networknt.status.Status;
+
 import io.undertow.util.Methods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +96,23 @@ public class ControllerClient {
                 .build();
         serviceRequest.sendRequest();
         return serviceRequest.getResponseBody();
+    }
+    
+    public static Result<String> shutdownService(ServerShutdownRequest request) {
+        if(logger.isTraceEnabled()) logger.trace("protocol = " + request.getProtocol() + " address = " + request.getAddress() + " port = " + request.getPort() + " loggers = " + JsonMapper.toJson(request));
+        ServiceRequest serviceRequest = new ServiceRequest.Builder(request.getProtocol(), request.getAddress(), String.valueOf(request.getPort()), Methods.POST)
+                .withRequestBody(request)
+                .buildFullPath(SHUTDOWN_SERVICE_ENDPOINT)
+                .build();
+        serviceRequest.sendRequest();
+        
+        int statusCode = serviceRequest.getStatusCode();
+        String responseBody = serviceRequest.getResponseBody();
+        if (statusCode >= 400) {
+            return Failure.of(JsonMapper.fromJson(responseBody, Status.class));
+        } else {
+            return Success.of(responseBody);
+        }
     }
 
 }
