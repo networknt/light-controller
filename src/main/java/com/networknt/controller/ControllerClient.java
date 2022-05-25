@@ -100,8 +100,7 @@ public class ControllerClient {
     
     public static Result<String> shutdownService(ServerShutdownRequest request) {
         if(logger.isTraceEnabled()) logger.trace("protocol = " + request.getProtocol() + " address = " + request.getAddress() + " port = " + request.getPort() + " loggers = " + JsonMapper.toJson(request));
-        ServiceRequest serviceRequest = new ServiceRequest.Builder(request.getProtocol(), request.getAddress(), String.valueOf(request.getPort()), Methods.POST)
-                .withRequestBody(request)
+        ServiceRequest serviceRequest = new ServiceRequest.Builder(request.getProtocol(), request.getAddress(), String.valueOf(request.getPort()), Methods.DELETE)
                 .buildFullPath(SHUTDOWN_SERVICE_ENDPOINT)
                 .build();
         serviceRequest.sendRequest();
