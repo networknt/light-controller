@@ -20,5 +20,6 @@ public final class ControllerConstants {
     public static final String CHAOS_MONKEY_ASSAULT_ENDPOINT = "/chaosmonkey/{assaultType}";
     public static final String CHAOS_MONKEY_ENDPOINT = "/chaosmonkey";
     public static final String RELOAD_CONFIG_ENDPOINT = "/modules";
+    public static final String SHUTDOWN_SERVICE_ENDPOINT = "/shutdown";
 
 }
