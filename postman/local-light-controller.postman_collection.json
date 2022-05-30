@@ -1,0 +1,301 @@
+{
+	"info": {
+		"_postman_id": "b5a171ba-77c2-499b-b4f0-3fd54c74b7b3",
+		"name": "light-controller",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get modules",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://sunlifeapi.oktapreview.com/oauth2/aus9xt6dd1cSYyRPH1d6/v1/token",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "0oajadklyDJkd3bGD1d6",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "ind.artifactindex.write",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTk2Mjk4NTUyOCwianRpIjoiT0Y4VGFZSDRVSjNTOFZyNnJ3REdDQSIsImlhdCI6MTY0NzYyNTUyOCwibmJmIjoxNjQ3NjI1NDA4LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlaHVAZ21haWwuY29tIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzMiLCJyb2xlcyI6InVzZXIgQ3RsUGx0QWRtaW4gQ3RsUGx0UmVhZCBDdGxQbHRXcml0ZSIsInNjb3BlIjpbInBvcnRhbC5yIiwicG9ydGFsLnciXX0.MIWNwUfdVsV7rjctaeugFYgzsbnolUeXsIrvOdj9bFrkM4UfShKOD3XnkOpRU2TNcp2pa2wla-5bSN5p-aQQ1fnpk_2QW_E7GbWHv0Rbj3Epq_yLB8DJAjoeEYn2Ux9OrssYYtMuq63kd3FflOi10wr01sZ47tZQleQPzCetsm2hZOZGZU8gSwBSlYXJs4bxTaYNlPnRNVEBZEgiprxyLbwssDZISTcFWBsOlCEzBKrLqeQdDXxRzp9HlZprXzq30rtuRrTfwGBC39x3miAyNbPV8dqokzCc8PzTpwC7irmGv3PoXJ-IiroJV_-s83ZrAUcDnjxuNFZ4x02kjjwf9g",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8438/services/modules?protocol=https&address=192.168.43.232&port=9443",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8438",
+					"path": [
+						"services",
+						"modules"
+					],
+					"query": [
+						{
+							"key": "protocol",
+							"value": "https"
+						},
+						{
+							"key": "address",
+							"value": "192.168.43.232"
+						},
+						{
+							"key": "port",
+							"value": "9443"
+						}
+					]
+				},
+				"description": "Shutdown handle"
+			},
+			"response": []
+		},
+		{
+			"name": "Reload modules",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://sunlifeapi.oktapreview.com/oauth2/aus9xt6dd1cSYyRPH1d6/v1/token",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "0oajadklyDJkd3bGD1d6",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "ind.artifactindex.write",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTk2Mjk4NTUyOCwianRpIjoiT0Y4VGFZSDRVSjNTOFZyNnJ3REdDQSIsImlhdCI6MTY0NzYyNTUyOCwibmJmIjoxNjQ3NjI1NDA4LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlaHVAZ21haWwuY29tIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzMiLCJyb2xlcyI6InVzZXIgQ3RsUGx0QWRtaW4gQ3RsUGx0UmVhZCBDdGxQbHRXcml0ZSIsInNjb3BlIjpbInBvcnRhbC5yIiwicG9ydGFsLnciXX0.MIWNwUfdVsV7rjctaeugFYgzsbnolUeXsIrvOdj9bFrkM4UfShKOD3XnkOpRU2TNcp2pa2wla-5bSN5p-aQQ1fnpk_2QW_E7GbWHv0Rbj3Epq_yLB8DJAjoeEYn2Ux9OrssYYtMuq63kd3FflOi10wr01sZ47tZQleQPzCetsm2hZOZGZU8gSwBSlYXJs4bxTaYNlPnRNVEBZEgiprxyLbwssDZISTcFWBsOlCEzBKrLqeQdDXxRzp9HlZprXzq30rtuRrTfwGBC39x3miAyNbPV8dqokzCc8PzTpwC7irmGv3PoXJ-IiroJV_-s83ZrAUcDnjxuNFZ4x02kjjwf9g",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\t\"protocol\": \"https\",\r\n        \"address\": \"192.168.1.2\",\r\n        \"port\": 9443,\r\n\t\t\"modules\":[\r\n    \"com.networknt.correlation.CorrelationHandler\",\r\n    \"com.networknt.server.Server\",\r\n    \"com.networknt.handler.Handler\",\r\n    \"com.networknt.audit.AuditHandler\",\r\n    \"com.networknt.traceability.TraceabilityHandler\",\r\n    \"com.networknt.service.SingletonServiceFactory\",\r\n    \"com.networknt.exception.ExceptionHandler\",\r\n    \"com.networknt.openapi.ValidatorHandler\",\r\n    \"com.networknt.body.BodyHandler\",\r\n    \"com.networknt.portal.registry.PortalRegistry\",\r\n    \"com.networknt.status.Status\",\r\n    \"com.networknt.sanitizer.SanitizerHandler\",\r\n    \"com.networknt.client.Http2Client\",\r\n    \"com.networknt.openapi.OpenApiHandler\"\r\n]\r\n}"
+				},
+				"url": {
+					"raw": "https://localhost:8438/services/modules",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8438",
+					"path": [
+						"services",
+						"modules"
+					]
+				},
+				"description": "reload modules handle"
+			},
+			"response": []
+		},
+		{
+			"name": "Get services",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://sunlifeapi.oktapreview.com/oauth2/aus9xt6dd1cSYyRPH1d6/v1/token",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "0oajadklyDJkd3bGD1d6",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "ind.artifactindex.write",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTk2Mjk4NTUyOCwianRpIjoiT0Y4VGFZSDRVSjNTOFZyNnJ3REdDQSIsImlhdCI6MTY0NzYyNTUyOCwibmJmIjoxNjQ3NjI1NDA4LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlaHVAZ21haWwuY29tIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzMiLCJyb2xlcyI6InVzZXIgQ3RsUGx0QWRtaW4gQ3RsUGx0UmVhZCBDdGxQbHRXcml0ZSIsInNjb3BlIjpbInBvcnRhbC5yIiwicG9ydGFsLnciXX0.MIWNwUfdVsV7rjctaeugFYgzsbnolUeXsIrvOdj9bFrkM4UfShKOD3XnkOpRU2TNcp2pa2wla-5bSN5p-aQQ1fnpk_2QW_E7GbWHv0Rbj3Epq_yLB8DJAjoeEYn2Ux9OrssYYtMuq63kd3FflOi10wr01sZ47tZQleQPzCetsm2hZOZGZU8gSwBSlYXJs4bxTaYNlPnRNVEBZEgiprxyLbwssDZISTcFWBsOlCEzBKrLqeQdDXxRzp9HlZprXzq30rtuRrTfwGBC39x3miAyNbPV8dqokzCc8PzTpwC7irmGv3PoXJ-IiroJV_-s83ZrAUcDnjxuNFZ4x02kjjwf9g",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://localhost:8438/services",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8438",
+					"path": [
+						"services"
+					]
+				},
+				"description": "get service modules handle"
+			},
+			"response": []
+		},
+		{
+			"name": "Server shutdown",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "clientId",
+							"value": "0oajadklyDJkd3bGD1d6",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://sunlifeapi.oktapreview.com/oauth2/aus9xt6dd1cSYyRPH1d6/v1/token",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTk2Mjk4NTUyOCwianRpIjoiT0Y4VGFZSDRVSjNTOFZyNnJ3REdDQSIsImlhdCI6MTY0NzYyNTUyOCwibmJmIjoxNjQ3NjI1NDA4LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlaHVAZ21haWwuY29tIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzMiLCJyb2xlcyI6InVzZXIgQ3RsUGx0QWRtaW4gQ3RsUGx0UmVhZCBDdGxQbHRXcml0ZSIsInNjb3BlIjpbInBvcnRhbC5yIiwicG9ydGFsLnciXX0.MIWNwUfdVsV7rjctaeugFYgzsbnolUeXsIrvOdj9bFrkM4UfShKOD3XnkOpRU2TNcp2pa2wla-5bSN5p-aQQ1fnpk_2QW_E7GbWHv0Rbj3Epq_yLB8DJAjoeEYn2Ux9OrssYYtMuq63kd3FflOi10wr01sZ47tZQleQPzCetsm2hZOZGZU8gSwBSlYXJs4bxTaYNlPnRNVEBZEgiprxyLbwssDZISTcFWBsOlCEzBKrLqeQdDXxRzp9HlZprXzq30rtuRrTfwGBC39x3miAyNbPV8dqokzCc8PzTpwC7irmGv3PoXJ-IiroJV_-s83ZrAUcDnjxuNFZ4x02kjjwf9g",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\t\"protocol\": \"https\",\r\n        \"address\": \"10.158.48.159\",\r\n        \"port\": 9443\r\n}"
+				},
+				"url": {
+					"raw": "https://localhost:8438/services/shutdown",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8438",
+					"path": [
+						"services",
+						"shutdown"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
