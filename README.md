@@ -183,3 +183,27 @@ And result:
 ```
 Response 200
 ```
+
+### Post: Shutdown Service
+```
+curl -k https://localhost:8438/services/shutdown
+```
+Request Body:
+```
+{
+		"protocol": "https",
+        "address": "172.18.0.1",
+        "port": 9443
+}
+```
+And result(from light-4j):
+
+```
+[
+    "tag":"dev",
+    "serviceId":"com.networknt.petstore-3.0.1",
+	 "time":"1605563379912"
+]
+```
+Response 200
+```
