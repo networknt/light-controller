@@ -17,6 +17,7 @@ import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.StreamsMetadata;
 import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.apache.kafka.streams.processor.AbstractProcessor;
 import org.apache.kafka.streams.processor.ProcessorContext;
@@ -54,7 +55,7 @@ public class HealthCheckStreams implements LightStreams {
     }
 
     public Collection<StreamsMetadata> getAllHealthStreamsMetadata() {
-        return healthStreams.allMetadataForStore(health);
+        return healthStreams.streamsMetadataForStore(health);
     }
 
     private void startHealthStreams(String ip, int port) {
