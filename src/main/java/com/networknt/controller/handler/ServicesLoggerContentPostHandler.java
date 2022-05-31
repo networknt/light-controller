@@ -1,25 +1,19 @@
 package com.networknt.controller.handler;
 
 import com.networknt.body.BodyHandler;
-import com.networknt.config.Config;
 import com.networknt.controller.ControllerClient;
 import com.networknt.controller.model.LoggerInfo;
 import com.networknt.handler.LightHttpHandler;
-import com.networknt.http.HttpMethod;
-import com.networknt.http.RequestEntity;
-import com.networknt.http.ResponseEntity;
+import com.networknt.http.MediaType;
 import com.networknt.utility.StringUtils;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.MediaType;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Deque;
 import java.util.Map;
 
 import static com.networknt.controller.ControllerConstants.*;
@@ -81,7 +75,7 @@ public class ServicesLoggerContentPostHandler implements LightHttpHandler {
 
         // use the above info to call the service to get the loggers.
         String result = ControllerClient.getLogContents(protocol, address, port, loggerInfo, startTime, endTime);
-        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         exchange.setStatusCode(200);
         exchange.getResponseSender().send(result);
     }
