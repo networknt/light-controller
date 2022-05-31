@@ -9,6 +9,7 @@ import net.lightapi.portal.controller.ControllerDeregisteredEvent;
 import net.lightapi.portal.controller.ControllerRegisteredEvent;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.StreamsMetadata;
 import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.apache.kafka.streams.processor.AbstractProcessor;
 import org.apache.kafka.streams.processor.ProcessorContext;
@@ -43,7 +44,7 @@ public class ServiceRegistrationStreams implements LightStreams {
     }
 
     public Collection<StreamsMetadata> getAllServiceStreamsMetadata() {
-        return serviceStreams.allMetadataForStore(service);
+        return serviceStreams.streamsMetadataForStore(service);
     }
 
     private void startServiceStreams(String ip, int port) {
