@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.1.2](https://github.com/networknt/light-controller/tree/2.1.2) (2022-10-22)
+
+
+**Merged pull requests:**
+
+
+- fixes \#160 update key test case to meet the requirement for multiple [\#161](https://github.com/networknt/light-controller/pull/161) ([stevehu](https://github.com/stevehu))
+- fixes \#158 resolve some deprecated classes after upgrading to kafka 3… [\#159](https://github.com/networknt/light-controller/pull/159) ([stevehu](https://github.com/stevehu))
+- Feature/shutdown readme postman [\#157](https://github.com/networknt/light-controller/pull/157) ([mayurikasaxena](https://github.com/mayurikasaxena))
+- Feature/issue 144 shutdown [\#156](https://github.com/networknt/light-controller/pull/156) ([mayurikasaxena](https://github.com/mayurikasaxena))
+- initial code generation from the spec [\#155](https://github.com/networknt/light-controller/pull/155) ([mayurikasaxena](https://github.com/mayurikasaxena))
 ## [2.1.1](https://github.com/networknt/light-controller/tree/2.1.1) (2022-04-26)
 
 
