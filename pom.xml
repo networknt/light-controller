@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
-    <artifactId>controller</artifactId>
+    <artifactId>light-controller</artifactId>
     <packaging>jar</packaging>
-    <name>controller</name>
+    <name>light-controller</name>
     <version>2.1.20-SNAPSHOT</version>
 
     <description>Light Controller</description>
@@ -61,7 +61,7 @@
         <version.junit>4.13.2</version.junit>
         <version.undertow>2.3.5.Final</version.undertow>
         <version.json-schema-validator>1.0.65</version.json-schema-validator>
-        <version.yaml-rule>1.0.0</version.yaml-rule>
+        <version.yaml-rule>1.0.2</version.yaml-rule>
         <version.caffeine>2.8.6</version.caffeine>
         
         
@@ -319,11 +319,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${version.jackson}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${version.jackson}</version>
         </dependency>
         <dependency>
