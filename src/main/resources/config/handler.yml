@@ -13,6 +13,9 @@ auditOnError: ${handler.auditOnError:false}
 # default, if not set:false
 auditStackTrace: ${handler.auditStackTrace:false}
 
+# Base Path of the API endpoints
+basePath: ${handler.basePath:/}
+
 #------------------------------------------------------------------------------
 # Support individual handler chains for each separate endpoint. It allows framework
 # handlers like health check, server info to bypass majority of the middleware handlers
@@ -39,76 +42,17 @@ auditStackTrace: ${handler.auditStackTrace:false}
 # - you can list in chains the fully qualified handler class names, and avoid using the
 #   handlers element altogether
 #------------------------------------------------------------------------------
-handlers:
-  # Light-framework cross-cutting concerns implemented in the microservice
-  - com.networknt.exception.ExceptionHandler@exception
-  - com.networknt.metrics.MetricsHandler@metrics
-  - com.networknt.traceability.TraceabilityHandler@traceability
-  - com.networknt.correlation.CorrelationHandler@correlation
-  - com.networknt.openapi.OpenApiHandler@specification
-  - com.networknt.openapi.JwtVerifyHandler@security
-  - com.networknt.body.BodyHandler@body
-  - com.networknt.audit.AuditHandler@audit
-  # DumpHandler is to dump detail request/response info to log, useful for troubleshooting but not suggested to use in production due to it may lower the performance
-  # - com.networknt.dump.DumpHandler@dump
-  - com.networknt.sanitizer.SanitizerHandler@sanitizer
-  - com.networknt.openapi.ValidatorHandler@validator
-  # Customer business domain specific cross-cutting concerns handlers
-  # - com.example.validator.CustomizedValidator@custvalidator
-  # Framework endpoint handlers
-  - com.networknt.health.HealthGetHandler@health
-  - com.networknt.info.ServerInfoGetHandler@info
-  - com.networknt.chaos.KillappAssaultHandler@killapp
-  - com.networknt.chaos.LatencyAssaultHandler@latency
-  - com.networknt.chaos.MemoryAssaultHandler@memory
-  - com.networknt.chaos.ExceptionAssaultHandler@exchaos
-  - com.networknt.chaos.ChaosMonkeyGetHandler@chaosget
-  - com.networknt.chaos.ChaosMonkeyPostHandler@chaospost
-  - com.networknt.logging.handler.LoggerGetHandler@getLogger
-  - com.networknt.logging.handler.LoggerPostHandler@postLogger
-  - com.networknt.specification.SpecDisplayHandler@spec
-  - com.networknt.specification.SpecSwaggerUIHandler@swaggerui
-  # - com.networknt.metrics.prometheus.PrometheusGetHandler@getprometheus
-  # Business Middleware Handlers
-  - com.networknt.openapi.AccessControlHandler@access
-  # Business Handlers
-  - com.networknt.controller.handler.ServicesPostHandler
-  - com.networknt.controller.handler.ServicesDeleteHandler
-  - com.networknt.controller.handler.ServicesGetHandler
-  - com.networknt.controller.handler.ServicesLookupGetHandler
-  - com.networknt.controller.handler.ServicesCheckGetHandler
-  - com.networknt.controller.handler.ServicesCheckPutHandler
-  - com.networknt.controller.handler.ServicesCheckIdGetHandler
-  - com.networknt.controller.handler.ServicesInfoNodeGetHandler
-  - com.networknt.controller.handler.WebSocketHandler
-  - com.networknt.controller.handler.ServicesLoggerGetHandler
-  - com.networknt.controller.handler.ServicesLoggerPostHandler
-  - com.networknt.controller.handler.ServicesLoggerContentPostHandler
-  - com.networknt.controller.handler.ServicesChaosMonkeyGetHandler
-  - com.networknt.controller.handler.ServicesChaosMonkeyPostHandler
-  - com.networknt.controller.handler.ServicesChaosMonkeyAssaultPostHandler
-  - com.networknt.controller.handler.ServicesModuleGetHandler
-  - com.networknt.controller.handler.ServicesModulePostHandler
-  - com.networknt.controller.handler.ServicesShutdownPostHandler
-
+handlers: ${handler.handlers:}
 
 chains:
-  default:
+  default: ${handler.chains.default:}
+  admin:
     - exception
-    - metrics
-    - traceability
     - correlation
-    - killapp
-    - latency
-    - memory
-    - exchaos
     - specification
     - security
     - body
-    - audit
-    - sanitizer
     - validator
-    - access
 
 paths:
   - path: '/services'
@@ -249,3 +193,7 @@ paths:
     method: 'get'
     exec:
       - swaggerui
+  - path: '/favicon.ico'
+    method: 'get'
+    exec:
+      - favicon
