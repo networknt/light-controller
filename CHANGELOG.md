@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.1.20](https://github.com/networknt/light-controller/tree/2.1.20) (2023-06-17)
+
+
+**Merged pull requests:**
+
+
+- fixes \#164 update the pom.xml to build fatjar for release [\#166](https://github.com/networknt/light-controller/pull/166) ([stevehu](https://github.com/stevehu))
+- fixes \#162 clean up default config files and upgrade dependencies [\#163](https://github.com/networknt/light-controller/pull/163) ([stevehu](https://github.com/stevehu))
 ## [2.1.19](https://github.com/networknt/light-controller/tree/2.1.19) (2023-06-05)
 
 
