@@ -11,6 +11,7 @@ import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
 import com.networknt.monad.Success;
 import com.networknt.server.Server;
+import com.networknt.server.ServerConfig;
 import com.networknt.status.Status;
 import com.networknt.utility.NetUtils;
 import com.networknt.utility.StringUtils;
@@ -102,7 +103,7 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
                 if (logger.isDebugEnabled())
                     logger.debug("found address in another instance " + hostInfo.host() + ":" + hostInfo.port());
                 String url = "https://" + hostInfo.host() + ":" + hostInfo.port();
-                if (NetUtils.getLocalAddressByDatagram().equals(hostInfo.host()) && Server.getServerConfig().getHttpsPort() == hostInfo.port()) {
+                if (NetUtils.getLocalAddressByDatagram().equals(hostInfo.host()) && ServerConfig.getInstance().getHttpsPort() == hostInfo.port()) {
                     logger.error("******Kafka returns the same instance!");
                     setExchangeStatus(exchange, OBJECT_NOT_FOUND, "service registry", key);
                     return;

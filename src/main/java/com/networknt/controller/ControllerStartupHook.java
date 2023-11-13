@@ -4,6 +4,7 @@ import com.networknt.controller.model.Check;
 import com.networknt.config.Config;
 import com.networknt.kafka.producer.NativeLightProducer;
 import com.networknt.server.Server;
+import com.networknt.server.ServerConfig;
 import com.networknt.server.StartupHookProvider;
 import com.networknt.service.SingletonServiceFactory;
 import com.networknt.utility.NetUtils;
@@ -57,7 +58,7 @@ public class ControllerStartupHook implements StartupHookProvider {
             lightProducer.open();
             producer = lightProducer.getProducer();
 
-            int port = Server.getServerConfig().getHttpsPort();
+            int port = ServerConfig.getInstance().getHttpsPort();
             String ip = NetUtils.getLocalAddressByDatagram();
             logger.info("ip = " + ip + " port = " + port);
 
