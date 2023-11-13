@@ -10,6 +10,7 @@ import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
 import com.networknt.monad.Success;
 import com.networknt.server.Server;
+import com.networknt.server.ServerConfig;
 import com.networknt.status.Status;
 import com.networknt.utility.NetUtils;
 import com.networknt.utility.StringUtils;
@@ -68,7 +69,7 @@ public class ServicesGetHandler implements LightHttpHandler {
                     if (logger.isDebugEnabled())
                         logger.debug("Found one address in the collection " + metadata.host() + ":" + metadata.port());
                     String url = "https://" + metadata.host() + ":" + metadata.port();
-                    if (NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.getServerConfig().getHttpsPort() == metadata.port()) {
+                    if (NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && ServerConfig.getInstance().getHttpsPort() == metadata.port()) {
                         if(logger.isTraceEnabled()) logger.trace("On the same host. Get the local service");
                         services.putAll(getLocalServices());
                     } else {

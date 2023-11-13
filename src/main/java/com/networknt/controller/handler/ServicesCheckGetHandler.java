@@ -11,6 +11,7 @@ import com.networknt.monad.Failure;
 import com.networknt.monad.Result;
 import com.networknt.monad.Success;
 import com.networknt.server.Server;
+import com.networknt.server.ServerConfig;
 import com.networknt.status.Status;
 import com.networknt.utility.NetUtils;
 import io.undertow.UndertowOptions;
@@ -92,7 +93,7 @@ public class ServicesCheckGetHandler implements LightHttpHandler {
         for (StreamsMetadata metadata : metadataList) {
             if (logger.isDebugEnabled()) logger.debug("found one address in the collection " + metadata.host() + ":" + metadata.port());
             String url = "https://" + metadata.host() + ":" + metadata.port();
-            if (NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.getServerConfig().getHttpsPort() == metadata.port()) {
+            if (NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && ServerConfig.getInstance().getHttpsPort() == metadata.port()) {
                 checks.putAll(getLocalChecks(stale));
                 if(logger.isTraceEnabled()) logger.trace("got local checks with url " + url);
             } else {
