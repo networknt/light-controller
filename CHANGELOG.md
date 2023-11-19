@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.1.29](https://github.com/networknt/light-controller/tree/2.1.29) (2023-11-19)
+
+
+**Merged pull requests:**
+
+
+- fixes \#168 refactor ServerConfig getInstance [\#169](https://github.com/networknt/light-controller/pull/169) ([stevehu](https://github.com/stevehu))
 ## [2.1.28](https://github.com/networknt/light-controller/tree/2.1.28) (2023-10-24)
 
 
