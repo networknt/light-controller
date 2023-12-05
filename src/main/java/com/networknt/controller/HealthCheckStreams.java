@@ -77,8 +77,8 @@ public class HealthCheckStreams implements LightStreams {
         streamsProps.putAll(streamsConfig.getProperties());
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, controllerConfig.getHealthApplicationId());
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
-        streamsProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        streamsProps.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        streamsProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
+        streamsProps.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
 
         healthStreams = new KafkaStreams(topology, streamsProps);
         healthStreams.setUncaughtExceptionHandler(ex -> {

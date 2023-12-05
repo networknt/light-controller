@@ -66,8 +66,8 @@ public class ServiceRegistrationStreams implements LightStreams {
         streamsProps.putAll(streamsConfig.getProperties());
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, controllerConfig.getRegistryApplicationId());
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
-        streamsProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        streamsProps.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        streamsProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
+        streamsProps.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.ByteArray().getClass());
         serviceStreams = new KafkaStreams(topology, streamsProps);
         serviceStreams.setUncaughtExceptionHandler(ex -> {
             logger.error("Kafka-Streams uncaught exception occurred. Stream will be replaced with new thread", ex);
