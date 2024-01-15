@@ -7,6 +7,8 @@
 
 
 - fixes \#173 update the Dockerfile to change the base image [\#174](https://github.com/networknt/light-controller/pull/174) ([stevehu](https://github.com/stevehu))
+
+
 ## [2.1.30](https://github.com/networknt/light-controller/tree/2.1.30) (2023-11-21)
 
 
