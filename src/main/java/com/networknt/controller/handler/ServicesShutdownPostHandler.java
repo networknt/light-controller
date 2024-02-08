@@ -17,20 +17,20 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
 /**
- * 
+ *
  * This is the post request to shutdown the target service instance to force a restart.
- * 
- * 
+ *
+ *
 */
 public class ServicesShutdownPostHandler implements LightHttpHandler {
 
     public ServicesShutdownPostHandler () {
     }
 
-    
+
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-             
+
         Map<String, Object> bodyMap = (Map<String, Object>) exchange.getAttachment(BodyHandler.REQUEST_BODY);
 
 		String protocol = (String) bodyMap.get(PROTOCOL);
@@ -39,7 +39,7 @@ public class ServicesShutdownPostHandler implements LightHttpHandler {
 
 		if (logger.isTraceEnabled())
 			logger.trace("protocol = " + protocol + " address = " + address + " port = " + port);
-		
+
 		ServerShutdownRequest request = new ServerShutdownRequest();
 		request.setProtocol(protocol);
 		request.setPort(port);
@@ -47,7 +47,7 @@ public class ServicesShutdownPostHandler implements LightHttpHandler {
 
 		Result<String> result = ControllerClient.shutdownService(request);
 		exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-		
+
         if (result.isSuccess()) {
             exchange.setStatusCode(200);
             exchange.getResponseSender().send(result.getResult());

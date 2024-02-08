@@ -13,8 +13,8 @@ import io.undertow.util.HttpString;
 /***
  * This endpoint is used to get the registered module, include middleware
  * handlers, server, client etc
- * 
- * 
+ *
+ *
  */
 public class ServicesModuleGetHandler implements LightHttpHandler {
 

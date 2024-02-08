@@ -16,10 +16,10 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
 /**
- * 
+ *
  * This is the endpoint to reload the configuration of all or a list of selected
  * modules on a target service instance.
- * 
+ *
  */
 public class ServicesModulePostHandler implements LightHttpHandler {
 
