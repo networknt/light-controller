@@ -63,27 +63,27 @@ public class ServicesLookupGetHandler implements LightHttpHandler {
         String serviceId = exchange.getQueryParameters().get(SERVICE_ID).getFirst();
         String tag = null;
         Deque<String> tagDeque = exchange.getQueryParameters().get(TAG);
-        if (tagDeque != null && !tagDeque.isEmpty()) 
+        if (tagDeque != null && !tagDeque.isEmpty())
           tag = tagDeque.getFirst();
-          
+
         String key = tag == null ? serviceId : serviceId + "|" + tag;
-          
+
         if (logger.isDebugEnabled()) logger.debug("key = " + key + " serviceId = " + serviceId + " tag = " + tag);
-          
+
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        
+
           if (ControllerStartupHook.config.isClusterMode()) {
             // get the stale health checks and potentially filter out the un-healthy services in the result.
             if (checks == null || System.currentTimeMillis() - lastLoadChecks > checkCachePeriod) {
                 checks = (SortedMap<String, Object>) ServicesCheckGetHandler.getClusterHealthChecks(exchange, true);
                 lastLoadChecks = System.currentTimeMillis();
             }
-            
+
             ReadOnlyKeyValueStore<String, String> serviceStore = ControllerStartupHook.srStreams.getServiceStore();
             String data = (String) ControllerStartupHook.srStreams.getKafkaValueByKey(serviceStore, key);
-            
+
             if (data != null) {
-                
+
               if (checks.size() > 0) {
                     SortedMap<String, Object> tailMap = checks.tailMap(key);
                     if (!tailMap.isEmpty() && tailMap.firstKey().startsWith(key)) {

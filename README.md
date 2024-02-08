@@ -36,7 +36,7 @@ By default, the OAuth2 JWT security verification is enabled. You can use Curl or
 curl -k https://localhost:8438/services
 ```
 
-You should have an error message. 
+You should have an error message.
 
 ```
 {"statusCode":401,"code":"ERR10002","message":"MISSING_AUTH_TOKEN","description":"No Authorization header or the token is not bearer type","severity":"ERROR"}
@@ -48,7 +48,7 @@ The OAuth JWT token verifier protects all endpoints, but it is enabled in the op
 
 ```
 curl -k -X GET https://localhost:8438/services \
-  -H 'Authorization: Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTk2Mjk4NTUyOCwianRpIjoiT0Y4VGFZSDRVSjNTOFZyNnJ3REdDQSIsImlhdCI6MTY0NzYyNTUyOCwibmJmIjoxNjQ3NjI1NDA4LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlaHVAZ21haWwuY29tIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzMiLCJyb2xlcyI6InVzZXIgQ3RsUGx0QWRtaW4gQ3RsUGx0UmVhZCBDdGxQbHRXcml0ZSIsInNjb3BlIjpbInBvcnRhbC5yIiwicG9ydGFsLnciXX0.MIWNwUfdVsV7rjctaeugFYgzsbnolUeXsIrvOdj9bFrkM4UfShKOD3XnkOpRU2TNcp2pa2wla-5bSN5p-aQQ1fnpk_2QW_E7GbWHv0Rbj3Epq_yLB8DJAjoeEYn2Ux9OrssYYtMuq63kd3FflOi10wr01sZ47tZQleQPzCetsm2hZOZGZU8gSwBSlYXJs4bxTaYNlPnRNVEBZEgiprxyLbwssDZISTcFWBsOlCEzBKrLqeQdDXxRzp9HlZprXzq30rtuRrTfwGBC39x3miAyNbPV8dqokzCc8PzTpwC7irmGv3PoXJ-IiroJV_-s83ZrAUcDnjxuNFZ4x02kjjwf9g' 
+  -H 'Authorization: Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTk2Mjk4NTUyOCwianRpIjoiT0Y4VGFZSDRVSjNTOFZyNnJ3REdDQSIsImlhdCI6MTY0NzYyNTUyOCwibmJmIjoxNjQ3NjI1NDA4LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlaHVAZ21haWwuY29tIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzMiLCJyb2xlcyI6InVzZXIgQ3RsUGx0QWRtaW4gQ3RsUGx0UmVhZCBDdGxQbHRXcml0ZSIsInNjb3BlIjpbInBvcnRhbC5yIiwicG9ydGFsLnciXX0.MIWNwUfdVsV7rjctaeugFYgzsbnolUeXsIrvOdj9bFrkM4UfShKOD3XnkOpRU2TNcp2pa2wla-5bSN5p-aQQ1fnpk_2QW_E7GbWHv0Rbj3Epq_yLB8DJAjoeEYn2Ux9OrssYYtMuq63kd3FflOi10wr01sZ47tZQleQPzCetsm2hZOZGZU8gSwBSlYXJs4bxTaYNlPnRNVEBZEgiprxyLbwssDZISTcFWBsOlCEzBKrLqeQdDXxRzp9HlZprXzq30rtuRrTfwGBC39x3miAyNbPV8dqokzCc8PzTpwC7irmGv3PoXJ-IiroJV_-s83ZrAUcDnjxuNFZ4x02kjjwf9g'
 ```
 
 If you have any registered service, you can expect the following message.
@@ -93,7 +93,7 @@ curl -k --location --request POST 'https://localhost:8438/services' \
 curl -k https://localhost:8438/services
 ```
 
-The result should be 
+The result should be
 
 ```
 {

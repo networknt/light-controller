@@ -5,9 +5,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * 
+ *
  * POJO class for POST request body of shutdown endpoint.
- * 
+ *
  *
  */
 public class ServerShutdownRequest {

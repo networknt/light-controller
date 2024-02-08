@@ -41,7 +41,7 @@
             <Pattern>%d{HH:mm:ss.SSS} [%thread] %X{sId} %X{cId} %-5level %class{36}:%L %M - %msg%n</Pattern>
         </layout>
     </appender>
-    
+
     <!--stdout-file log-->
     <appender name="stdout-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>log/stdout.log.json</file>
