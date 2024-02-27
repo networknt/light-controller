@@ -8,6 +8,8 @@
 
 - [pre-commit.ci] pre-commit autoupdate [\#177](https://github.com/networknt/light-controller/pull/177) ([pre-commit-ci](https://github.com/apps/pre-commit-ci))
 - fixes \#175 add pre-commit hook and apply it [\#176](https://github.com/networknt/light-controller/pull/176) ([stevehu](https://github.com/stevehu))
+
+
 ## [2.1.31](https://github.com/networknt/light-controller/tree/2.1.31) (2024-01-16)
 
 
